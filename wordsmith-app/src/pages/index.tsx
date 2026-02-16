@@ -6,6 +6,15 @@ import WordCard from "@/components/WordCard";
 import UsageBar from "@/components/UsageBar";
 import { FREE_SEARCH_LIMIT } from "@/lib/constants";
 
+// Landing page components
+import SocialProofBar from "@/components/landing/SocialProofBar";
+import HowItWorks from "@/components/landing/HowItWorks";
+import FeaturesSection from "@/components/landing/FeaturesSection";
+import TestimonialsSection from "@/components/landing/TestimonialsSection";
+import PricingSection from "@/components/landing/PricingSection";
+import CtaSection from "@/components/landing/CtaSection";
+import Footer from "@/components/landing/Footer";
+
 const CATEGORY_LEGEND = [
   { key: "elevated", label: "Elevated", color: "#8B6914" },
   { key: "literary", label: "Literary", color: "#6B4C8A" },
@@ -23,6 +32,8 @@ const STARTER_WORDS = [
   "beautiful",
   "fast",
 ];
+
+const ANON_COUNT_KEY = "wordsmith_anon_searches";
 
 export default function Home() {
   const session = useSession();
@@ -42,7 +53,22 @@ export default function Home() {
   // User state
   const [userInfo, setUserInfo] = useState<any>(null);
 
+  // Anonymous search tracking
+  const [anonSearchCount, setAnonSearchCount] = useState(0);
+
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Hydrate anonymous search count from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(ANON_COUNT_KEY);
+      if (stored) {
+        setAnonSearchCount(parseInt(stored, 10) || 0);
+      }
+    } catch {
+      // localStorage unavailable
+    }
+  }, []);
 
   // Fetch user info on session change
   const fetchUserInfo = useCallback(async () => {
@@ -65,6 +91,34 @@ export default function Home() {
     fetchUserInfo();
   }, [fetchUserInfo]);
 
+  // Transfer anonymous search count when user signs in
+  useEffect(() => {
+    if (!session) return;
+
+    try {
+      const stored = localStorage.getItem(ANON_COUNT_KEY);
+      const count = stored ? parseInt(stored, 10) || 0 : 0;
+
+      if (count > 0) {
+        fetch("/api/user", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ anonSearchCount: count }),
+        })
+          .then(() => {
+            localStorage.removeItem(ANON_COUNT_KEY);
+            setAnonSearchCount(0);
+            fetchUserInfo(); // Refresh to pick up transferred count
+          })
+          .catch((err) =>
+            console.error("Failed to transfer anon count:", err)
+          );
+      }
+    } catch {
+      // localStorage unavailable
+    }
+  }, [session, fetchUserInfo]);
+
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
@@ -83,11 +137,13 @@ export default function Home() {
     if (!word.trim()) return;
     const searchTerm = word.trim().toLowerCase();
 
-    // If not logged in, prompt auth
+    // If not logged in, check anonymous limit
     if (!session) {
-      setAuthMode("signup");
-      setShowAuth(true);
-      return;
+      if (anonSearchCount >= FREE_SEARCH_LIMIT) {
+        setAuthMode("signup");
+        setShowAuth(true);
+        return;
+      }
     }
 
     setLoading(true);
@@ -95,16 +151,30 @@ export default function Home() {
     setResults(null);
 
     try {
+      const body: any = { query: searchTerm };
+
+      // Include anonymous count if not logged in
+      if (!session) {
+        body.anonSearchCount = anonSearchCount;
+      }
+
       const res = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: searchTerm }),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
 
       if (res.status === 403 && data.error === "free_limit_reached") {
         setShowPaywall(true);
+        setLoading(false);
+        return;
+      }
+
+      if (res.status === 403 && data.error === "signup_required") {
+        setAuthMode("signup");
+        setShowAuth(true);
         setLoading(false);
         return;
       }
@@ -119,7 +189,20 @@ export default function Home() {
         return updated.slice(0, 12);
       });
 
-      // Update local user info with new count
+      // Update anonymous count if this was an anonymous search
+      if (data.isAnonymous && typeof data.anonSearchCount === "number") {
+        setAnonSearchCount(data.anonSearchCount);
+        try {
+          localStorage.setItem(
+            ANON_COUNT_KEY,
+            String(data.anonSearchCount)
+          );
+        } catch {
+          // localStorage unavailable
+        }
+      }
+
+      // Update local user info with new count (authenticated)
       if (data.usage) {
         setUserInfo((prev: any) =>
           prev
@@ -163,6 +246,23 @@ export default function Home() {
       console.error("Portal error:", err);
     }
   };
+
+  const handleGetStarted = () => {
+    setAuthMode("signup");
+    setShowAuth(true);
+  };
+
+  const handleUpgrade = () => {
+    if (!session) {
+      setAuthMode("signup");
+      setShowAuth(true);
+    } else {
+      setShowPaywall(true);
+    }
+  };
+
+  // Show landing sections when there are no results displayed
+  const showLandingSections = !results && !loading && !error;
 
   return (
     <div style={{ minHeight: "100vh" }}>
@@ -340,6 +440,9 @@ export default function Home() {
         </p>
       </header>
 
+      {/* Social Proof Bar */}
+      <SocialProofBar />
+
       {/* Search */}
       <div style={{ maxWidth: "720px", margin: "0 auto", padding: "0 24px" }}>
         <div
@@ -393,6 +496,67 @@ export default function Home() {
             {loading ? "Searching…" : "Find Words"}
           </button>
         </div>
+
+        {/* Anonymous usage indicator */}
+        {!session && anonSearchCount > 0 && (
+          <div
+            style={{
+              textAlign: "center",
+              marginTop: "10px",
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: "12px",
+              color: "#B8B2A8",
+            }}
+          >
+            {anonSearchCount >= FREE_SEARCH_LIMIT ? (
+              <span>
+                You&apos;ve used all {FREE_SEARCH_LIMIT} free searches.{" "}
+                <button
+                  onClick={handleGetStarted}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#8B6914",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    fontSize: "inherit",
+                    textDecoration: "underline",
+                    padding: 0,
+                  }}
+                >
+                  Sign up
+                </button>{" "}
+                for more.
+              </span>
+            ) : (
+              <span>
+                {FREE_SEARCH_LIMIT - anonSearchCount} free{" "}
+                {FREE_SEARCH_LIMIT - anonSearchCount === 1
+                  ? "search"
+                  : "searches"}{" "}
+                remaining.{" "}
+                <button
+                  onClick={handleGetStarted}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#8B6914",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    fontFamily: "inherit",
+                    fontSize: "inherit",
+                    textDecoration: "underline",
+                    padding: 0,
+                  }}
+                >
+                  Sign up
+                </button>{" "}
+                for unlimited access.
+              </span>
+            )}
+          </div>
+        )}
 
         {/* History chips */}
         {history.length > 0 && (
@@ -648,6 +812,23 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Landing Page Sections — shown when no results are displayed */}
+      {showLandingSections && (
+        <>
+          <HowItWorks />
+          <FeaturesSection />
+          <TestimonialsSection />
+          <PricingSection
+            onGetStarted={handleGetStarted}
+            onUpgrade={handleUpgrade}
+          />
+          <CtaSection onGetStarted={handleGetStarted} />
+        </>
+      )}
+
+      {/* Footer — always visible */}
+      <Footer />
 
       {/* Modals */}
       <AuthModal

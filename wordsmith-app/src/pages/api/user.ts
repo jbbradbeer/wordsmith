@@ -1,15 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { FREE_SEARCH_LIMIT } from "@/lib/constants";
+import { getServiceSupabase } from "@/lib/supabase";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== "GET") {
-    return res.status(405).json({ error: "Method not allowed" });
-  }
-
   const supabase = createServerSupabaseClient({ req, res });
   const {
     data: { session },
@@ -17,6 +14,35 @@ export default async function handler(
 
   if (!session) {
     return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  // POST: Transfer anonymous search count to profile
+  if (req.method === "POST") {
+    const { anonSearchCount } = req.body;
+
+    if (typeof anonSearchCount === "number" && anonSearchCount > 0) {
+      const serviceClient = getServiceSupabase();
+
+      // Get current count and add anonymous searches
+      const { data: profile } = await serviceClient
+        .from("profiles")
+        .select("search_count")
+        .eq("id", session.user.id)
+        .single();
+
+      const currentCount = profile?.search_count || 0;
+      await serviceClient
+        .from("profiles")
+        .update({ search_count: currentCount + anonSearchCount })
+        .eq("id", session.user.id);
+    }
+
+    return res.status(200).json({ success: true });
+  }
+
+  // GET: Return user info
+  if (req.method !== "GET") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   const { data: profile } = await supabase
