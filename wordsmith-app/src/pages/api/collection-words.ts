@@ -1,0 +1,166 @@
+import type { NextApiRequest, NextApiResponse } from "next";
+import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { getServiceSupabase } from "@/lib/supabase";
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const supabase = createServerSupabaseClient({ req, res });
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
+  const serviceClient = getServiceSupabase();
+  const userId = session.user.id;
+
+  // Check subscription status
+  const { data: profile } = await serviceClient
+    .from("profiles")
+    .select("subscription_status")
+    .eq("id", userId)
+    .single();
+
+  if (profile?.subscription_status !== "active") {
+    return res.status(403).json({ error: "subscription_required" });
+  }
+
+  // GET: List words in a collection
+  if (req.method === "GET") {
+    const collectionId = req.query.collectionId as string;
+
+    if (!collectionId) {
+      return res.status(400).json({ error: "collectionId is required" });
+    }
+
+    // Verify collection ownership
+    const { data: collection } = await serviceClient
+      .from("collections")
+      .select("id")
+      .eq("id", collectionId)
+      .eq("user_id", userId)
+      .single();
+
+    if (!collection) {
+      return res.status(404).json({ error: "Collection not found" });
+    }
+
+    const { data: words, error } = await serviceClient
+      .from("collection_words")
+      .select("*")
+      .eq("collection_id", collectionId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      return res.status(500).json({ error: "Failed to fetch words" });
+    }
+
+    return res.status(200).json(words || []);
+  }
+
+  // POST: Save a word to a collection
+  if (req.method === "POST") {
+    const { collectionId, word, pronunciation, definition, example, context, category } =
+      req.body;
+
+    if (!collectionId || !word) {
+      return res
+        .status(400)
+        .json({ error: "collectionId and word are required" });
+    }
+
+    // Verify collection ownership
+    const { data: collection } = await serviceClient
+      .from("collections")
+      .select("id")
+      .eq("id", collectionId)
+      .eq("user_id", userId)
+      .single();
+
+    if (!collection) {
+      return res.status(404).json({ error: "Collection not found" });
+    }
+
+    // Check if word already exists in this collection
+    const { count: existingCount } = await serviceClient
+      .from("collection_words")
+      .select("*", { count: "exact", head: true })
+      .eq("collection_id", collectionId)
+      .eq("word", word);
+
+    if ((existingCount || 0) > 0) {
+      return res.status(200).json({ saved: true, alreadyExists: true });
+    }
+
+    // Insert the word
+    const { error } = await serviceClient.from("collection_words").insert({
+      collection_id: collectionId,
+      word,
+      pronunciation: pronunciation || null,
+      definition: definition || null,
+      example: example || null,
+      context: context || null,
+      category: category || null,
+    });
+
+    if (error) {
+      return res.status(500).json({ error: "Failed to save word" });
+    }
+
+    // Update collection's updated_at
+    await serviceClient
+      .from("collections")
+      .update({ updated_at: new Date().toISOString() })
+      .eq("id", collectionId);
+
+    return res.status(201).json({ saved: true, alreadyExists: false });
+  }
+
+  // DELETE: Remove a word from a collection
+  if (req.method === "DELETE") {
+    const { id } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ error: "Word id is required" });
+    }
+
+    // Verify ownership through collection join
+    const { data: wordRow } = await serviceClient
+      .from("collection_words")
+      .select("id, collection_id")
+      .eq("id", id)
+      .single();
+
+    if (!wordRow) {
+      return res.status(404).json({ error: "Word not found" });
+    }
+
+    const { data: collection } = await serviceClient
+      .from("collections")
+      .select("id")
+      .eq("id", wordRow.collection_id)
+      .eq("user_id", userId)
+      .single();
+
+    if (!collection) {
+      return res.status(404).json({ error: "Word not found" });
+    }
+
+    const { error } = await serviceClient
+      .from("collection_words")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      return res.status(500).json({ error: "Failed to remove word" });
+    }
+
+    return res.status(200).json({ success: true });
+  }
+
+  return res.status(405).json({ error: "Method not allowed" });
+}

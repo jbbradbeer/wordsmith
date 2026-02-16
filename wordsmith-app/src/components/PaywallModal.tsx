@@ -115,6 +115,7 @@ export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
         >
           {[
             "Unlimited word searches",
+            "Save words to collections",
             "Full search history",
             "Priority response speed",
             "Cancel anytime",

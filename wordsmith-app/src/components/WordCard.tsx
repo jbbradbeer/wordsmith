@@ -1,4 +1,6 @@
 import { useState } from "react";
+import type { WordData } from "@/lib/types";
+import SaveToCollectionButton from "@/components/SaveToCollectionButton";
 
 const WORD_CATEGORIES: Record<
   string,
@@ -10,22 +12,23 @@ const WORD_CATEGORIES: Record<
   rare: { label: "Rare Gem", color: "#1A7A6D", desc: "Uncommon & distinctive" },
 };
 
-interface WordData {
-  word: string;
-  pronunciation: string;
-  definition: string;
-  example?: string;
-  context?: string;
-  category: string;
+interface WordCardProps {
+  word: WordData;
+  index: number;
+  session?: any;
+  isPaid?: boolean;
+  onAuthRequired?: () => void;
+  onUpgradeRequired?: () => void;
 }
 
 export default function WordCard({
   word,
   index,
-}: {
-  word: WordData;
-  index: number;
-}) {
+  session,
+  isPaid,
+  onAuthRequired,
+  onUpgradeRequired,
+}: WordCardProps) {
   const [flipped, setFlipped] = useState(false);
   const cat = WORD_CATEGORIES[word.category] || WORD_CATEGORIES.elevated;
 
@@ -52,12 +55,34 @@ export default function WordCard({
             : "0 1px 4px rgba(0,0,0,0.04)",
         }}
       >
+        {/* Bookmark button — top right */}
+        {onAuthRequired && onUpgradeRequired && (
+          <div
+            style={{
+              position: "absolute",
+              top: "10px",
+              right: "10px",
+              zIndex: 10,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <SaveToCollectionButton
+              word={word}
+              session={session}
+              isPaid={isPaid || false}
+              onAuthRequired={onAuthRequired}
+              onUpgradeRequired={onUpgradeRequired}
+            />
+          </div>
+        )}
+
         <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "flex-start",
             marginBottom: "10px",
+            paddingRight: onAuthRequired ? "28px" : "0",
           }}
         >
           <h3

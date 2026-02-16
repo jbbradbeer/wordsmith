@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import Link from "next/link";
 import AuthModal from "@/components/AuthModal";
 import PaywallModal from "@/components/PaywallModal";
 import WordCard from "@/components/WordCard";
@@ -286,6 +287,21 @@ export default function Home() {
               onUpgrade={() => setShowPaywall(true)}
             />
             <div style={{ flex: 1 }} />
+            {userInfo?.isPaid && (
+              <Link
+                href="/collections"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  color: "#8B6914",
+                  textDecoration: "none",
+                  cursor: "pointer",
+                }}
+              >
+                Collections
+              </Link>
+            )}
             {userInfo?.isPaid && (
               <button
                 onClick={handleManageSubscription}
@@ -739,7 +755,18 @@ export default function Home() {
               }}
             >
               {results.alternatives?.map((word: any, i: number) => (
-                <WordCard key={word.word + i} word={word} index={i} />
+                <WordCard
+                  key={word.word + i}
+                  word={word}
+                  index={i}
+                  session={session}
+                  isPaid={userInfo?.isPaid || false}
+                  onAuthRequired={() => {
+                    setAuthMode("signup");
+                    setShowAuth(true);
+                  }}
+                  onUpgradeRequired={() => setShowPaywall(true)}
+                />
               ))}
             </div>
           </div>
