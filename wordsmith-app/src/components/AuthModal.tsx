@@ -38,7 +38,7 @@ export default function AuthModal({
 
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -46,7 +46,12 @@ export default function AuthModal({
           },
         });
         if (error) throw error;
-        setSuccess("Check your email for a confirmation link!");
+        // If email confirmation is off, user gets a session immediately
+        if (data.session) {
+          onClose();
+        } else {
+          setSuccess("Check your email for a confirmation link!");
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
