@@ -39,33 +39,39 @@ export default async function handler(
 
   try {
     switch (event.type) {
-      // Checkout completed — ensure stripe_customer_id is linked to profile
+      // Checkout completed — payment succeeded, activate subscription
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
         const customerId = session.customer as string;
+        const subscriptionId = session.subscription as string;
         const userId = session.metadata?.supabase_user_id;
 
-        if (userId && customerId) {
+        if (userId) {
+          // Use user ID (not customer ID) to match — this is the most reliable
           await serviceClient
             .from("profiles")
-            .update({ stripe_customer_id: customerId })
+            .update({
+              stripe_customer_id: customerId,
+              subscription_status: "active",
+              subscription_id: subscriptionId,
+            })
             .eq("id", userId);
         }
         break;
       }
 
-      // Subscription created or updated
-      case "customer.subscription.created":
+      // Subscription updated (renewals, plan changes, etc.)
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
         const status = subscription.status;
 
         // Map Stripe status to our status
-        let subStatus = "free";
+        let subStatus: string;
         if (status === "active" || status === "trialing") subStatus = "active";
         else if (status === "canceled") subStatus = "canceled";
         else if (status === "past_due") subStatus = "past_due";
+        else break; // Skip "incomplete" and other transient statuses
 
         await serviceClient
           .from("profiles")
@@ -75,6 +81,14 @@ export default async function handler(
           })
           .eq("stripe_customer_id", customerId);
 
+        break;
+      }
+
+      // Subscription created — skip, handled by checkout.session.completed
+      case "customer.subscription.created": {
+        // New subscriptions are activated via checkout.session.completed
+        // which uses the reliable user ID match. This event often fires
+        // with status "incomplete" before payment confirms, causing issues.
         break;
       }
 
