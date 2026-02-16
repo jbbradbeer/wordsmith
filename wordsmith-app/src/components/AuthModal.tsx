@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 type AuthMode = "signin" | "signup";
@@ -16,6 +16,12 @@ export default function AuthModal({
 }: AuthModalProps) {
   const supabase = useSupabaseClient();
   const [mode, setMode] = useState<AuthMode>(initialMode);
+
+  // Sync mode when initialMode prop changes (e.g. clicking "Sign in" vs "Get started free")
+  useEffect(() => {
+    setMode(initialMode);
+  }, [initialMode]);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);

@@ -39,6 +39,21 @@ export default async function handler(
 
   try {
     switch (event.type) {
+      // Checkout completed — ensure stripe_customer_id is linked to profile
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const customerId = session.customer as string;
+        const userId = session.metadata?.supabase_user_id;
+
+        if (userId && customerId) {
+          await serviceClient
+            .from("profiles")
+            .update({ stripe_customer_id: customerId })
+            .eq("id", userId);
+        }
+        break;
+      }
+
       // Subscription created or updated
       case "customer.subscription.created":
       case "customer.subscription.updated": {
