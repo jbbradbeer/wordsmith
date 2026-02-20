@@ -269,6 +269,7 @@ export default function Home() {
     <div style={{ minHeight: "100vh" }}>
       {/* Nav bar */}
       <nav
+        aria-label="Site navigation"
         style={{
           maxWidth: "800px",
           margin: "0 auto",
@@ -473,13 +474,32 @@ export default function Home() {
             alignItems: "center",
           }}
         >
+          <label
+            htmlFor="word-search"
+            style={{
+              position: "absolute",
+              width: "1px",
+              height: "1px",
+              padding: 0,
+              margin: "-1px",
+              overflow: "hidden",
+              clip: "rect(0,0,0,0)",
+              whiteSpace: "nowrap",
+              border: 0,
+            }}
+          >
+            Enter a word to find alternatives
+          </label>
           <input
+            id="word-search"
             ref={inputRef}
-            type="text"
+            type="search"
+            name="q"
+            autoComplete="off"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-            placeholder="Enter a word you'd like to upgrade…"
+            placeholder="Enter a word you'd like to upgrade\u2026"
             style={{
               flex: 1,
               border: "none",
@@ -622,6 +642,11 @@ export default function Home() {
         )}
       </div>
 
+      {/* Screen-reader live region for search status */}
+      <div aria-live="polite" aria-atomic="true" style={{ position: "absolute", width: "1px", height: "1px", overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap" }}>
+        {loading ? "Searching for word alternatives\u2026" : error ? error : results ? `Found ${results.alternatives?.length ?? 0} alternatives for ${results.original}` : ""}
+      </div>
+
       {/* Results */}
       <div
         style={{ maxWidth: "720px", margin: "0 auto", padding: "24px 24px 60px" }}
@@ -668,6 +693,7 @@ export default function Home() {
         {/* Error */}
         {error && (
           <div
+            role="alert"
             style={{
               textAlign: "center",
               padding: "40px 20px",
@@ -829,7 +855,7 @@ export default function Home() {
                     fontSize: "13px",
                     color: "#8A8478",
                     cursor: "pointer",
-                    transition: "all 0.2s ease",
+                    transition: "background 0.2s ease, border-color 0.2s ease, color 0.2s ease",
                   }}
                 >
                   try &ldquo;{w}&rdquo;

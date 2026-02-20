@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 
 type AuthMode = "signin" | "signup";
@@ -27,6 +27,19 @@ export default function AuthModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const headingId = "auth-modal-title";
+  const firstFocusRef = useRef<HTMLButtonElement>(null);
+
+  // Move focus into modal and trap it
+  useEffect(() => {
+    if (!isOpen) return;
+    firstFocusRef.current?.focus();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -93,9 +106,13 @@ export default function AuthModal({
         zIndex: 1000,
         padding: "20px",
         animation: "fadeUp 0.2s ease both",
+        overscrollBehavior: "contain",
       }}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={headingId}
         onClick={(e) => e.stopPropagation()}
         style={{
           background: "#FDFBF7",
@@ -108,6 +125,7 @@ export default function AuthModal({
         }}
       >
         <h2
+          id={headingId}
           style={{
             fontFamily: "'Playfair Display', Georgia, serif",
             fontSize: "26px",
@@ -135,6 +153,7 @@ export default function AuthModal({
 
         {/* Google OAuth */}
         <button
+          ref={firstFocusRef}
           onClick={handleGoogleSignIn}
           disabled={loading}
           style={{
@@ -156,7 +175,7 @@ export default function AuthModal({
             transition: "border-color 0.2s ease",
           }}
         >
-          <svg width="18" height="18" viewBox="0 0 18 18">
+          <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
             <path
               d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"
               fill="#4285F4"
@@ -201,6 +220,7 @@ export default function AuthModal({
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: "14px" }}>
             <label
+              htmlFor="auth-email"
               style={{
                 display: "block",
                 fontSize: "12px",
@@ -215,7 +235,10 @@ export default function AuthModal({
               Email
             </label>
             <input
+              id="auth-email"
               type="email"
+              name="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -228,13 +251,13 @@ export default function AuthModal({
                 fontFamily: "'DM Sans', sans-serif",
                 color: "#1A1A18",
                 background: "#FFFFFF",
-                outline: "none",
                 boxSizing: "border-box",
               }}
             />
           </div>
           <div style={{ marginBottom: "20px" }}>
             <label
+              htmlFor="auth-password"
               style={{
                 display: "block",
                 fontSize: "12px",
@@ -249,7 +272,10 @@ export default function AuthModal({
               Password
             </label>
             <input
+              id="auth-password"
               type="password"
+              name="password"
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -263,7 +289,6 @@ export default function AuthModal({
                 fontFamily: "'DM Sans', sans-serif",
                 color: "#1A1A18",
                 background: "#FFFFFF",
-                outline: "none",
                 boxSizing: "border-box",
               }}
             />
@@ -271,6 +296,7 @@ export default function AuthModal({
 
           {error && (
             <p
+              role="alert"
               style={{
                 color: "#C0392B",
                 fontSize: "13px",
@@ -283,6 +309,8 @@ export default function AuthModal({
           )}
           {success && (
             <p
+              role="status"
+              aria-live="polite"
               style={{
                 color: "#1A7A6D",
                 fontSize: "13px",
@@ -313,7 +341,7 @@ export default function AuthModal({
             }}
           >
             {loading
-              ? "Please wait..."
+              ? "Please wait\u2026"
               : mode === "signup"
               ? "Create Account"
               : "Sign In"}

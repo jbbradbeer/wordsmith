@@ -53,7 +53,7 @@ export default function CtaSection({ onGetStarted }: CtaSectionProps) {
             fontSize: "16px",
             fontWeight: 600,
             cursor: "pointer",
-            transition: "all 0.2s ease",
+            transition: "background 0.2s ease, opacity 0.2s ease",
             letterSpacing: "0.02em",
             boxShadow: "0 4px 16px rgba(139, 105, 20, 0.25)",
           }}

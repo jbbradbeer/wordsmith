@@ -147,7 +147,7 @@ export default function PricingSection({
               fontWeight: 600,
               color: "#8B6914",
               cursor: "pointer",
-              transition: "all 0.2s ease",
+              transition: "background 0.2s ease, color 0.2s ease, opacity 0.2s ease",
             }}
           >
             Get Started Free
@@ -253,7 +253,7 @@ export default function PricingSection({
               fontWeight: 600,
               color: "#FFFFFF",
               cursor: "pointer",
-              transition: "all 0.2s ease",
+              transition: "background 0.2s ease, opacity 0.2s ease",
             }}
           >
             Upgrade to Pro

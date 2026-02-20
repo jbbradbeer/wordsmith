@@ -34,7 +34,12 @@ export default function WordCard({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-pressed={flipped}
+      aria-label={`${word.word} — ${flipped ? "collapse" : "show example"}`}
       onClick={() => setFlipped(!flipped)}
+      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setFlipped(!flipped)}
       className="cursor-pointer"
       style={{
         animation: "cardIn 0.4s ease both",
@@ -49,7 +54,7 @@ export default function WordCard({
           borderRadius: "10px",
           padding: "20px 22px",
           minHeight: "140px",
-          transition: "all 0.3s ease",
+          transition: "background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease",
           boxShadow: flipped
             ? `0 4px 20px ${cat.color}15`
             : "0 1px 4px rgba(0,0,0,0.04)",
@@ -171,7 +176,7 @@ export default function WordCard({
                   lineHeight: 1.5,
                 }}
               >
-                &#128161; {word.context}
+                <span aria-hidden="true">&#128161;</span> {word.context}
               </p>
             )}
           </div>

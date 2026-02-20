@@ -466,6 +466,8 @@ export default function Collections() {
       >
         {loading ? (
           <div
+            aria-live="polite"
+            aria-busy="true"
             style={{
               textAlign: "center",
               padding: "60px 20px",
@@ -474,7 +476,7 @@ export default function Collections() {
               color: "#B8B2A8",
             }}
           >
-            Loading collections...
+            Loading collections\u2026
           </div>
         ) : collections.length === 0 ? (
           /* Empty state */
@@ -576,7 +578,12 @@ export default function Collections() {
                 >
                   {/* Collection header */}
                   <div
+                    role={isEditing ? undefined : "button"}
+                    tabIndex={isEditing ? undefined : 0}
+                    aria-expanded={isEditing ? undefined : isExpanded}
+                    aria-label={isEditing ? undefined : `${collection.name}, ${collection.word_count} words`}
                     onClick={() => !isEditing && handleExpand(collection.id)}
+                    onKeyDown={(e) => !isEditing && (e.key === "Enter" || e.key === " ") && handleExpand(collection.id)}
                     style={{
                       display: "flex",
                       alignItems: "center",
@@ -604,6 +611,7 @@ export default function Collections() {
                     {isEditing ? (
                       <input
                         autoFocus
+                        aria-label={`Rename collection: ${collection.name}`}
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
                         onKeyDown={(e) => {
@@ -622,7 +630,6 @@ export default function Collections() {
                           border: "1px solid #8B6914",
                           borderRadius: "6px",
                           padding: "4px 8px",
-                          outline: "none",
                           background: "#FDFBF7",
                         }}
                       />
@@ -660,6 +667,7 @@ export default function Collections() {
                     {/* Edit button */}
                     {!isEditing && (
                       <button
+                        aria-label={`Rename ${collection.name}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           setEditingId(collection.id);
@@ -674,14 +682,14 @@ export default function Collections() {
                           color: "#B8B2A8",
                           flexShrink: 0,
                         }}
-                        title="Rename"
                       >
-                        ✏️
+                        <span aria-hidden="true">✏️</span>
                       </button>
                     )}
 
                     {/* Delete button */}
                     <button
+                      aria-label={`Delete ${collection.name}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         setDeletingId(
@@ -697,9 +705,8 @@ export default function Collections() {
                         color: "#B8B2A8",
                         flexShrink: 0,
                       }}
-                      title="Delete"
                     >
-                      🗑️
+                      <span aria-hidden="true">🗑️</span>
                     </button>
                   </div>
 
@@ -766,6 +773,8 @@ export default function Collections() {
                     >
                       {wordsLoading === collection.id ? (
                         <div
+                          aria-live="polite"
+                          aria-busy="true"
                           style={{
                             padding: "20px",
                             textAlign: "center",
@@ -774,7 +783,7 @@ export default function Collections() {
                             color: "#B8B2A8",
                           }}
                         >
-                          Loading words...
+                          Loading words\u2026
                         </div>
                       ) : collectionWords.length === 0 ? (
                         <div
@@ -875,10 +884,10 @@ export default function Collections() {
                                 </p>
                               </div>
                               <button
+                                aria-label={`Remove ${w.word}`}
                                 onClick={() =>
                                   handleRemoveWord(w.id, collection.id)
                                 }
-                                title="Remove word"
                                 style={{
                                   background: "none",
                                   border: "none",

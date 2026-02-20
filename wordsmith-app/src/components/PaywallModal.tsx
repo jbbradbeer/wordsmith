@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FREE_SEARCH_LIMIT, SUBSCRIPTION_PRICE_MONTHLY } from "@/lib/constants";
 
 interface PaywallModalProps {
@@ -8,6 +8,18 @@ interface PaywallModalProps {
 
 export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
   const [loading, setLoading] = useState(false);
+  const headingId = "paywall-modal-title";
+  const firstFocusRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    firstFocusRef.current?.focus();
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -40,9 +52,13 @@ export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
         zIndex: 1000,
         padding: "20px",
         animation: "fadeUp 0.2s ease both",
+        overscrollBehavior: "contain",
       }}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={headingId}
         onClick={(e) => e.stopPropagation()}
         style={{
           background: "#FDFBF7",
@@ -78,6 +94,7 @@ export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
         </div>
 
         <h2
+          id={headingId}
           style={{
             fontFamily: "'Playfair Display', Georgia, serif",
             fontSize: "28px",
@@ -163,6 +180,7 @@ export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
         </div>
 
         <button
+          ref={firstFocusRef}
           onClick={handleUpgrade}
           disabled={loading}
           style={{
@@ -181,7 +199,7 @@ export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             marginBottom: "12px",
           }}
         >
-          {loading ? "Redirecting to checkout..." : "Upgrade to Pro"}
+          {loading ? "Redirecting to checkout\u2026" : "Upgrade to Pro"}
         </button>
 
         <button

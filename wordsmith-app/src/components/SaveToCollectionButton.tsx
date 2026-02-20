@@ -157,11 +157,13 @@ export default function SaveToCollectionButton({
       {/* Bookmark icon */}
       <button
         onClick={handleClick}
-        title={
+        aria-label={
           !session
             ? "Sign up to save words"
             : !isPaid
             ? "Upgrade to save words"
+            : isSaved
+            ? "Saved — manage collections"
             : "Save to collection"
         }
         style={{
@@ -184,7 +186,7 @@ export default function SaveToCollectionButton({
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          style={{ transition: "all 0.2s ease" }}
+          style={{ transition: "fill 0.2s ease, stroke 0.2s ease" }}
         >
           <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
         </svg>
@@ -193,6 +195,8 @@ export default function SaveToCollectionButton({
       {/* Popover */}
       {open && (
         <div
+          role="dialog"
+          aria-label="Save to collection"
           onClick={(e) => e.stopPropagation()}
           style={{
             position: "absolute",
@@ -259,6 +263,8 @@ export default function SaveToCollectionButton({
           >
             {loading ? (
               <div
+                aria-live="polite"
+                aria-busy="true"
                 style={{
                   padding: "16px 14px",
                   textAlign: "center",
@@ -267,7 +273,7 @@ export default function SaveToCollectionButton({
                   color: "#B8B2A8",
                 }}
               >
-                Loading...
+                Loading\u2026
               </div>
             ) : collections.length === 0 ? (
               <div
@@ -289,6 +295,7 @@ export default function SaveToCollectionButton({
                     key={collection.id}
                     onClick={() => saveToCollection(collection.id)}
                     disabled={isInCollection}
+                    aria-pressed={isInCollection}
                     style={{
                       display: "flex",
                       alignItems: "center",
@@ -358,10 +365,11 @@ export default function SaveToCollectionButton({
             <input
               ref={inputRef}
               type="text"
+              aria-label="New collection name"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && createAndSave()}
-              placeholder="New collection..."
+              placeholder="New collection\u2026"
               onClick={(e) => e.stopPropagation()}
               style={{
                 flex: 1,
@@ -371,7 +379,6 @@ export default function SaveToCollectionButton({
                 fontFamily: "'DM Sans', sans-serif",
                 fontSize: "12px",
                 color: "#4A4740",
-                outline: "none",
                 background: "#FDFBF7",
               }}
             />
