@@ -43,7 +43,7 @@ export default async function handler(
 
     try {
       const message = await anthropic.messages.create({
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-4-6",
         max_tokens: 1200,
         messages: [
           {
@@ -125,7 +125,7 @@ Only return the JSON.`,
 
     // Call Anthropic API
     const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 1200,
       messages: [
         {
