@@ -9,11 +9,68 @@
 
 body {
   font-family: "DM Sans", system-ui, sans-serif;
-  background: linear-gradient(170deg, #f8f5ef 0%, #f0ebe1 40%, #eae4d8 100%);
+  background: linear-gradient(170deg, #f2ede2 0%, #ede5d6 40%, #e6dccc 100%);
   min-height: 100vh;
   margin: 0;
   -webkit-font-smoothing: antialiased;
 }
+
+/* ─── Typography ────────────────────────────────────── */
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+/* ─── Touch optimisation ────────────────────────────── */
+
+button,
+[role="button"] {
+  touch-action: manipulation;
+}
+
+/* ─── Focus states ──────────────────────────────────── */
+
+/* Replaces bare outline:none on the search input */
+.search-input:focus-visible {
+  outline: 2px solid rgba(139, 101, 32, 0.65);
+  outline-offset: -1px;
+  border-radius: 8px;
+}
+
+/* ─── WordCard hover lift ───────────────────────────── */
+
+.wordcard-inner {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.wordcard-inner:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(26, 26, 24, 0.11) !important;
+}
+
+/* ─── Button hover states ───────────────────────────── */
+
+.btn-primary:hover:not(:disabled) {
+  background: #7a5812 !important;
+}
+
+.btn-ghost:hover {
+  color: #1a1a18 !important;
+}
+
+.history-chip:hover {
+  background: #e4dccf !important;
+}
+
+.starter-word:hover {
+  background: #e4dccf !important;
+  border-color: #c8beb0 !important;
+}
+
+/* ─── Animations ────────────────────────────────────── */
 
 @keyframes cardIn {
   from {

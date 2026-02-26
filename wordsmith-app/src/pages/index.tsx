@@ -333,6 +333,8 @@ export default function Home() {
           justifyContent: "flex-end",
           alignItems: "center",
           gap: "12px",
+          borderBottom: "1px solid rgba(139,101,32,0.09)",
+          backdropFilter: "blur(8px)",
         }}
       >
         {session ? (
@@ -361,6 +363,7 @@ export default function Home() {
             {userInfo?.isPaid && (
               <button
                 onClick={handleManageSubscription}
+                className="btn-ghost"
                 style={{
                   background: "none",
                   border: "none",
@@ -368,6 +371,7 @@ export default function Home() {
                   fontSize: "12px",
                   cursor: "pointer",
                   fontFamily: "'DM Sans', sans-serif",
+                  transition: "color 0.2s ease",
                 }}
               >
                 Manage
@@ -393,6 +397,7 @@ export default function Home() {
                 color: "#8A8478",
                 cursor: "pointer",
                 fontFamily: "'DM Sans', sans-serif",
+                transition: "background 0.2s ease, border-color 0.2s ease, color 0.2s ease",
               }}
             >
               Sign out
@@ -405,6 +410,7 @@ export default function Home() {
                 setAuthMode("signin");
                 setShowAuth(true);
               }}
+              className="btn-ghost"
               style={{
                 background: "none",
                 border: "none",
@@ -413,6 +419,7 @@ export default function Home() {
                 cursor: "pointer",
                 fontFamily: "'DM Sans', sans-serif",
                 fontWeight: 500,
+                transition: "color 0.2s ease",
               }}
             >
               Sign in
@@ -422,6 +429,7 @@ export default function Home() {
                 setAuthMode("signup");
                 setShowAuth(true);
               }}
+              className="btn-primary"
               style={{
                 background: "#8B6914",
                 color: "#FFFFFF",
@@ -432,6 +440,7 @@ export default function Home() {
                 fontWeight: 600,
                 cursor: "pointer",
                 fontFamily: "'DM Sans', sans-serif",
+                transition: "background 0.2s ease",
               }}
             >
               Get started free
@@ -461,7 +470,7 @@ export default function Home() {
         >
           <div
             style={{
-              width: "32px",
+              width: "44px",
               height: "2px",
               background: "linear-gradient(90deg, transparent, #8B6914)",
             }}
@@ -480,7 +489,7 @@ export default function Home() {
           </span>
           <div
             style={{
-              width: "32px",
+              width: "44px",
               height: "2px",
               background: "linear-gradient(90deg, #8B6914, transparent)",
             }}
@@ -489,7 +498,7 @@ export default function Home() {
         <h1
           style={{
             fontFamily: "'Playfair Display', Georgia, serif",
-            fontSize: "clamp(36px, 6vw, 52px)",
+            fontSize: "clamp(38px, 6.5vw, 58px)",
             fontWeight: 900,
             color: "#1A1A18",
             margin: "0 0 8px 0",
@@ -502,9 +511,10 @@ export default function Home() {
         <p
           style={{
             fontFamily: "'Playfair Display', Georgia, serif",
-            fontSize: "16px",
+            fontSize: "17px",
             color: "#8A8478",
             fontStyle: "italic",
+            letterSpacing: "-0.01em",
             margin: "0 0 32px 0",
           }}
         >
@@ -522,10 +532,10 @@ export default function Home() {
             display: "flex",
             gap: "10px",
             background: "#FFFFFF",
-            borderRadius: "12px",
-            padding: "6px 6px 6px 20px",
+            borderRadius: "16px",
+            padding: "8px 8px 8px 22px",
             boxShadow:
-              "0 2px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04)",
+              "0 4px 28px rgba(26,26,24,0.09), 0 1px 4px rgba(26,26,24,0.06), 0 0 0 1px rgba(139,101,32,0.14)",
             alignItems: "center",
           }}
         >
@@ -555,6 +565,7 @@ export default function Home() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             placeholder="Enter a word you'd like to upgrade\u2026"
+            className="search-input"
             style={{
               flex: 1,
               border: "none",
@@ -563,20 +574,20 @@ export default function Home() {
               fontSize: "16px",
               color: "#1A1A18",
               padding: "10px 0",
-              outline: "none",
             }}
           />
           <button
             onClick={handleSubmit}
             disabled={loading || !query.trim()}
+            className="btn-primary"
             style={{
               background: loading ? "#B8B2A8" : "#8B6914",
               color: "#FFFFFF",
               border: "none",
-              borderRadius: "8px",
-              padding: "12px 24px",
+              borderRadius: "10px",
+              padding: "12px 28px",
               fontFamily: "'DM Sans', sans-serif",
-              fontSize: "14px",
+              fontSize: "15px",
               fontWeight: 600,
               cursor: loading ? "wait" : "pointer",
               transition: "background 0.2s ease",
@@ -678,11 +689,12 @@ export default function Home() {
                   setQuery(w);
                   searchWord(w);
                 }}
+                className="history-chip"
                 style={{
                   background: "#F0EBE1",
                   border: "1px solid #E0DAD0",
-                  borderRadius: "6px",
-                  padding: "4px 10px",
+                  borderRadius: "20px",
+                  padding: "5px 12px",
                   fontFamily: "'DM Sans', sans-serif",
                   fontSize: "12px",
                   color: "#6A6460",
@@ -722,8 +734,8 @@ export default function Home() {
                 <div
                   key={i}
                   style={{
-                    width: "8px",
-                    height: "8px",
+                    width: "10px",
+                    height: "10px",
                     borderRadius: "50%",
                     background: "#8B6914",
                     animation: "pulse 1.2s ease infinite",
@@ -735,7 +747,7 @@ export default function Home() {
             <p
               style={{
                 fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "16px",
+                fontSize: "17px",
                 color: "#8A8478",
                 fontStyle: "italic",
               }}
@@ -774,14 +786,14 @@ export default function Home() {
                 borderBottom: "1px solid #E0DAD0",
               }}
             >
-              <p style={{ margin: 0, fontSize: "14px", color: "#8A8478" }}>
+              <p style={{ margin: 0, fontSize: "15px", color: "#8A8478" }}>
                 Alternatives for{" "}
                 <span
                   style={{
                     fontFamily: "'Playfair Display', Georgia, serif",
                     fontWeight: 700,
                     color: "#1A1A18",
-                    fontSize: "18px",
+                    fontSize: "20px",
                   }}
                 >
                   {results.original}
@@ -866,7 +878,7 @@ export default function Home() {
             <p
               style={{
                 fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "20px",
+                fontSize: "22px",
                 color: "#B8B2A8",
                 fontStyle: "italic",
                 margin: "0 0 16px 0",
@@ -879,7 +891,7 @@ export default function Home() {
             <p
               style={{
                 fontSize: "13px",
-                color: "#C8C2B8",
+                color: "#A8A298",
                 margin: "0 0 28px 0",
               }}
             >
@@ -901,11 +913,12 @@ export default function Home() {
                     setQuery(w);
                     searchWord(w);
                   }}
+                  className="starter-word"
                   style={{
                     background: "transparent",
                     border: "1.5px dashed #D8D2C8",
-                    borderRadius: "8px",
-                    padding: "8px 16px",
+                    borderRadius: "20px",
+                    padding: "8px 18px",
                     fontFamily: "'DM Sans', sans-serif",
                     fontSize: "13px",
                     color: "#8A8478",

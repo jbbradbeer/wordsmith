@@ -20,7 +20,7 @@ export default function App({ Component, pageProps }: AppProps) {
           content="Find alternative, elevated words to improve your vocabulary and writing. Trade the ordinary for the extraordinary."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#F8F5EF" />
+        <meta name="theme-color" content="#F2EDE2" />
         <link rel="icon" href="/favicon.ico" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

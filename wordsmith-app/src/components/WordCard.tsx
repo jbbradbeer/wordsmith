@@ -47,17 +47,17 @@ export default function WordCard({
       }}
     >
       <div
+        className="wordcard-inner"
         style={{
           position: "relative",
           background: flipped ? "#FDFBF7" : "#FFFFFF",
           border: `1.5px solid ${flipped ? cat.color + "40" : "#E8E2D8"}`,
-          borderRadius: "10px",
+          borderRadius: "12px",
           padding: "20px 22px",
           minHeight: "140px",
-          transition: "background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease",
           boxShadow: flipped
             ? `0 4px 20px ${cat.color}15`
-            : "0 1px 4px rgba(0,0,0,0.04)",
+            : "0 2px 8px rgba(26,26,24,0.06), 0 1px 3px rgba(26,26,24,0.04)",
         }}
       >
         {/* Bookmark button — top right */}
@@ -93,11 +93,11 @@ export default function WordCard({
           <h3
             style={{
               fontFamily: "'Playfair Display', Georgia, serif",
-              fontSize: "22px",
+              fontSize: "24px",
               fontWeight: 700,
               color: "#1A1A18",
               margin: 0,
-              letterSpacing: "-0.02em",
+              letterSpacing: "-0.025em",
             }}
           >
             {word.word}
@@ -111,8 +111,9 @@ export default function WordCard({
               textTransform: "uppercase",
               color: cat.color,
               background: cat.color + "12",
-              padding: "3px 8px",
-              borderRadius: "4px",
+              border: `1px solid ${cat.color}20`,
+              padding: "4px 10px",
+              borderRadius: "6px",
               whiteSpace: "nowrap",
             }}
           >
@@ -185,8 +186,8 @@ export default function WordCard({
         <p
           style={{
             fontFamily: "'DM Sans', sans-serif",
-            fontSize: "10px",
-            color: "#B8B2A8",
+            fontSize: "11px",
+            color: "#A8A298",
             margin: "8px 0 0 0",
             textAlign: "right",
           }}
