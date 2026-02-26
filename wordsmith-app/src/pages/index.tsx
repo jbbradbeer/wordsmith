@@ -138,7 +138,7 @@ export default function Home() {
     if (!word.trim()) return;
     const searchTerm = word.trim().toLowerCase();
 
-    // If not logged in, check anonymous limit
+    // If not logged in, check anonymous limit before making any request
     if (!session) {
       if (anonSearchCount >= FREE_SEARCH_LIMIT) {
         setAuthMode("signup");
@@ -153,74 +153,129 @@ export default function Home() {
 
     try {
       const body: any = { query: searchTerm };
-
-      // Include anonymous count if not logged in
       if (!session) {
         body.anonSearchCount = anonSearchCount;
       }
 
-      const res = await fetch("/api/search", {
+      const response = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
 
-      const data = await res.json();
-
-      if (res.status === 403 && data.error === "free_limit_reached") {
-        setShowPaywall(true);
-        setLoading(false);
-        return;
-      }
-
-      if (res.status === 403 && data.error === "signup_required") {
-        setAuthMode("signup");
-        setShowAuth(true);
-        setLoading(false);
-        return;
-      }
-
-      if (!res.ok) {
-        throw new Error(data.error || "Search failed");
-      }
-
-      setResults(data);
-      setHistory((prev) => {
-        const updated = [searchTerm, ...prev.filter((w) => w !== searchTerm)];
-        return updated.slice(0, 12);
-      });
-
-      // Update anonymous count if this was an anonymous search
-      if (data.isAnonymous && typeof data.anonSearchCount === "number") {
-        setAnonSearchCount(data.anonSearchCount);
-        try {
-          localStorage.setItem(
-            ANON_COUNT_KEY,
-            String(data.anonSearchCount)
-          );
-        } catch {
-          // localStorage unavailable
+      // 403s are returned as plain JSON (before SSE headers are set on the server)
+      if (response.status === 403) {
+        const data = await response.json();
+        if (data.error === "free_limit_reached") {
+          setShowPaywall(true);
+          setLoading(false);
+          return;
+        }
+        if (data.error === "signup_required") {
+          setAuthMode("signup");
+          setShowAuth(true);
+          setLoading(false);
+          return;
         }
       }
 
-      // Update local user info with new count (authenticated)
-      if (data.usage) {
-        setUserInfo((prev: any) =>
-          prev
-            ? {
+      if (!response.ok || !response.body) {
+        throw new Error("Search failed");
+      }
+
+      // Initialise results so the header and legend render immediately
+      setResults({ original: searchTerm, alternatives: [] });
+
+      // Consume the SSE stream
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let sseBuffer = "";
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        sseBuffer += decoder.decode(value, { stream: true });
+        const rawEvents = sseBuffer.split("\n\n");
+        sseBuffer = rawEvents.pop()!; // keep incomplete trailing event
+
+        for (const rawEvent of rawEvents) {
+          if (!rawEvent.trim()) continue;
+
+          let eventName = "";
+          let dataLine = "";
+          for (const line of rawEvent.split("\n")) {
+            if (line.startsWith("event: ")) eventName = line.slice(7).trim();
+            if (line.startsWith("data: ")) dataLine = line.slice(6);
+          }
+          if (!dataLine) continue;
+
+          try {
+            const payload = JSON.parse(dataLine);
+
+            if (eventName === "word") {
+              // Hide spinner and show results grid on first word
+              setLoading(false);
+              setResults((prev: any) => ({
                 ...prev,
-                searchCount: data.usage.searchCount,
-                isPaid: data.usage.isPaid,
-                searchesRemaining: data.usage.isPaid
-                  ? null
-                  : Math.max(0, FREE_SEARCH_LIMIT - data.usage.searchCount),
+                alternatives: [...(prev?.alternatives ?? []), payload],
+              }));
+            }
+
+            if (eventName === "done") {
+              setHistory((prev) => {
+                const updated = [
+                  searchTerm,
+                  ...prev.filter((w) => w !== searchTerm),
+                ];
+                return updated.slice(0, 12);
+              });
+              if (
+                payload.isAnonymous &&
+                typeof payload.anonSearchCount === "number"
+              ) {
+                setAnonSearchCount(payload.anonSearchCount);
+                try {
+                  localStorage.setItem(
+                    ANON_COUNT_KEY,
+                    String(payload.anonSearchCount)
+                  );
+                } catch {
+                  // localStorage unavailable
+                }
               }
-            : prev
-        );
+              if (payload.usage) {
+                setUserInfo((prev: any) =>
+                  prev
+                    ? {
+                        ...prev,
+                        searchCount: payload.usage.searchCount,
+                        isPaid: payload.usage.isPaid,
+                        searchesRemaining: payload.usage.isPaid
+                          ? null
+                          : Math.max(
+                              0,
+                              FREE_SEARCH_LIMIT - payload.usage.searchCount
+                            ),
+                      }
+                    : prev
+                );
+              }
+            }
+
+            if (eventName === "error") {
+              setError(
+                payload.message || "Something went wrong. Please try again."
+              );
+              setLoading(false);
+            }
+          } catch {
+            // Malformed SSE event — skip
+          }
+        }
       }
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");
-    } finally {
       setLoading(false);
     }
   };

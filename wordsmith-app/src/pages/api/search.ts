@@ -1,11 +1,101 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import Anthropic from "@anthropic-ai/sdk";
+import { LRUCache } from "lru-cache";
+import type { WordData } from "@/lib/types";
 import { FREE_SEARCH_LIMIT } from "@/lib/constants";
+
+// Disable Vercel response buffering so SSE events are flushed immediately
+export const config = {
+  api: { responseLimit: false },
+};
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
+
+// In-memory cache — persists across warm serverless invocations
+const wordCache = new LRUCache<string, WordData[]>({
+  max: 500,
+  ttl: 1000 * 60 * 60 * 24, // 24 hours
+});
+
+function writeSSEEvent(res: NextApiResponse, event: string, data: unknown) {
+  res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+}
+
+function buildPrompt(searchTerm: string): string {
+  return `I'm looking for alternative, more interesting words for: "${searchTerm}"
+
+Return ONLY 6 lines of NDJSON. Each line must be a complete, self-contained JSON object.
+No arrays, no wrapper, no markdown, no preamble. One object per line:
+
+{"word":"...","pronunciation":"...","definition":"...","example":"...","context":"...","category":"..."}
+
+Rules:
+- Each line is valid JSON on its own
+- "category" must be one of: elevated, literary, punchy, rare
+- "pronunciation" uses phonetic notation like /fə-ˈnɛt-ɪk/
+- "definition" is one crisp sentence
+- "example" is a vivid sentence using the word naturally
+- "context" is a brief note on when/where this word works best
+- Give 6 alternatives ranging from slightly sophisticated to truly rare/unusual
+- Output exactly 6 lines, nothing else`;
+}
+
+async function streamFromClaude(
+  res: NextApiResponse,
+  searchTerm: string
+): Promise<WordData[]> {
+  const words: WordData[] = [];
+  let buffer = "";
+
+  const stream = anthropic.messages.stream({
+    model: "claude-sonnet-4-6",
+    max_tokens: 1200,
+    messages: [{ role: "user", content: buildPrompt(searchTerm) }],
+  });
+
+  stream.on("text", (chunk: string) => {
+    buffer += chunk;
+    const lines = buffer.split("\n");
+    buffer = lines.pop()!; // keep incomplete final line
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      try {
+        const word = JSON.parse(trimmed) as WordData;
+        words.push(word);
+        writeSSEEvent(res, "word", word);
+      } catch {
+        // Partial or non-JSON line — skip
+      }
+    }
+  });
+
+  stream.on("error", (err: Error) => {
+    console.error("Stream error:", err);
+    writeSSEEvent(res, "error", {
+      message: "Something went wrong. Please try again.",
+    });
+    res.end();
+  });
+
+  await stream.finalMessage();
+
+  // Flush any remaining content in buffer
+  if (buffer.trim()) {
+    try {
+      const word = JSON.parse(buffer.trim()) as WordData;
+      words.push(word);
+      writeSSEEvent(res, "word", word);
+    } catch {
+      // ignore
+    }
+  }
+
+  return words;
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -20,7 +110,7 @@ export default async function handler(
     return res.status(400).json({ error: "A search word is required" });
   }
 
-  const searchTerm = query.trim().toLowerCase().slice(0, 50); // Cap length
+  const searchTerm = query.trim().toLowerCase().slice(0, 50);
 
   // Check for authenticated user
   const supabase = createServerSupabaseClient({ req, res });
@@ -32,8 +122,10 @@ export default async function handler(
 
   // --- Anonymous search path ---
   if (isAnonymous) {
-    const currentAnonCount = typeof anonSearchCount === "number" ? anonSearchCount : 0;
+    const currentAnonCount =
+      typeof anonSearchCount === "number" ? anonSearchCount : 0;
 
+    // 403 guard — must fire BEFORE SSE headers
     if (currentAnonCount >= FREE_SEARCH_LIMIT) {
       return res.status(403).json({
         error: "signup_required",
@@ -41,154 +133,137 @@ export default async function handler(
       });
     }
 
+    // Open SSE stream
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache, no-transform");
+    res.setHeader("Connection", "keep-alive");
+    res.setHeader("X-Accel-Buffering", "no");
+    res.flushHeaders();
+
     try {
-      const message = await anthropic.messages.create({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1200,
-        messages: [
-          {
-            role: "user",
-            content: `I'm looking for alternative, more interesting words for: "${searchTerm}"
+      // Cache hit — stream instantly
+      const cached = wordCache.get(searchTerm);
+      if (cached) {
+        for (const word of cached) {
+          writeSSEEvent(res, "word", word);
+        }
+        writeSSEEvent(res, "done", {
+          isAnonymous: true,
+          anonSearchCount: currentAnonCount + 1,
+        });
+        res.end();
+        return;
+      }
 
-Return ONLY valid JSON (no markdown, no backticks, no preamble) in this exact format:
-{
-  "original": "${searchTerm}",
-  "alternatives": [
-    {
-      "word": "the alternative word",
-      "pronunciation": "phonetic pronunciation like /f\u0259-\u02C8n\u025Bt-\u026Ak/",
-      "definition": "concise definition (1 sentence)",
-      "example": "a vivid example sentence using this word naturally",
-      "context": "brief note on when/where this word works best",
-      "category": "one of: elevated, literary, punchy, rare"
-    }
-  ]
-}
+      // Cache miss — stream from Claude
+      const words = await streamFromClaude(res, searchTerm);
+      wordCache.set(searchTerm, words);
 
-Give me 6 alternatives, ranging from slightly more sophisticated to truly rare/unusual. Make the examples vivid and the definitions crisp. Categorize each:
-- "elevated": sophisticated, polished vocabulary for professional/social settings
-- "literary": evocative, bookish words that add texture to writing
-- "punchy": sharp, impactful words that hit hard
-- "rare": uncommon gems that make people pause and think
-
-Only return the JSON.`,
-          },
-        ],
-      });
-
-      const text =
-        message.content
-          ?.map((c: any) => (c.type === "text" ? c.text : ""))
-          .join("") || "";
-      const clean = text.replace(/```json|```/g, "").trim();
-      const parsed = JSON.parse(clean);
-
-      return res.status(200).json({
-        ...parsed,
+      writeSSEEvent(res, "done", {
         isAnonymous: true,
         anonSearchCount: currentAnonCount + 1,
       });
+      res.end();
     } catch (err: any) {
       console.error("Anonymous search error:", err);
-      return res.status(500).json({ error: "Something went wrong. Please try again." });
+      writeSSEEvent(res, "error", {
+        message: "Something went wrong. Please try again.",
+      });
+      res.end();
     }
+    return;
   }
 
   // --- Authenticated search path ---
   const userId = session.user.id;
 
-  try {
-    // Check user profile and subscription status
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("subscription_status, search_count")
-      .eq("id", userId)
-      .single();
+  // Fetch profile — needed for limit check (must happen before SSE headers)
+  const { data: profile, error: profileError } = await supabase
+    .from("profiles")
+    .select("subscription_status, search_count")
+    .eq("id", userId)
+    .single();
 
-    if (profileError || !profile) {
-      return res.status(500).json({ error: "Could not load profile" });
-    }
+  if (profileError || !profile) {
+    return res.status(500).json({ error: "Could not load profile" });
+  }
 
-    const isPaid =
-      profile.subscription_status === "active";
-    const searchCount = profile.search_count || 0;
+  const isPaid = profile.subscription_status === "active";
+  const searchCount = profile.search_count || 0;
 
-    // Enforce free tier limit
-    if (!isPaid && searchCount >= FREE_SEARCH_LIMIT) {
-      return res.status(403).json({
-        error: "free_limit_reached",
-        message: `You've used all ${FREE_SEARCH_LIMIT} free searches. Upgrade to Wordsmith Pro for unlimited access.`,
-        searchCount,
-        limit: FREE_SEARCH_LIMIT,
-      });
-    }
-
-    // Call Anthropic API
-    const message = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1200,
-      messages: [
-        {
-          role: "user",
-          content: `I'm looking for alternative, more interesting words for: "${searchTerm}"
-
-Return ONLY valid JSON (no markdown, no backticks, no preamble) in this exact format:
-{
-  "original": "${searchTerm}",
-  "alternatives": [
-    {
-      "word": "the alternative word",
-      "pronunciation": "phonetic pronunciation like /f\u0259-\u02C8n\u025Bt-\u026Ak/",
-      "definition": "concise definition (1 sentence)",
-      "example": "a vivid example sentence using this word naturally",
-      "context": "brief note on when/where this word works best",
-      "category": "one of: elevated, literary, punchy, rare"
-    }
-  ]
-}
-
-Give me 6 alternatives, ranging from slightly more sophisticated to truly rare/unusual. Make the examples vivid and the definitions crisp. Categorize each:
-- "elevated": sophisticated, polished vocabulary for professional/social settings
-- "literary": evocative, bookish words that add texture to writing
-- "punchy": sharp, impactful words that hit hard
-- "rare": uncommon gems that make people pause and think
-
-Only return the JSON.`,
-        },
-      ],
+  // 403 guard — must fire BEFORE SSE headers
+  if (!isPaid && searchCount >= FREE_SEARCH_LIMIT) {
+    return res.status(403).json({
+      error: "free_limit_reached",
+      message: `You've used all ${FREE_SEARCH_LIMIT} free searches. Upgrade to Wordsmith Pro for unlimited access.`,
+      searchCount,
+      limit: FREE_SEARCH_LIMIT,
     });
+  }
 
-    const text =
-      message.content
-        ?.map((c: any) => (c.type === "text" ? c.text : ""))
-        .join("") || "";
-    const clean = text.replace(/```json|```/g, "").trim();
-    const parsed = JSON.parse(clean);
+  // Open SSE stream
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache, no-transform");
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no");
+  res.flushHeaders();
 
-    // Log the search and increment count (using service role to bypass RLS for update)
+  try {
     const { getServiceSupabase } = await import("@/lib/supabase");
     const serviceClient = getServiceSupabase();
 
-    await serviceClient.from("searches").insert({
-      user_id: userId,
-      query: searchTerm,
-    });
-
-    await serviceClient
-      .from("profiles")
-      .update({ search_count: searchCount + 1 })
-      .eq("id", userId);
-
-    return res.status(200).json({
-      ...parsed,
+    const donePayload = {
       usage: {
         searchCount: searchCount + 1,
         limit: isPaid ? null : FREE_SEARCH_LIMIT,
         isPaid,
       },
-    });
+    };
+
+    // Cache hit — stream instantly, still track usage
+    const cached = wordCache.get(searchTerm);
+    if (cached) {
+      for (const word of cached) {
+        writeSSEEvent(res, "word", word);
+      }
+      // Fire-and-forget DB writes — don't block the response
+      Promise.all([
+        serviceClient
+          .from("searches")
+          .insert({ user_id: userId, query: searchTerm }),
+        serviceClient
+          .from("profiles")
+          .update({ search_count: searchCount + 1 })
+          .eq("id", userId),
+      ]).catch((err) => console.error("DB write failed (cache hit):", err));
+
+      writeSSEEvent(res, "done", donePayload);
+      res.end();
+      return;
+    }
+
+    // Cache miss — stream from Claude
+    const words = await streamFromClaude(res, searchTerm);
+    wordCache.set(searchTerm, words);
+
+    // Fire-and-forget DB writes — don't block the response
+    Promise.all([
+      serviceClient
+        .from("searches")
+        .insert({ user_id: userId, query: searchTerm }),
+      serviceClient
+        .from("profiles")
+        .update({ search_count: searchCount + 1 })
+        .eq("id", userId),
+    ]).catch((err) => console.error("DB write failed:", err));
+
+    writeSSEEvent(res, "done", donePayload);
+    res.end();
   } catch (err: any) {
     console.error("Search API error:", err);
-    return res.status(500).json({ error: "Something went wrong. Please try again." });
+    writeSSEEvent(res, "error", {
+      message: "Something went wrong. Please try again.",
+    });
+    res.end();
   }
 }
