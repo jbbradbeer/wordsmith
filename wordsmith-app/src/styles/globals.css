@@ -32,11 +32,11 @@ button,
 
 /* ─── Focus states ──────────────────────────────────── */
 
-/* Replaces bare outline:none on the search input */
-.search-input:focus-visible {
-  outline: 2px solid rgba(139, 101, 32, 0.65);
-  outline-offset: -1px;
-  border-radius: 8px;
+/* Search box — focus ring on compound control (input or button focused) */
+.search-box:focus-within {
+  box-shadow: 0 4px 28px rgba(26, 26, 24, 0.09),
+    0 1px 4px rgba(26, 26, 24, 0.06),
+    0 0 0 2px rgba(139, 101, 32, 0.5);
 }
 
 /* ─── WordCard hover lift ───────────────────────────── */

@@ -528,6 +528,7 @@ export default function Home() {
       {/* Search */}
       <div style={{ maxWidth: "720px", margin: "0 auto", padding: "0 24px" }}>
         <div
+          className="search-box"
           style={{
             display: "flex",
             gap: "10px",
@@ -535,7 +536,7 @@ export default function Home() {
             borderRadius: "16px",
             padding: "8px 8px 8px 22px",
             boxShadow:
-              "0 4px 28px rgba(26,26,24,0.09), 0 1px 4px rgba(26,26,24,0.06), 0 0 0 1px rgba(139,101,32,0.14)",
+              "0 4px 28px rgba(26,26,24,0.09), 0 1px 4px rgba(26,26,24,0.06)",
             alignItems: "center",
           }}
         >
@@ -564,8 +565,7 @@ export default function Home() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-            placeholder="Enter a word you'd like to upgrade\u2026"
-            className="search-input"
+            placeholder="Enter a word you'd like to upgrade…"
             style={{
               flex: 1,
               border: "none",
