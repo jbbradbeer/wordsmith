@@ -2,20 +2,14 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { FREE_SEARCH_LIMIT } from "@/lib/constants";
 import { getServiceSupabase } from "@/lib/supabase";
+import { withAuth } from "@/lib/api";
+import type { Session } from "@supabase/supabase-js";
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
+  session: Session
 ) {
-  const supabase = createServerSupabaseClient({ req, res });
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    return res.status(401).json({ error: "Not authenticated" });
-  }
-
   // POST: Transfer anonymous search count to profile
   if (req.method === "POST") {
     const { anonSearchCount } = req.body;
@@ -45,6 +39,8 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  // Use session-scoped client (respects RLS) for user's own profile read
+  const supabase = createServerSupabaseClient({ req, res });
   const { data: profile } = await supabase
     .from("profiles")
     .select("subscription_status, search_count, created_at")
@@ -69,3 +65,5 @@ export default async function handler(
     memberSince: profile.created_at,
   });
 }
+
+export default withAuth(handler);

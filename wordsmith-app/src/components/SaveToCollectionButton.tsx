@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
+import type { Session } from "@supabase/supabase-js";
 import type { WordData, Collection } from "@/lib/types";
 
 interface SaveToCollectionButtonProps {
   word: WordData;
-  session: any;
+  session: Session | null | undefined;
   isPaid: boolean;
   onAuthRequired: () => void;
   onUpgradeRequired: () => void;
@@ -22,6 +23,8 @@ export default function SaveToCollectionButton({
   const [newName, setNewName] = useState("");
   const [creating, setCreating] = useState(false);
   const [savedTo, setSavedTo] = useState<Set<string>>(new Set());
+  // Track in-flight saves to prevent double-submit on rapid clicks
+  const [saving, setSaving] = useState<Set<string>>(new Set());
   const [feedback, setFeedback] = useState<string | null>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -85,8 +88,10 @@ export default function SaveToCollectionButton({
   };
 
   const saveToCollection = async (collectionId: string) => {
-    if (savedTo.has(collectionId)) return;
+    // Guard: already saved or save in flight
+    if (savedTo.has(collectionId) || saving.has(collectionId)) return;
 
+    setSaving((prev) => new Set(prev).add(collectionId));
     try {
       const res = await fetch("/api/collection-words", {
         method: "POST",
@@ -104,16 +109,18 @@ export default function SaveToCollectionButton({
       const data = await res.json();
       if (data.saved) {
         setSavedTo((prev) => new Set(prev).add(collectionId));
-        if (data.alreadyExists) {
-          setFeedback("Already saved");
-        } else {
-          setFeedback("Saved!");
-        }
+        setFeedback(data.alreadyExists ? "Already saved" : "Saved!");
         setTimeout(() => setFeedback(null), 1500);
       }
     } catch {
       setFeedback("Error saving");
       setTimeout(() => setFeedback(null), 1500);
+    } finally {
+      setSaving((prev) => {
+        const next = new Set(prev);
+        next.delete(collectionId);
+        return next;
+      });
     }
   };
 
@@ -273,7 +280,7 @@ export default function SaveToCollectionButton({
                   color: "#B8B2A8",
                 }}
               >
-                Loading\u2026
+                Loading…
               </div>
             ) : collections.length === 0 ? (
               <div
@@ -290,11 +297,12 @@ export default function SaveToCollectionButton({
             ) : (
               collections.map((collection) => {
                 const isInCollection = savedTo.has(collection.id);
+                const isSavingToCollection = saving.has(collection.id);
                 return (
                   <button
                     key={collection.id}
                     onClick={() => saveToCollection(collection.id)}
-                    disabled={isInCollection}
+                    disabled={isInCollection || isSavingToCollection}
                     aria-pressed={isInCollection}
                     style={{
                       display: "flex",
@@ -304,7 +312,7 @@ export default function SaveToCollectionButton({
                       padding: "8px 14px",
                       background: isInCollection ? "#FDFBF7" : "transparent",
                       border: "none",
-                      cursor: isInCollection ? "default" : "pointer",
+                      cursor: isInCollection || isSavingToCollection ? "default" : "pointer",
                       fontFamily: "'DM Sans', sans-serif",
                       fontSize: "13px",
                       color: isInCollection ? "#B8B2A8" : "#4A4740",
@@ -369,7 +377,7 @@ export default function SaveToCollectionButton({
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && createAndSave()}
-              placeholder="New collection\u2026"
+              placeholder="New collection…"
               onClick={(e) => e.stopPropagation()}
               style={{
                 flex: 1,

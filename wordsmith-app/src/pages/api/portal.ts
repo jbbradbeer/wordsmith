@@ -1,23 +1,16 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { stripe } from "@/lib/stripe";
 import { getServiceSupabase } from "@/lib/supabase";
+import { withAuth } from "@/lib/api";
+import type { Session } from "@supabase/supabase-js";
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
+  session: Session
 ) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
-  }
-
-  const supabase = createServerSupabaseClient({ req, res });
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    return res.status(401).json({ error: "Not authenticated" });
   }
 
   const serviceClient = getServiceSupabase();
@@ -38,8 +31,10 @@ export default async function handler(
     });
 
     return res.status(200).json({ url: portalSession.url });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Portal error:", err);
     return res.status(500).json({ error: "Failed to create portal session" });
   }
 }
+
+export default withAuth(handler);

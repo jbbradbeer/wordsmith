@@ -22,3 +22,18 @@ export interface CollectionWord extends WordData {
   collection_id: string;
   created_at: string;
 }
+
+export interface SearchResults {
+  original: string;
+  alternatives: WordData[];
+}
+
+export interface UserInfo {
+  email: string;
+  isPaid: boolean;
+  subscriptionStatus: string | null;
+  searchCount: number;
+  searchesRemaining: number | null;
+  limit: number | null;
+  memberSince: string;
+}

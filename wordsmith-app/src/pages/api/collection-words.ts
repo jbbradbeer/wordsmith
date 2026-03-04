@@ -1,33 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { getServiceSupabase } from "@/lib/supabase";
+import { withSubscription } from "@/lib/api";
+import type { Session } from "@supabase/supabase-js";
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
+  session: Session
 ) {
-  const supabase = createServerSupabaseClient({ req, res });
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    return res.status(401).json({ error: "Not authenticated" });
-  }
-
   const serviceClient = getServiceSupabase();
   const userId = session.user.id;
-
-  // Check subscription status
-  const { data: profile } = await serviceClient
-    .from("profiles")
-    .select("subscription_status")
-    .eq("id", userId)
-    .single();
-
-  if (profile?.subscription_status !== "active") {
-    return res.status(403).json({ error: "subscription_required" });
-  }
 
   // GET: List words in a collection
   if (req.method === "GET") {
@@ -164,3 +146,5 @@ export default async function handler(
 
   return res.status(405).json({ error: "Method not allowed" });
 }
+
+export default withSubscription(handler);

@@ -112,6 +112,11 @@ export default async function handler(
 
   const searchTerm = query.trim().toLowerCase().slice(0, 50);
 
+  // Reject queries that contain anything other than letters, spaces, hyphens, or apostrophes
+  if (!/^[a-z\s'-]+$/.test(searchTerm)) {
+    return res.status(400).json({ error: "Search term must contain only letters" });
+  }
+
   // Check for authenticated user
   const supabase = createServerSupabaseClient({ req, res });
   const {
@@ -164,7 +169,7 @@ export default async function handler(
         anonSearchCount: currentAnonCount + 1,
       });
       res.end();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Anonymous search error:", err);
       writeSSEEvent(res, "error", {
         message: "Something went wrong. Please try again.",
@@ -259,7 +264,7 @@ export default async function handler(
 
     writeSSEEvent(res, "done", donePayload);
     res.end();
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Search API error:", err);
     writeSSEEvent(res, "error", {
       message: "Something went wrong. Please try again.",

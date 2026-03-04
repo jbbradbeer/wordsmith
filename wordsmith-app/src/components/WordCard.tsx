@@ -1,21 +1,13 @@
 import { useState } from "react";
+import type { Session } from "@supabase/supabase-js";
 import type { WordData } from "@/lib/types";
+import { WORD_CATEGORIES } from "@/lib/constants";
 import SaveToCollectionButton from "@/components/SaveToCollectionButton";
-
-const WORD_CATEGORIES: Record<
-  string,
-  { label: string; color: string; desc: string }
-> = {
-  elevated: { label: "Elevated", color: "#8B6914", desc: "Sophisticated & refined" },
-  literary: { label: "Literary", color: "#6B4C8A", desc: "Bookish & evocative" },
-  punchy: { label: "Punchy", color: "#C0392B", desc: "Sharp & impactful" },
-  rare: { label: "Rare Gem", color: "#1A7A6D", desc: "Uncommon & distinctive" },
-};
 
 interface WordCardProps {
   word: WordData;
   index: number;
-  session?: any;
+  session?: Session | null;
   isPaid?: boolean;
   onAuthRequired?: () => void;
   onUpgradeRequired?: () => void;
@@ -47,14 +39,11 @@ export default function WordCard({
       }}
     >
       <div
-        className="wordcard-inner"
+        className={`relative rounded-xl px-[22px] py-5 min-h-[140px] ${
+          flipped ? "bg-parchment-50" : "bg-white"
+        }`}
         style={{
-          position: "relative",
-          background: flipped ? "#FDFBF7" : "#FFFFFF",
           border: `1.5px solid ${flipped ? cat.color + "40" : "#E8E2D8"}`,
-          borderRadius: "12px",
-          padding: "20px 22px",
-          minHeight: "140px",
           boxShadow: flipped
             ? `0 4px 20px ${cat.color}15`
             : "0 2px 8px rgba(26,26,24,0.06), 0 1px 3px rgba(26,26,24,0.04)",
@@ -63,12 +52,7 @@ export default function WordCard({
         {/* Bookmark button — top right */}
         {onAuthRequired && onUpgradeRequired && (
           <div
-            style={{
-              position: "absolute",
-              top: "10px",
-              right: "10px",
-              zIndex: 10,
-            }}
+            className="absolute top-2.5 right-2.5 z-10"
             onClick={(e) => e.stopPropagation()}
           >
             <SaveToCollectionButton
@@ -82,116 +66,50 @@ export default function WordCard({
         )}
 
         <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            marginBottom: "10px",
-            paddingRight: onAuthRequired ? "28px" : "0",
-          }}
+          className={`flex justify-between items-start mb-2.5 ${
+            onAuthRequired ? "pr-7" : ""
+          }`}
         >
-          <h3
-            style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
-              fontSize: "24px",
-              fontWeight: 700,
-              color: "#1A1A18",
-              margin: 0,
-              letterSpacing: "-0.025em",
-            }}
-          >
+          <h3 className="font-display text-2xl font-bold text-parchment-900 m-0 tracking-tight">
             {word.word}
           </h3>
           <span
+            className="text-[10px] font-body font-semibold tracking-[0.08em] uppercase px-2.5 py-1 rounded whitespace-nowrap"
             style={{
-              fontSize: "10px",
-              fontFamily: "'DM Sans', sans-serif",
-              fontWeight: 600,
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
               color: cat.color,
               background: cat.color + "12",
               border: `1px solid ${cat.color}20`,
-              padding: "4px 10px",
-              borderRadius: "6px",
-              whiteSpace: "nowrap",
             }}
           >
             {cat.label}
           </span>
         </div>
 
-        <p
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: "12px",
-            color: "#8A8478",
-            fontStyle: "italic",
-            margin: "0 0 8px 0",
-          }}
-        >
+        <p className="font-body text-xs text-parchment-600 italic m-0 mb-2">
           {word.pronunciation}
         </p>
 
-        <p
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: "14px",
-            color: "#4A4740",
-            lineHeight: 1.55,
-            margin: "0 0 12px 0",
-          }}
-        >
+        <p className="font-body text-sm text-parchment-800 leading-[1.55] m-0 mb-3">
           {word.definition}
         </p>
 
         {flipped && word.example && (
           <div
-            style={{
-              borderTop: "1px solid #E8E2D8",
-              paddingTop: "12px",
-              marginTop: "4px",
-              animation: "fadeUp 0.3s ease both",
-            }}
+            className="border-t border-parchment-300 pt-3 mt-1"
+            style={{ animation: "fadeUp 0.3s ease both" }}
           >
-            <p
-              style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "13.5px",
-                color: "#5A5650",
-                fontStyle: "italic",
-                lineHeight: 1.6,
-                margin: 0,
-              }}
-            >
+            <p className="font-display text-[13.5px] text-[#5A5650] italic leading-relaxed m-0">
               &ldquo;{word.example}&rdquo;
             </p>
             {word.context && (
-              <p
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "12px",
-                  color: "#9A948A",
-                  marginTop: "8px",
-                  marginBottom: 0,
-                  lineHeight: 1.5,
-                }}
-              >
+              <p className="font-body text-xs text-parchment-600 mt-2 mb-0 leading-snug">
                 <span aria-hidden="true">&#128161;</span> {word.context}
               </p>
             )}
           </div>
         )}
 
-        <p
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: "11px",
-            color: "#A8A298",
-            margin: "8px 0 0 0",
-            textAlign: "right",
-          }}
-        >
+        <p className="font-body text-[11px] text-parchment-500 mt-2 mb-0 text-right">
           {flipped ? "click to collapse" : "click for example"}
         </p>
       </div>

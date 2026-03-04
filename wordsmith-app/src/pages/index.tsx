@@ -5,7 +5,8 @@ import AuthModal from "@/components/AuthModal";
 import PaywallModal from "@/components/PaywallModal";
 import WordCard from "@/components/WordCard";
 import UsageBar from "@/components/UsageBar";
-import { FREE_SEARCH_LIMIT } from "@/lib/constants";
+import { FREE_SEARCH_LIMIT, WORD_CATEGORIES, ANON_COUNT_KEY } from "@/lib/constants";
+import type { WordData, SearchResults, UserInfo } from "@/lib/types";
 
 // Landing page components
 import SocialProofBar from "@/components/landing/SocialProofBar";
@@ -16,12 +17,12 @@ import PricingSection from "@/components/landing/PricingSection";
 import CtaSection from "@/components/landing/CtaSection";
 import Footer from "@/components/landing/Footer";
 
-const CATEGORY_LEGEND = [
-  { key: "elevated", label: "Elevated", color: "#8B6914" },
-  { key: "literary", label: "Literary", color: "#6B4C8A" },
-  { key: "punchy", label: "Punchy", color: "#C0392B" },
-  { key: "rare", label: "Rare Gem", color: "#1A7A6D" },
-];
+// Derive the category legend from the single source of truth
+const CATEGORY_LEGEND = Object.entries(WORD_CATEGORIES).map(([key, v]) => ({
+  key,
+  label: v.label,
+  color: v.color,
+}));
 
 const STARTER_WORDS = [
   "good",
@@ -34,14 +35,12 @@ const STARTER_WORDS = [
   "fast",
 ];
 
-const ANON_COUNT_KEY = "wordsmith_anon_searches";
-
 export default function Home() {
   const session = useSession();
   const supabase = useSupabaseClient();
 
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<SearchResults | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<string[]>([]);
@@ -52,7 +51,7 @@ export default function Home() {
   const [showPaywall, setShowPaywall] = useState(false);
 
   // User state
-  const [userInfo, setUserInfo] = useState<any>(null);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
   // Anonymous search tracking
   const [anonSearchCount, setAnonSearchCount] = useState(0);
@@ -321,21 +320,11 @@ export default function Home() {
   const showLandingSections = !results && !loading && !error;
 
   return (
-    <div style={{ minHeight: "100vh" }}>
+    <div className="min-h-screen">
       {/* Nav bar */}
       <nav
         aria-label="Site navigation"
-        style={{
-          maxWidth: "800px",
-          margin: "0 auto",
-          padding: "16px 24px",
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
-          gap: "12px",
-          borderBottom: "1px solid rgba(139,101,32,0.09)",
-          backdropFilter: "blur(8px)",
-        }}
+        className="max-w-[800px] mx-auto px-6 py-4 flex justify-end items-center gap-3 border-b border-gold/[.09] backdrop-blur"
       >
         {session ? (
           <>
@@ -344,18 +333,11 @@ export default function Home() {
               isPaid={userInfo?.isPaid || false}
               onUpgrade={() => setShowPaywall(true)}
             />
-            <div style={{ flex: 1 }} />
+            <div className="flex-1" />
             {userInfo?.isPaid && (
               <Link
                 href="/collections"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "12px",
-                  fontWeight: 600,
-                  color: "#8B6914",
-                  textDecoration: "none",
-                  cursor: "pointer",
-                }}
+                className="font-body text-xs font-semibold text-gold no-underline cursor-pointer"
               >
                 Collections
               </Link>
@@ -363,42 +345,17 @@ export default function Home() {
             {userInfo?.isPaid && (
               <button
                 onClick={handleManageSubscription}
-                className="btn-ghost"
-                style={{
-                  background: "none",
-                  border: "none",
-                  color: "#B8B2A8",
-                  fontSize: "12px",
-                  cursor: "pointer",
-                  fontFamily: "'DM Sans', sans-serif",
-                  transition: "color 0.2s ease",
-                }}
+                className="btn-ghost bg-transparent border-none text-parchment-500 text-xs cursor-pointer font-body transition-colors duration-200"
               >
                 Manage
               </button>
             )}
-            <span
-              style={{
-                fontSize: "12px",
-                color: "#8A8478",
-                fontFamily: "'DM Sans', sans-serif",
-              }}
-            >
+            <span className="font-body text-xs text-parchment-600">
               {session.user.email}
             </span>
             <button
               onClick={handleSignOut}
-              style={{
-                background: "none",
-                border: "1px solid #E8E2D8",
-                borderRadius: "6px",
-                padding: "6px 12px",
-                fontSize: "12px",
-                color: "#8A8478",
-                cursor: "pointer",
-                fontFamily: "'DM Sans', sans-serif",
-                transition: "background 0.2s ease, border-color 0.2s ease, color 0.2s ease",
-              }}
+              className="bg-transparent border border-parchment-300 rounded px-3 py-1.5 text-xs text-parchment-600 cursor-pointer font-body transition-all duration-200"
             >
               Sign out
             </button>
@@ -410,17 +367,7 @@ export default function Home() {
                 setAuthMode("signin");
                 setShowAuth(true);
               }}
-              className="btn-ghost"
-              style={{
-                background: "none",
-                border: "none",
-                color: "#8A8478",
-                fontSize: "13px",
-                cursor: "pointer",
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 500,
-                transition: "color 0.2s ease",
-              }}
+              className="btn-ghost bg-transparent border-none text-parchment-600 text-[13px] cursor-pointer font-body font-medium transition-colors duration-200"
             >
               Sign in
             </button>
@@ -429,19 +376,7 @@ export default function Home() {
                 setAuthMode("signup");
                 setShowAuth(true);
               }}
-              className="btn-primary"
-              style={{
-                background: "#8B6914",
-                color: "#FFFFFF",
-                border: "none",
-                borderRadius: "8px",
-                padding: "8px 16px",
-                fontSize: "13px",
-                fontWeight: 600,
-                cursor: "pointer",
-                fontFamily: "'DM Sans', sans-serif",
-                transition: "background 0.2s ease",
-              }}
+              className="btn-primary bg-gold text-white border-none rounded-lg px-4 py-2 text-[13px] font-semibold cursor-pointer font-body transition-colors duration-200"
             >
               Get started free
             </button>
@@ -451,73 +386,23 @@ export default function Home() {
 
       {/* Header */}
       <header
-        style={{
-          maxWidth: "720px",
-          margin: "0 auto",
-          padding: "24px 24px 8px",
-          textAlign: "center",
-          animation: "heroIn 0.6s ease both",
-        }}
+        className="max-w-[720px] mx-auto px-6 pt-6 pb-2 text-center"
+        style={{ animation: "heroIn 0.6s ease both" }}
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "10px",
-            marginBottom: "6px",
-          }}
-        >
-          <div
-            style={{
-              width: "44px",
-              height: "2px",
-              background: "linear-gradient(90deg, transparent, #8B6914)",
-            }}
-          />
-          <span
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "11px",
-              fontWeight: 600,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "#8B6914",
-            }}
-          >
+        <div className="flex items-center justify-center gap-2.5 mb-1.5">
+          <div className="w-11 h-0.5 bg-gradient-to-r from-transparent to-gold" />
+          <span className="font-body text-[11px] font-semibold tracking-[0.2em] uppercase text-gold">
             A Writer&apos;s Companion
           </span>
-          <div
-            style={{
-              width: "44px",
-              height: "2px",
-              background: "linear-gradient(90deg, #8B6914, transparent)",
-            }}
-          />
+          <div className="w-11 h-0.5 bg-gradient-to-r from-gold to-transparent" />
         </div>
         <h1
-          style={{
-            fontFamily: "'Playfair Display', Georgia, serif",
-            fontSize: "clamp(38px, 6.5vw, 58px)",
-            fontWeight: 900,
-            color: "#1A1A18",
-            margin: "0 0 8px 0",
-            letterSpacing: "-0.03em",
-            lineHeight: 1.1,
-          }}
+          className="font-display font-black text-parchment-900 m-0 mb-2 tracking-[-0.03em] leading-[1.1]"
+          style={{ fontSize: "clamp(38px, 6.5vw, 58px)" }}
         >
           Wordsmith
         </h1>
-        <p
-          style={{
-            fontFamily: "'Playfair Display', Georgia, serif",
-            fontSize: "17px",
-            color: "#8A8478",
-            fontStyle: "italic",
-            letterSpacing: "-0.01em",
-            margin: "0 0 32px 0",
-          }}
-        >
+        <p className="font-display text-[17px] text-parchment-600 italic tracking-[-0.01em] mt-0 mb-8">
           Trade the ordinary for the extraordinary
         </p>
       </header>
@@ -526,34 +411,12 @@ export default function Home() {
       <SocialProofBar />
 
       {/* Search */}
-      <div style={{ maxWidth: "720px", margin: "0 auto", padding: "0 24px" }}>
+      <div className="max-w-[720px] mx-auto px-6">
         <div
-          className="search-box"
-          style={{
-            display: "flex",
-            gap: "10px",
-            background: "#FFFFFF",
-            borderRadius: "16px",
-            padding: "8px 8px 8px 22px",
-            boxShadow:
-              "0 4px 28px rgba(26,26,24,0.09), 0 1px 4px rgba(26,26,24,0.06)",
-            alignItems: "center",
-          }}
+          className="search-box flex gap-2.5 bg-white rounded-2xl pl-[22px] pr-2 py-2 items-center"
+          style={{ boxShadow: "0 4px 28px rgba(26,26,24,0.09), 0 1px 4px rgba(26,26,24,0.06)" }}
         >
-          <label
-            htmlFor="word-search"
-            style={{
-              position: "absolute",
-              width: "1px",
-              height: "1px",
-              padding: 0,
-              margin: "-1px",
-              overflow: "hidden",
-              clip: "rect(0,0,0,0)",
-              whiteSpace: "nowrap",
-              border: 0,
-            }}
-          >
+          <label htmlFor="word-search" className="sr-only">
             Enter a word to find alternatives
           </label>
           <input
@@ -566,34 +429,12 @@ export default function Home() {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             placeholder="Enter a word you'd like to upgrade…"
-            style={{
-              flex: 1,
-              border: "none",
-              background: "none",
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "16px",
-              color: "#1A1A18",
-              padding: "10px 0",
-            }}
+            className="flex-1 border-none bg-transparent font-body text-base text-parchment-900 py-2.5 outline-none"
           />
           <button
             onClick={handleSubmit}
             disabled={loading || !query.trim()}
-            className="btn-primary"
-            style={{
-              background: loading ? "#B8B2A8" : "#8B6914",
-              color: "#FFFFFF",
-              border: "none",
-              borderRadius: "10px",
-              padding: "12px 28px",
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "15px",
-              fontWeight: 600,
-              cursor: loading ? "wait" : "pointer",
-              transition: "background 0.2s ease",
-              letterSpacing: "0.02em",
-              whiteSpace: "nowrap",
-            }}
+            className={`btn-primary ${loading ? "bg-parchment-500 cursor-wait" : "bg-gold cursor-pointer"} text-white border-none rounded-[10px] px-7 py-3 font-body text-[15px] font-semibold transition-colors duration-200 tracking-[0.02em] whitespace-nowrap`}
           >
             {loading ? "Searching…" : "Find Words"}
           </button>
@@ -601,31 +442,13 @@ export default function Home() {
 
         {/* Anonymous usage indicator */}
         {!session && anonSearchCount > 0 && (
-          <div
-            style={{
-              textAlign: "center",
-              marginTop: "10px",
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "12px",
-              color: "#B8B2A8",
-            }}
-          >
+          <div className="text-center mt-2.5 font-body text-xs text-parchment-500">
             {anonSearchCount >= FREE_SEARCH_LIMIT ? (
               <span>
                 You&apos;ve used all {FREE_SEARCH_LIMIT} free searches.{" "}
                 <button
                   onClick={handleGetStarted}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#8B6914",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    fontFamily: "inherit",
-                    fontSize: "inherit",
-                    textDecoration: "underline",
-                    padding: 0,
-                  }}
+                  className="bg-transparent border-none text-gold font-semibold cursor-pointer underline p-0 font-body text-xs"
                 >
                   Sign up
                 </button>{" "}
@@ -634,23 +457,11 @@ export default function Home() {
             ) : (
               <span>
                 {FREE_SEARCH_LIMIT - anonSearchCount} free{" "}
-                {FREE_SEARCH_LIMIT - anonSearchCount === 1
-                  ? "search"
-                  : "searches"}{" "}
+                {FREE_SEARCH_LIMIT - anonSearchCount === 1 ? "search" : "searches"}{" "}
                 remaining.{" "}
                 <button
                   onClick={handleGetStarted}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "#8B6914",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                    fontFamily: "inherit",
-                    fontSize: "inherit",
-                    textDecoration: "underline",
-                    padding: 0,
-                  }}
+                  className="bg-transparent border-none text-gold font-semibold cursor-pointer underline p-0 font-body text-xs"
                 >
                   Sign up
                 </button>{" "}
@@ -663,23 +474,10 @@ export default function Home() {
         {/* History chips */}
         {history.length > 0 && (
           <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "6px",
-              marginTop: "14px",
-              animation: "fadeUp 0.3s ease both",
-            }}
+            className="flex flex-wrap gap-1.5 mt-3.5"
+            style={{ animation: "fadeUp 0.3s ease both" }}
           >
-            <span
-              style={{
-                fontSize: "11px",
-                color: "#B8B2A8",
-                fontWeight: 500,
-                padding: "4px 2px",
-                letterSpacing: "0.04em",
-              }}
-            >
+            <span className="text-[11px] text-parchment-500 font-medium px-0.5 py-1 tracking-[0.04em]">
               Recent:
             </span>
             {history.map((w) => (
@@ -689,18 +487,7 @@ export default function Home() {
                   setQuery(w);
                   searchWord(w);
                 }}
-                className="history-chip"
-                style={{
-                  background: "#F0EBE1",
-                  border: "1px solid #E0DAD0",
-                  borderRadius: "20px",
-                  padding: "5px 12px",
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "12px",
-                  color: "#6A6460",
-                  cursor: "pointer",
-                  transition: "background 0.15s ease",
-                }}
+                className="history-chip bg-parchment-200 border border-[#E0DAD0] rounded-full px-3 py-[5px] font-body text-xs text-parchment-700 cursor-pointer transition-colors duration-150"
               >
                 {w}
               </button>
@@ -710,48 +497,28 @@ export default function Home() {
       </div>
 
       {/* Screen-reader live region for search status */}
-      <div aria-live="polite" aria-atomic="true" style={{ position: "absolute", width: "1px", height: "1px", overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap" }}>
-        {loading ? "Searching for word alternatives\u2026" : error ? error : results ? `Found ${results.alternatives?.length ?? 0} alternatives for ${results.original}` : ""}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {loading ? "Searching for word alternatives…" : error ? error : results ? `Found ${results.alternatives?.length ?? 0} alternatives for ${results.original}` : ""}
       </div>
 
       {/* Results */}
-      <div
-        style={{ maxWidth: "720px", margin: "0 auto", padding: "24px 24px 60px" }}
-      >
+      <div className="max-w-[720px] mx-auto px-6 pt-6 pb-[60px]">
         {/* Loading */}
         {loading && (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              padding: "60px 20px",
-              gap: "16px",
-            }}
-          >
-            <div style={{ display: "flex", gap: "6px" }}>
+          <div className="flex flex-col items-center px-5 py-[60px] gap-4">
+            <div className="flex gap-1.5">
               {[0, 1, 2].map((i) => (
                 <div
                   key={i}
+                  className="w-2.5 h-2.5 rounded-full bg-gold"
                   style={{
-                    width: "10px",
-                    height: "10px",
-                    borderRadius: "50%",
-                    background: "#8B6914",
                     animation: "pulse 1.2s ease infinite",
                     animationDelay: `${i * 0.2}s`,
                   }}
                 />
               ))}
             </div>
-            <p
-              style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "17px",
-                color: "#8A8478",
-                fontStyle: "italic",
-              }}
-            >
+            <p className="font-display text-[17px] text-parchment-600 italic">
               Hunting for the perfect words…
             </p>
           </div>
@@ -761,13 +528,7 @@ export default function Home() {
         {error && (
           <div
             role="alert"
-            style={{
-              textAlign: "center",
-              padding: "40px 20px",
-              color: "#C0392B",
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "14px",
-            }}
+            className="text-center px-5 py-[40px] text-category-punchy font-body text-sm"
           >
             {error}
           </div>
@@ -776,64 +537,24 @@ export default function Home() {
         {/* Results grid */}
         {results && !loading && (
           <div style={{ animation: "fadeUp 0.4s ease both" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                marginBottom: "20px",
-                paddingBottom: "14px",
-                borderBottom: "1px solid #E0DAD0",
-              }}
-            >
-              <p style={{ margin: 0, fontSize: "15px", color: "#8A8478" }}>
+            <div className="flex items-center gap-3 mb-5 pb-3.5 border-b border-[#E0DAD0]">
+              <p className="m-0 text-[15px] text-parchment-600">
                 Alternatives for{" "}
-                <span
-                  style={{
-                    fontFamily: "'Playfair Display', Georgia, serif",
-                    fontWeight: 700,
-                    color: "#1A1A18",
-                    fontSize: "20px",
-                  }}
-                >
+                <span className="font-display font-bold text-parchment-900 text-xl">
                   {results.original}
                 </span>
               </p>
             </div>
 
             {/* Category legend */}
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "12px",
-                marginBottom: "20px",
-              }}
-            >
+            <div className="flex flex-wrap gap-3 mb-5">
               {CATEGORY_LEGEND.map((cat) => (
-                <div
-                  key={cat.key}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "5px",
-                  }}
-                >
+                <div key={cat.key} className="flex items-center gap-[5px]">
                   <div
-                    style={{
-                      width: "8px",
-                      height: "8px",
-                      borderRadius: "2px",
-                      background: cat.color,
-                    }}
+                    className="w-2 h-2 rounded-[2px]"
+                    style={{ background: cat.color }}
                   />
-                  <span
-                    style={{
-                      fontSize: "11px",
-                      color: "#8A8478",
-                      letterSpacing: "0.02em",
-                    }}
-                  >
+                  <span className="text-[11px] text-parchment-600 tracking-[0.02em]">
                     {cat.label}
                   </span>
                 </div>
@@ -841,13 +562,10 @@ export default function Home() {
             </div>
 
             <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-                gap: "14px",
-              }}
+              className="grid gap-3.5"
+              style={{ gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))" }}
             >
-              {results.alternatives?.map((word: any, i: number) => (
+              {results.alternatives?.map((word: WordData, i: number) => (
                 <WordCard
                   key={word.word + i}
                   word={word}
@@ -868,44 +586,19 @@ export default function Home() {
         {/* Empty state */}
         {!results && !loading && !error && (
           <div
-            style={{
-              textAlign: "center",
-              padding: "60px 20px",
-              animation: "fadeUp 0.5s ease both",
-              animationDelay: "0.3s",
-            }}
+            className="text-center px-5 py-[60px]"
+            style={{ animation: "fadeUp 0.5s ease both", animationDelay: "0.3s" }}
           >
-            <p
-              style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "22px",
-                color: "#B8B2A8",
-                fontStyle: "italic",
-                margin: "0 0 16px 0",
-              }}
-            >
+            <p className="font-display text-[22px] text-parchment-500 italic m-0 mb-4">
               The difference between the right word
               <br />
               and the almost right word…
             </p>
-            <p
-              style={{
-                fontSize: "13px",
-                color: "#A8A298",
-                margin: "0 0 28px 0",
-              }}
-            >
+            <p className="text-[13px] text-[#A8A298] m-0 mb-7">
               — is the difference between lightning and a lightning bug.
             </p>
 
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                justifyContent: "center",
-                gap: "8px",
-              }}
-            >
+            <div className="flex flex-wrap justify-center gap-2">
               {STARTER_WORDS.map((w) => (
                 <button
                   key={w}
@@ -913,18 +606,7 @@ export default function Home() {
                     setQuery(w);
                     searchWord(w);
                   }}
-                  className="starter-word"
-                  style={{
-                    background: "transparent",
-                    border: "1.5px dashed #D8D2C8",
-                    borderRadius: "20px",
-                    padding: "8px 18px",
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: "13px",
-                    color: "#8A8478",
-                    cursor: "pointer",
-                    transition: "background 0.2s ease, border-color 0.2s ease, color 0.2s ease",
-                  }}
+                  className="starter-word bg-transparent border-[1.5px] border-dashed border-parchment-400 rounded-full px-[18px] py-2 font-body text-[13px] text-parchment-600 cursor-pointer transition-all duration-200"
                 >
                   try &ldquo;{w}&rdquo;
                 </button>

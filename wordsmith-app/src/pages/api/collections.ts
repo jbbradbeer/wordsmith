@@ -1,33 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { getServiceSupabase } from "@/lib/supabase";
+import { withSubscription } from "@/lib/api";
+import { validateEnv } from "@/lib/env";
+import type { Session } from "@supabase/supabase-js";
 
-export default async function handler(
+validateEnv();
+
+async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
+  session: Session
 ) {
-  const supabase = createServerSupabaseClient({ req, res });
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  if (!session) {
-    return res.status(401).json({ error: "Not authenticated" });
-  }
-
   const serviceClient = getServiceSupabase();
-
-  // Check subscription status
-  const { data: profile } = await serviceClient
-    .from("profiles")
-    .select("subscription_status")
-    .eq("id", session.user.id)
-    .single();
-
-  if (profile?.subscription_status !== "active") {
-    return res.status(403).json({ error: "subscription_required" });
-  }
-
   const userId = session.user.id;
 
   // GET: List collections with word counts
@@ -44,33 +28,48 @@ export default async function handler(
       return res.status(500).json({ error: "Failed to fetch collections" });
     }
 
-    // Get word counts for each collection
-    const collectionsWithCounts = await Promise.all(
-      (collections || []).map(async (collection) => {
-        const { count } = await serviceClient
+    const collectionIds = (collections || []).map((c) => c.id);
+
+    if (collectionIds.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    // Replace N+1 queries with 2 queries total (run in parallel)
+    const wordCountsPromise = serviceClient
+      .from("collection_words")
+      .select("collection_id")
+      .in("collection_id", collectionIds);
+
+    const checkWordPromise = checkWord
+      ? serviceClient
           .from("collection_words")
-          .select("*", { count: "exact", head: true })
-          .eq("collection_id", collection.id);
+          .select("collection_id")
+          .eq("word", checkWord)
+          .in("collection_id", collectionIds)
+      : Promise.resolve({ data: [] as { collection_id: string }[], error: null });
 
-        let containsWord: boolean | undefined;
-        if (checkWord) {
-          const { count: wordCount } = await serviceClient
-            .from("collection_words")
-            .select("*", { count: "exact", head: true })
-            .eq("collection_id", collection.id)
-            .eq("word", checkWord);
-          containsWord = (wordCount || 0) > 0;
-        }
+    const [wordCountsResult, checkWordResult] = await Promise.all([
+      wordCountsPromise,
+      checkWordPromise,
+    ]);
 
-        return {
-          ...collection,
-          word_count: count || 0,
-          ...(checkWord !== undefined ? { containsWord } : {}),
-        };
-      })
+    // Compute counts in JS — O(total words), avoids N DB round-trips
+    const wordCounts: Record<string, number> = {};
+    for (const row of wordCountsResult.data || []) {
+      wordCounts[row.collection_id] = (wordCounts[row.collection_id] || 0) + 1;
+    }
+
+    const containsWordIn = new Set<string>(
+      (checkWordResult.data || []).map((r) => r.collection_id)
     );
 
-    return res.status(200).json(collectionsWithCounts);
+    const result = (collections || []).map((c) => ({
+      ...c,
+      word_count: wordCounts[c.id] || 0,
+      ...(checkWord !== undefined ? { containsWord: containsWordIn.has(c.id) } : {}),
+    }));
+
+    return res.status(200).json(result);
   }
 
   // POST: Create a new collection
@@ -176,3 +175,5 @@ export default async function handler(
 
   return res.status(405).json({ error: "Method not allowed" });
 }
+
+export default withSubscription(handler);

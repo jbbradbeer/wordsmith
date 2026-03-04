@@ -4,14 +4,8 @@ import Link from "next/link";
 import AuthModal from "@/components/AuthModal";
 import PaywallModal from "@/components/PaywallModal";
 import Footer from "@/components/landing/Footer";
-import type { Collection, CollectionWord } from "@/lib/types";
-
-const WORD_CATEGORIES: Record<string, { label: string; color: string }> = {
-  elevated: { label: "Elevated", color: "#8B6914" },
-  literary: { label: "Literary", color: "#6B4C8A" },
-  punchy: { label: "Punchy", color: "#C0392B" },
-  rare: { label: "Rare Gem", color: "#1A7A6D" },
-};
+import type { Collection, CollectionWord, UserInfo } from "@/lib/types";
+import { WORD_CATEGORIES } from "@/lib/constants";
 
 export default function Collections() {
   const session = useSession();
@@ -35,7 +29,7 @@ export default function Collections() {
   const [showPaywall, setShowPaywall] = useState(false);
 
   // User info
-  const [userInfo, setUserInfo] = useState<any>(null);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
   // Fetch user info
   const fetchUserInfo = useCallback(async () => {
@@ -83,7 +77,7 @@ export default function Collections() {
 
   // Fetch words for a collection
   const fetchWords = async (collectionId: string) => {
-    if (words[collectionId]) return; // Already loaded
+    if (words[collectionId] || wordsLoading === collectionId) return; // Already loaded or fetch in flight
     setWordsLoading(collectionId);
     try {
       const res = await fetch(
