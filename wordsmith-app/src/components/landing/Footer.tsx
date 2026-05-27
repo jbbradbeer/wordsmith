@@ -53,6 +53,7 @@ export default function Footer() {
         >
           <Link
             href="/privacy"
+            className="footer-link"
             style={{
               fontFamily: "'DM Sans', sans-serif",
               fontSize: "13px",
@@ -65,6 +66,7 @@ export default function Footer() {
           </Link>
           <a
             href="mailto:privacy@trywordsmith.com"
+            className="footer-link"
             style={{
               fontFamily: "'DM Sans', sans-serif",
               fontSize: "13px",

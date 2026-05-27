@@ -239,6 +239,8 @@ export default function AuthModal({
               type="email"
               name="email"
               autoComplete="email"
+              spellCheck={false}
+              placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required

@@ -39,7 +39,7 @@ export default function WordCard({
       }}
     >
       <div
-        className={`relative rounded-xl px-[22px] py-5 min-h-[140px] ${
+        className={`wordcard-inner relative rounded-xl px-[22px] py-5 min-h-[140px] ${
           flipped ? "bg-parchment-50" : "bg-white"
         }`}
         style={{
@@ -109,8 +109,8 @@ export default function WordCard({
           </div>
         )}
 
-        <p className="font-body text-[11px] text-parchment-500 mt-2 mb-0 text-right">
-          {flipped ? "click to collapse" : "click for example"}
+        <p className="font-body text-[11px] text-parchment-500 mt-2 mb-0 text-right" aria-hidden="true">
+          {flipped ? "tap to collapse" : "tap for example"}
         </p>
       </div>
     </div>

@@ -96,6 +96,7 @@ export default function UsageBar({
           fontFamily: "'DM Sans', sans-serif",
           color: remaining === 0 ? "#C0392B" : "#8A8478",
           whiteSpace: "nowrap",
+          fontVariantNumeric: "tabular-nums",
         }}
       >
         {remaining === 0 ? (

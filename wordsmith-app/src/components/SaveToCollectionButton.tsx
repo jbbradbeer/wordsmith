@@ -373,6 +373,8 @@ export default function SaveToCollectionButton({
             <input
               ref={inputRef}
               type="text"
+              name="collection-name"
+              autoComplete="off"
               aria-label="New collection name"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
@@ -393,6 +395,7 @@ export default function SaveToCollectionButton({
             <button
               onClick={createAndSave}
               disabled={!newName.trim() || creating}
+              aria-label="Create collection"
               style={{
                 background: newName.trim() ? "#8B6914" : "#E8E2D8",
                 color: "#FFFFFF",

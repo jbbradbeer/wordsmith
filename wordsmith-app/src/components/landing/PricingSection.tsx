@@ -136,6 +136,7 @@ export default function PricingSection({
           </ul>
           <button
             onClick={onGetStarted}
+            className="btn-outline"
             style={{
               width: "100%",
               background: "transparent",
@@ -242,6 +243,7 @@ export default function PricingSection({
           </ul>
           <button
             onClick={onUpgrade}
+            className="btn-primary"
             style={{
               width: "100%",
               background: "#8B6914",

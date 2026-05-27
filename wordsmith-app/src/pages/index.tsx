@@ -477,9 +477,15 @@ export default function Home() {
         )}
       </div>
 
-      {/* Screen-reader live region for search status */}
+      {/* Screen-reader live region for search status and anonymous count */}
       <div aria-live="polite" aria-atomic="true" className="sr-only">
-        {loading ? "Searching for word alternatives…" : error ? error : results ? `Found ${results.alternatives?.length ?? 0} alternatives for ${results.original}` : ""}
+        {loading
+          ? "Searching for word alternatives…"
+          : error
+          ? error
+          : results
+          ? `Found ${results.alternatives?.length ?? 0} alternatives for ${results.original}${!session && anonSearchCount > 0 ? `. ${Math.max(0, FREE_SEARCH_LIMIT - anonSearchCount)} free searches remaining.` : ""}`
+          : ""}
       </div>
 
       {/* Results */}

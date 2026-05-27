@@ -32,11 +32,25 @@ button,
 
 /* ─── Focus states ──────────────────────────────────── */
 
+/* Global keyboard focus ring — buttons, links, role=button */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid rgba(139, 101, 20, 0.6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 /* Search box — focus ring on compound control (input or button focused) */
 .search-box:focus-within {
   box-shadow: 0 4px 28px rgba(26, 26, 24, 0.09),
     0 1px 4px rgba(26, 26, 24, 0.06),
     0 0 0 2px rgba(139, 101, 32, 0.5);
+}
+
+/* Suppress outline on search input — ring is on the parent .search-box instead */
+.search-box input:focus-visible {
+  outline: none;
 }
 
 /* ─── WordCard hover lift ───────────────────────────── */
@@ -61,6 +75,11 @@ button,
   color: #1a1a18 !important;
 }
 
+.btn-outline:hover:not(:disabled) {
+  background: #8B6914 !important;
+  color: #ffffff !important;
+}
+
 .history-chip:hover {
   background: #e4dccf !important;
 }
@@ -68,6 +87,10 @@ button,
 .starter-word:hover {
   background: #e4dccf !important;
   border-color: #c8beb0 !important;
+}
+
+.footer-link:hover {
+  color: #1a1a18 !important;
 }
 
 /* ─── Animations ────────────────────────────────────── */

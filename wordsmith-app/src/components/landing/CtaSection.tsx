@@ -43,6 +43,7 @@ export default function CtaSection({ onGetStarted }: CtaSectionProps) {
         </p>
         <button
           onClick={onGetStarted}
+          className="btn-primary"
           style={{
             background: "#8B6914",
             color: "#FFFFFF",
