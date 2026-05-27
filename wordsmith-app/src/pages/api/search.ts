@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
+import { getServiceSupabase } from "@/lib/supabase";
+import { getAnonCount, setAnonCount } from "@/lib/anon-cookie";
 import Anthropic from "@anthropic-ai/sdk";
 import { LRUCache } from "lru-cache";
 import type { WordData } from "@/lib/types";
@@ -59,7 +61,7 @@ async function streamFromClaude(
   stream.on("text", (chunk: string) => {
     buffer += chunk;
     const lines = buffer.split("\n");
-    buffer = lines.pop()!; // keep incomplete final line
+    buffer = lines.pop()!;
     for (const line of lines) {
       const trimmed = line.trim();
       if (!trimmed) continue;
@@ -83,7 +85,6 @@ async function streamFromClaude(
 
   await stream.finalMessage();
 
-  // Flush any remaining content in buffer
   if (buffer.trim()) {
     try {
       const word = JSON.parse(buffer.trim()) as WordData;
@@ -97,6 +98,14 @@ async function streamFromClaude(
   return words;
 }
 
+function openSSE(res: NextApiResponse) {
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache, no-transform");
+  res.setHeader("Connection", "keep-alive");
+  res.setHeader("X-Accel-Buffering", "no");
+  res.flushHeaders();
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -105,32 +114,26 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { query, anonSearchCount } = req.body;
+  const { query } = req.body;
   if (!query || typeof query !== "string" || query.trim().length === 0) {
     return res.status(400).json({ error: "A search word is required" });
   }
 
   const searchTerm = query.trim().toLowerCase().slice(0, 50);
 
-  // Reject queries that contain anything other than letters, spaces, hyphens, or apostrophes
   if (!/^[a-z\s'-]+$/.test(searchTerm)) {
     return res.status(400).json({ error: "Search term must contain only letters" });
   }
 
-  // Check for authenticated user
   const supabase = createServerSupabaseClient({ req, res });
   const {
     data: { session },
   } = await supabase.auth.getSession();
 
-  const isAnonymous = !session;
-
   // --- Anonymous search path ---
-  if (isAnonymous) {
-    const currentAnonCount =
-      typeof anonSearchCount === "number" ? anonSearchCount : 0;
+  if (!session) {
+    const currentAnonCount = getAnonCount(req);
 
-    // 403 guard — must fire BEFORE SSE headers
     if (currentAnonCount >= FREE_SEARCH_LIMIT) {
       return res.status(403).json({
         error: "signup_required",
@@ -138,15 +141,12 @@ export default async function handler(
       });
     }
 
-    // Open SSE stream
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache, no-transform");
-    res.setHeader("Connection", "keep-alive");
-    res.setHeader("X-Accel-Buffering", "no");
-    res.flushHeaders();
+    // Increment cookie before opening SSE (headers must be set before flushHeaders)
+    setAnonCount(res, currentAnonCount + 1);
+
+    openSSE(res);
 
     try {
-      // Cache hit — stream instantly
       const cached = wordCache.get(searchTerm);
       if (cached) {
         for (const word of cached) {
@@ -160,7 +160,6 @@ export default async function handler(
         return;
       }
 
-      // Cache miss — stream from Claude
       const words = await streamFromClaude(res, searchTerm);
       wordCache.set(searchTerm, words);
 
@@ -181,86 +180,62 @@ export default async function handler(
 
   // --- Authenticated search path ---
   const userId = session.user.id;
+  const serviceClient = getServiceSupabase();
 
-  // Fetch profile — needed for limit check (must happen before SSE headers)
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("subscription_status, search_count")
-    .eq("id", userId)
-    .single();
+  // Atomic check-and-increment — prevents concurrent request bypass
+  const { data: rpcResult, error: rpcError } = await serviceClient.rpc(
+    "try_increment_search_count",
+    { p_user_id: userId, p_limit: FREE_SEARCH_LIMIT }
+  );
 
-  if (profileError || !profile) {
-    return res.status(500).json({ error: "Could not load profile" });
+  if (rpcError || !rpcResult) {
+    console.error("RPC error:", rpcError);
+    return res.status(500).json({ error: "Could not process search" });
   }
 
-  const isPaid = profile.subscription_status === "active";
-  const searchCount = profile.search_count || 0;
-
-  // 403 guard — must fire BEFORE SSE headers
-  if (!isPaid && searchCount >= FREE_SEARCH_LIMIT) {
+  if (!rpcResult.allowed) {
     return res.status(403).json({
       error: "free_limit_reached",
       message: `You've used all ${FREE_SEARCH_LIMIT} free searches. Upgrade to Wordsmith Pro for unlimited access.`,
-      searchCount,
+      searchCount: rpcResult.search_count,
       limit: FREE_SEARCH_LIMIT,
     });
   }
 
-  // Open SSE stream
-  res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache, no-transform");
-  res.setHeader("Connection", "keep-alive");
-  res.setHeader("X-Accel-Buffering", "no");
-  res.flushHeaders();
+  const isPaid = rpcResult.subscription_status === "active";
+  const newSearchCount: number = rpcResult.search_count;
+
+  openSSE(res);
 
   try {
-    const { getServiceSupabase } = await import("@/lib/supabase");
-    const serviceClient = getServiceSupabase();
-
     const donePayload = {
       usage: {
-        searchCount: searchCount + 1,
+        searchCount: newSearchCount,
         limit: isPaid ? null : FREE_SEARCH_LIMIT,
         isPaid,
       },
     };
 
-    // Cache hit — stream instantly, still track usage
     const cached = wordCache.get(searchTerm);
     if (cached) {
       for (const word of cached) {
         writeSSEEvent(res, "word", word);
       }
-      // Fire-and-forget DB writes — don't block the response
-      Promise.all([
-        serviceClient
-          .from("searches")
-          .insert({ user_id: userId, query: searchTerm }),
-        serviceClient
-          .from("profiles")
-          .update({ search_count: searchCount + 1 })
-          .eq("id", userId),
-      ]).catch((err) => console.error("DB write failed (cache hit):", err));
+      Promise.resolve(
+        serviceClient.from("searches").insert({ user_id: userId, query: searchTerm })
+      ).catch((err) => console.error("DB write failed (cache hit):", err));
 
       writeSSEEvent(res, "done", donePayload);
       res.end();
       return;
     }
 
-    // Cache miss — stream from Claude
     const words = await streamFromClaude(res, searchTerm);
     wordCache.set(searchTerm, words);
 
-    // Fire-and-forget DB writes — don't block the response
-    Promise.all([
-      serviceClient
-        .from("searches")
-        .insert({ user_id: userId, query: searchTerm }),
-      serviceClient
-        .from("profiles")
-        .update({ search_count: searchCount + 1 })
-        .eq("id", userId),
-    ]).catch((err) => console.error("DB write failed:", err));
+    Promise.resolve(
+      serviceClient.from("searches").insert({ user_id: userId, query: searchTerm })
+    ).catch((err) => console.error("DB write failed:", err));
 
     writeSSEEvent(res, "done", donePayload);
     res.end();

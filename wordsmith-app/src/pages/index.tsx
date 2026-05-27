@@ -91,32 +91,18 @@ export default function Home() {
     fetchUserInfo();
   }, [fetchUserInfo]);
 
-  // Transfer anonymous search count when user signs in
+  // Transfer anonymous search count (from server cookie) to profile on login
   useEffect(() => {
     if (!session) return;
 
-    try {
-      const stored = localStorage.getItem(ANON_COUNT_KEY);
-      const count = stored ? parseInt(stored, 10) || 0 : 0;
-
-      if (count > 0) {
-        fetch("/api/user", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ anonSearchCount: count }),
-        })
-          .then(() => {
-            localStorage.removeItem(ANON_COUNT_KEY);
-            setAnonSearchCount(0);
-            fetchUserInfo(); // Refresh to pick up transferred count
-          })
-          .catch((err) =>
-            console.error("Failed to transfer anon count:", err)
-          );
-      }
-    } catch {
-      // localStorage unavailable
-    }
+    fetch("/api/user", { method: "POST" })
+      .then(() => {
+        // Clear local display state now that it's been merged into the profile
+        try { localStorage.removeItem(ANON_COUNT_KEY); } catch { /* unavailable */ }
+        setAnonSearchCount(0);
+        fetchUserInfo();
+      })
+      .catch((err) => console.error("Failed to transfer anon count:", err));
   }, [session, fetchUserInfo]);
 
   useEffect(() => {
@@ -151,15 +137,10 @@ export default function Home() {
     setResults(null);
 
     try {
-      const body: any = { query: searchTerm };
-      if (!session) {
-        body.anonSearchCount = anonSearchCount;
-      }
-
       const response = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ query: searchTerm }),
       });
 
       // 403s are returned as plain JSON (before SSE headers are set on the server)

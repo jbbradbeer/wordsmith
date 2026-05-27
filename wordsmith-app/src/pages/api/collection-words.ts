@@ -55,6 +55,10 @@ async function handler(
         .json({ error: "collectionId and word are required" });
     }
 
+    if (typeof word !== "string" || word.length > 100) {
+      return res.status(400).json({ error: "Invalid word" });
+    }
+
     // Verify collection ownership
     const { data: collection } = await serviceClient
       .from("collections")
@@ -81,12 +85,12 @@ async function handler(
     // Insert the word
     const { error } = await serviceClient.from("collection_words").insert({
       collection_id: collectionId,
-      word,
-      pronunciation: pronunciation || null,
-      definition: definition || null,
-      example: example || null,
-      context: context || null,
-      category: category || null,
+      word: String(word).slice(0, 100),
+      pronunciation: pronunciation ? String(pronunciation).slice(0, 100) : null,
+      definition: definition ? String(definition).slice(0, 500) : null,
+      example: example ? String(example).slice(0, 500) : null,
+      context: context ? String(context).slice(0, 300) : null,
+      category: category ? String(category).slice(0, 50) : null,
     });
 
     if (error) {

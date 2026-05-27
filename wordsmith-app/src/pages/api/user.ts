@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { FREE_SEARCH_LIMIT } from "@/lib/constants";
 import { getServiceSupabase } from "@/lib/supabase";
 import { withAuth } from "@/lib/api";
+import { getAnonCount, clearAnonCookie } from "@/lib/anon-cookie";
 import type { Session } from "@supabase/supabase-js";
 
 async function handler(
@@ -10,14 +11,13 @@ async function handler(
   res: NextApiResponse,
   session: Session
 ) {
-  // POST: Transfer anonymous search count to profile
+  // POST: Transfer anonymous search count (from signed cookie) to profile on login
   if (req.method === "POST") {
-    const { anonSearchCount } = req.body;
+    const anonCount = getAnonCount(req);
 
-    if (typeof anonSearchCount === "number" && anonSearchCount > 0) {
+    if (anonCount > 0) {
       const serviceClient = getServiceSupabase();
 
-      // Get current count and add anonymous searches
       const { data: profile } = await serviceClient
         .from("profiles")
         .select("search_count")
@@ -27,9 +27,12 @@ async function handler(
       const currentCount = profile?.search_count || 0;
       await serviceClient
         .from("profiles")
-        .update({ search_count: currentCount + anonSearchCount })
+        .update({ search_count: currentCount + anonCount })
         .eq("id", session.user.id);
     }
+
+    // Clear the cookie regardless — count is now in the DB
+    clearAnonCookie(res);
 
     return res.status(200).json({ success: true });
   }
