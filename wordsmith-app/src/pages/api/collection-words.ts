@@ -1,7 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServiceSupabase } from "@/lib/supabase";
 import { withSubscription } from "@/lib/api";
+import { validateEnv } from "@/lib/env";
 import type { Session } from "@supabase/supabase-js";
+
+validateEnv();
 
 async function handler(
   req: NextApiRequest,

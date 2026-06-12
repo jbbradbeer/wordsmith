@@ -4,7 +4,10 @@ import { FREE_SEARCH_LIMIT } from "@/lib/constants";
 import { getServiceSupabase } from "@/lib/supabase";
 import { withAuth } from "@/lib/api";
 import { getAnonCount, clearAnonCookie } from "@/lib/anon-cookie";
+import { validateEnv } from "@/lib/env";
 import type { Session } from "@supabase/supabase-js";
+
+validateEnv();
 
 async function handler(
   req: NextApiRequest,
@@ -13,7 +16,9 @@ async function handler(
 ) {
   // POST: Transfer anonymous search count (from signed cookie) to profile on login
   if (req.method === "POST") {
-    const anonCount = getAnonCount(req);
+    // Cap at the free limit — the cookie is signed, but if the secret ever
+    // leaks a forged count must not exceed what a legitimate user could reach
+    const anonCount = Math.min(getAnonCount(req), FREE_SEARCH_LIMIT);
 
     if (anonCount > 0) {
       const serviceClient = getServiceSupabase();

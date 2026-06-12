@@ -48,12 +48,11 @@ export function clearAnonCookie(res: NextApiResponse): void {
 
 function appendCookie(res: NextApiResponse, cookie: string): void {
   const existing = res.getHeader("Set-Cookie");
-  if (!existing) {
-    res.setHeader("Set-Cookie", cookie);
-  } else if (Array.isArray(existing)) {
-    const filtered = existing.filter((c) => !c.startsWith(`${COOKIE_NAME}=`));
-    res.setHeader("Set-Cookie", [...filtered, cookie]);
-  } else {
-    res.setHeader("Set-Cookie", [existing as string, cookie]);
-  }
+  const current = !existing
+    ? []
+    : Array.isArray(existing)
+      ? existing
+      : [String(existing)];
+  const filtered = current.filter((c) => !c.startsWith(`${COOKIE_NAME}=`));
+  res.setHeader("Set-Cookie", [...filtered, cookie]);
 }

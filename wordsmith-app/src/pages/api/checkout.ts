@@ -2,6 +2,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { stripe } from "@/lib/stripe";
 import { getServiceSupabase } from "@/lib/supabase";
+import { validateEnv } from "@/lib/env";
+import { createRequestLogger } from "@/lib/logger";
+
+validateEnv();
 
 export default async function handler(
   req: NextApiRequest,
@@ -79,7 +83,7 @@ export default async function handler(
 
     return res.status(200).json({ url: checkoutSession.url });
   } catch (err: any) {
-    console.error("Checkout error:", err);
+    createRequestLogger("/api/checkout", userId).error("checkout session creation failed", err);
     return res.status(500).json({ error: "Failed to create checkout session" });
   }
 }

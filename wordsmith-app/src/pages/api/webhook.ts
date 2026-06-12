@@ -2,7 +2,11 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { stripe } from "@/lib/stripe";
 import { getServiceSupabase } from "@/lib/supabase";
 import { buffer } from "micro";
+import { validateEnv } from "@/lib/env";
+import { createRequestLogger } from "@/lib/logger";
 import Stripe from "stripe";
+
+validateEnv();
 
 // Disable body parsing — Stripe needs raw body for signature verification
 export const config = {
@@ -19,6 +23,8 @@ export default async function handler(
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  const log = createRequestLogger("/api/webhook");
+
   const buf = await buffer(req);
   const sig = req.headers["stripe-signature"] as string;
 
@@ -31,11 +37,26 @@ export default async function handler(
       process.env.STRIPE_WEBHOOK_SECRET!
     );
   } catch (err: any) {
-    console.error("Webhook signature verification failed:", err.message);
+    log.error("signature verification failed", err);
     return res.status(400).json({ error: `Webhook Error: ${err.message}` });
   }
 
   const serviceClient = getServiceSupabase();
+
+  // Idempotency: claim the event id before processing. Stripe retries
+  // deliveries and can send the same event twice — a duplicate insert hits
+  // the primary key (23505) and we acknowledge without reprocessing.
+  const { error: claimError } = await serviceClient
+    .from("stripe_events")
+    .insert({ id: event.id, type: event.type });
+
+  if (claimError) {
+    if (claimError.code === "23505") {
+      return res.status(200).json({ received: true, duplicate: true });
+    }
+    log.error("event claim failed", claimError, { eventId: event.id, eventType: event.type });
+    return res.status(500).json({ error: "Webhook processing failed" });
+  }
 
   try {
     switch (event.type) {
@@ -122,7 +143,9 @@ export default async function handler(
       }
     }
   } catch (err: any) {
-    console.error("Webhook processing error:", err);
+    log.error("event processing failed", err, { eventId: event.id, eventType: event.type });
+    // Release the claim so Stripe's retry of this event isn't skipped as a duplicate
+    await serviceClient.from("stripe_events").delete().eq("id", event.id);
     return res.status(500).json({ error: "Webhook processing failed" });
   }
 

@@ -2,10 +2,15 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { getServiceSupabase } from "@/lib/supabase";
 import { getAnonCount, setAnonCount } from "@/lib/anon-cookie";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { createRequestLogger, type RequestLogger } from "@/lib/logger";
 import Anthropic from "@anthropic-ai/sdk";
 import { LRUCache } from "lru-cache";
 import type { WordData } from "@/lib/types";
 import { FREE_SEARCH_LIMIT } from "@/lib/constants";
+import { validateEnv } from "@/lib/env";
+
+validateEnv();
 
 // Disable Vercel response buffering so SSE events are flushed immediately
 export const config = {
@@ -21,6 +26,21 @@ const wordCache = new LRUCache<string, WordData[]>({
   max: 500,
   ttl: 1000 * 60 * 60 * 24, // 24 hours
 });
+
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const ANON_SEARCHES_PER_MINUTE = 10;
+const USER_SEARCHES_PER_MINUTE = 30;
+
+function rateLimited(
+  res: NextApiResponse,
+  retryAfterSeconds: number
+): void {
+  res.setHeader("Retry-After", String(retryAfterSeconds));
+  res.status(429).json({
+    error: "rate_limited",
+    message: "Too many searches. Please wait a moment and try again.",
+  });
+}
 
 function writeSSEEvent(res: NextApiResponse, event: string, data: unknown) {
   res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
@@ -47,7 +67,8 @@ Rules:
 
 async function streamFromClaude(
   res: NextApiResponse,
-  searchTerm: string
+  searchTerm: string,
+  log: RequestLogger
 ): Promise<WordData[]> {
   const words: WordData[] = [];
   let buffer = "";
@@ -76,7 +97,7 @@ async function streamFromClaude(
   });
 
   stream.on("error", (err: Error) => {
-    console.error("Stream error:", err);
+    log.error("Claude stream error", err, { term: searchTerm });
     writeSSEEvent(res, "error", {
       message: "Something went wrong. Please try again.",
     });
@@ -130,8 +151,19 @@ export default async function handler(
     data: { session },
   } = await supabase.auth.getSession();
 
+  const log = createRequestLogger("/api/search", session?.user.id);
+
   // --- Anonymous search path ---
   if (!session) {
+    const ipLimit = checkRateLimit(
+      `ip:${getClientIp(req)}`,
+      ANON_SEARCHES_PER_MINUTE,
+      RATE_LIMIT_WINDOW_MS
+    );
+    if (!ipLimit.allowed) {
+      return rateLimited(res, ipLimit.retryAfterSeconds);
+    }
+
     const currentAnonCount = getAnonCount(req);
 
     if (currentAnonCount >= FREE_SEARCH_LIMIT) {
@@ -160,7 +192,7 @@ export default async function handler(
         return;
       }
 
-      const words = await streamFromClaude(res, searchTerm);
+      const words = await streamFromClaude(res, searchTerm, log);
       wordCache.set(searchTerm, words);
 
       writeSSEEvent(res, "done", {
@@ -168,8 +200,9 @@ export default async function handler(
         anonSearchCount: currentAnonCount + 1,
       });
       res.end();
+      log.info("anon search complete", { term: searchTerm, latencyMs: log.latencyMs() });
     } catch (err: unknown) {
-      console.error("Anonymous search error:", err);
+      log.error("anonymous search failed", err, { term: searchTerm });
       writeSSEEvent(res, "error", {
         message: "Something went wrong. Please try again.",
       });
@@ -180,6 +213,16 @@ export default async function handler(
 
   // --- Authenticated search path ---
   const userId = session.user.id;
+
+  const userLimit = checkRateLimit(
+    `user:${userId}`,
+    USER_SEARCHES_PER_MINUTE,
+    RATE_LIMIT_WINDOW_MS
+  );
+  if (!userLimit.allowed) {
+    return rateLimited(res, userLimit.retryAfterSeconds);
+  }
+
   const serviceClient = getServiceSupabase();
 
   // Atomic check-and-increment — prevents concurrent request bypass
@@ -189,7 +232,7 @@ export default async function handler(
   );
 
   if (rpcError || !rpcResult) {
-    console.error("RPC error:", rpcError);
+    log.error("try_increment_search_count RPC failed", rpcError);
     return res.status(500).json({ error: "Could not process search" });
   }
 
@@ -223,24 +266,25 @@ export default async function handler(
       }
       Promise.resolve(
         serviceClient.from("searches").insert({ user_id: userId, query: searchTerm })
-      ).catch((err) => console.error("DB write failed (cache hit):", err));
+      ).catch((err) => log.error("search history write failed (cache hit)", err));
 
       writeSSEEvent(res, "done", donePayload);
       res.end();
       return;
     }
 
-    const words = await streamFromClaude(res, searchTerm);
+    const words = await streamFromClaude(res, searchTerm, log);
     wordCache.set(searchTerm, words);
 
     Promise.resolve(
       serviceClient.from("searches").insert({ user_id: userId, query: searchTerm })
-    ).catch((err) => console.error("DB write failed:", err));
+    ).catch((err) => log.error("search history write failed", err));
 
     writeSSEEvent(res, "done", donePayload);
     res.end();
+    log.info("search complete", { term: searchTerm, latencyMs: log.latencyMs() });
   } catch (err: unknown) {
-    console.error("Search API error:", err);
+    log.error("search failed", err, { term: searchTerm });
     writeSSEEvent(res, "error", {
       message: "Something went wrong. Please try again.",
     });

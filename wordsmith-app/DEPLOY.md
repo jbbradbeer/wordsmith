@@ -17,7 +17,7 @@ User → Next.js Frontend (Vercel)
 
 1. Go to [supabase.com](https://supabase.com) → **New Project**
 2. Name it `wordsmith`, choose a region close to your users, set a DB password
-3. Once created, go to **SQL Editor** → paste the contents of `supabase-schema.sql` → **Run**
+3. Once created, go to **SQL Editor** → paste the contents of `supabase-schema.sql` → **Run**, then run each file in `supabase-migrations/` in order (001, 002, …)
 4. Go to **Settings → API** and copy:
    - `Project URL` → this is your `NEXT_PUBLIC_SUPABASE_URL`
    - `anon public` key → this is your `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -77,7 +77,7 @@ User → Next.js Frontend (Vercel)
 1. Push this project to a GitHub repo
 2. Go to [vercel.com](https://vercel.com) → **New Project** → Import your repo
 3. Framework: **Next.js** (auto-detected)
-4. Add all environment variables from `.env.example` with your real values
+4. Add all environment variables from `.env.example` with your real values (generate `COOKIE_SECRET` with `openssl rand -hex 32` — it signs the anonymous free-search cookie)
 5. Set `NEXT_PUBLIC_APP_URL` to your Vercel domain (e.g., `https://wordsmith.vercel.app`)
 6. Click **Deploy**
 

@@ -2,7 +2,11 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { stripe } from "@/lib/stripe";
 import { getServiceSupabase } from "@/lib/supabase";
 import { withAuth } from "@/lib/api";
+import { validateEnv } from "@/lib/env";
+import { createRequestLogger } from "@/lib/logger";
 import type { Session } from "@supabase/supabase-js";
+
+validateEnv();
 
 async function handler(
   req: NextApiRequest,
@@ -32,7 +36,7 @@ async function handler(
 
     return res.status(200).json({ url: portalSession.url });
   } catch (err: unknown) {
-    console.error("Portal error:", err);
+    createRequestLogger("/api/portal", session.user.id).error("portal session creation failed", err);
     return res.status(500).json({ error: "Failed to create portal session" });
   }
 }
