@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import Head from "next/head";
 import Link from "next/link";
 import AuthModal from "@/components/AuthModal";
 import PaywallModal from "@/components/PaywallModal";
@@ -20,6 +21,28 @@ import CtaSection from "@/components/landing/CtaSection";
 import Footer from "@/components/landing/Footer";
 import WordRain from "@/components/WordRain";
 import { useKonami } from "@/lib/use-konami";
+import { SITE_URL } from "@/lib/seo";
+import { SUBSCRIPTION_PRICE_MONTHLY } from "@/lib/constants";
+
+const LANDING_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Wordsmith",
+  url: SITE_URL,
+  applicationCategory: "UtilitiesApplication",
+  operatingSystem: "Web",
+  description:
+    "AI-powered word discovery for writers — six curated alternatives for any word, categorized by style with definitions, pronunciation, and examples.",
+  offers: [
+    { "@type": "Offer", price: "0", priceCurrency: "USD", name: "Free" },
+    {
+      "@type": "Offer",
+      price: String(SUBSCRIPTION_PRICE_MONTHLY),
+      priceCurrency: "USD",
+      name: "Pro (monthly)",
+    },
+  ],
+};
 
 // Derive the category legend from the single source of truth
 const CATEGORY_LEGEND = Object.entries(WORD_CATEGORIES).map(([key, v]) => ({
@@ -310,6 +333,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
+      <Head>
+        <link rel="canonical" href={`${SITE_URL}/`} />
+        <meta property="og:url" content={`${SITE_URL}/`} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(LANDING_JSON_LD) }}
+        />
+      </Head>
+
       {/* Nav bar */}
       <nav
         aria-label="Site navigation"

@@ -4,6 +4,7 @@ import { getServiceSupabase } from "@/lib/supabase";
 import { getAnonCount, setAnonCount } from "@/lib/anon-cookie";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { createRequestLogger, type RequestLogger } from "@/lib/logger";
+import { buildWordPrompt } from "@/lib/word-prompt";
 import Anthropic from "@anthropic-ai/sdk";
 import { LRUCache } from "lru-cache";
 import type { WordData } from "@/lib/types";
@@ -46,25 +47,6 @@ function writeSSEEvent(res: NextApiResponse, event: string, data: unknown) {
   res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
 }
 
-function buildPrompt(searchTerm: string): string {
-  return `I'm looking for alternative, more interesting words for: "${searchTerm}"
-
-Return ONLY 6 lines of NDJSON. Each line must be a complete, self-contained JSON object.
-No arrays, no wrapper, no markdown, no preamble. One object per line:
-
-{"word":"...","pronunciation":"...","definition":"...","example":"...","context":"...","category":"..."}
-
-Rules:
-- Each line is valid JSON on its own
-- "category" must be one of: elevated, literary, punchy, rare
-- "pronunciation" uses phonetic notation like /fə-ˈnɛt-ɪk/
-- "definition" is one crisp sentence
-- "example" is a vivid sentence using the word naturally
-- "context" is a brief note on when/where this word works best
-- Give 6 alternatives ranging from slightly sophisticated to truly rare/unusual
-- Output exactly 6 lines, nothing else`;
-}
-
 async function streamFromClaude(
   res: NextApiResponse,
   searchTerm: string,
@@ -76,7 +58,7 @@ async function streamFromClaude(
   const stream = anthropic.messages.stream({
     model: "claude-sonnet-4-6",
     max_tokens: 1200,
-    messages: [{ role: "user", content: buildPrompt(searchTerm) }],
+    messages: [{ role: "user", content: buildWordPrompt(searchTerm) }],
   });
 
   stream.on("text", (chunk: string) => {

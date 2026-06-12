@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import Head from "next/head";
 import Link from "next/link";
 import AuthModal from "@/components/AuthModal";
 import PaywallModal from "@/components/PaywallModal";
@@ -201,6 +202,9 @@ export default function Collections() {
   if (!session) {
     return (
       <div style={{ minHeight: "100vh" }}>
+      <Head>
+        <meta name="robots" content="noindex" />
+      </Head>
         <div
           style={{
             maxWidth: "720px",
@@ -273,6 +277,9 @@ export default function Collections() {
   if (userInfo && !userInfo.isPaid) {
     return (
       <div style={{ minHeight: "100vh" }}>
+      <Head>
+        <meta name="robots" content="noindex" />
+      </Head>
         <div
           style={{
             maxWidth: "720px",
@@ -342,6 +349,9 @@ export default function Collections() {
 
   return (
     <div style={{ minHeight: "100vh" }}>
+      <Head>
+        <meta name="robots" content="noindex" />
+      </Head>
       {/* Nav bar */}
       <nav
         style={{

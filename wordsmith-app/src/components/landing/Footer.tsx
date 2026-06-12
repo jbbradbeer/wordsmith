@@ -33,6 +33,12 @@ export default function Footer({ onSecret }: FooterProps) {
 
         <div className="flex gap-6 items-center">
           <Link
+            href="/words"
+            className="footer-link font-body text-[13px] text-parchment-600 no-underline transition-colors duration-200"
+          >
+            Word Library
+          </Link>
+          <Link
             href="/privacy"
             className="footer-link font-body text-[13px] text-parchment-600 no-underline transition-colors duration-200"
           >
