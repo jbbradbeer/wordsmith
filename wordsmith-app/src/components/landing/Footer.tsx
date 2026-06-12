@@ -1,104 +1,63 @@
 import Link from "next/link";
+import { useRef } from "react";
 
-export default function Footer() {
+interface FooterProps {
+  /** Fires after five clicks on the fleuron — the page's hidden flourish. */
+  onSecret?: () => void;
+}
+
+const SECRET_CLICKS = 5;
+
+export default function Footer({ onSecret }: FooterProps) {
+  const clicks = useRef(0);
+
+  const handleFleuron = () => {
+    clicks.current += 1;
+    if (clicks.current >= SECRET_CLICKS) {
+      clicks.current = 0;
+      onSecret?.();
+    }
+  };
+
   return (
-    <footer
-      style={{
-        borderTop: "1px solid #E8E2D8",
-        padding: "40px 24px 32px",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: "900px",
-          margin: "0 auto",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
-          flexWrap: "wrap",
-          gap: "24px",
-        }}
-      >
-        {/* Left: Brand */}
+    <footer className="border-t border-parchment-300 pt-10 pb-8 px-6">
+      <div className="max-w-[900px] mx-auto flex justify-between items-start flex-wrap gap-6">
         <div>
-          <div
-            style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
-              fontSize: "18px",
-              fontWeight: 800,
-              color: "#1A1A18",
-              marginBottom: "4px",
-            }}
-          >
+          <div className="font-display font-extrabold text-lg text-parchment-900 mb-1">
             Wordsmith
           </div>
-          <div
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "13px",
-              color: "#B8B2A8",
-            }}
-          >
+          <div className="font-body text-[13px] text-parchment-500">
             A Writer&apos;s Companion
           </div>
         </div>
 
-        {/* Right: Links */}
-        <div
-          style={{
-            display: "flex",
-            gap: "24px",
-            alignItems: "center",
-          }}
-        >
+        <div className="flex gap-6 items-center">
           <Link
             href="/privacy"
-            className="footer-link"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "13px",
-              color: "#8A8478",
-              textDecoration: "none",
-              transition: "color 0.2s ease",
-            }}
+            className="footer-link font-body text-[13px] text-parchment-600 no-underline transition-colors duration-200"
           >
             Privacy Policy
           </Link>
           <a
             href="mailto:privacy@trywordsmith.com"
-            className="footer-link"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "13px",
-              color: "#8A8478",
-              textDecoration: "none",
-              transition: "color 0.2s ease",
-            }}
+            className="footer-link font-body text-[13px] text-parchment-600 no-underline transition-colors duration-200"
           >
             Contact
           </a>
         </div>
       </div>
 
-      {/* Bottom: Copyright */}
-      <div
-        style={{
-          maxWidth: "900px",
-          margin: "24px auto 0",
-          textAlign: "center",
-          borderTop: "1px solid #E8E2D8",
-          paddingTop: "20px",
-        }}
-      >
-        <p
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: "12px",
-            color: "#B8B2A8",
-            margin: 0,
-          }}
-        >
-          &copy; 2025 Wordsmith. All rights reserved.
+      <div className="max-w-[900px] mx-auto mt-6 pt-5 text-center border-t border-parchment-300">
+        <p className="font-body text-xs text-parchment-500 m-0">
+          &copy; 2026 Wordsmith{" "}
+          <button
+            onClick={handleFleuron}
+            aria-label="A decorative flourish"
+            className="bg-transparent border-none p-0 mx-1 text-parchment-500 hover:text-gold cursor-pointer transition-colors duration-300 text-sm align-middle"
+          >
+            &#10086;
+          </button>{" "}
+          All rights reserved.
         </p>
       </div>
     </footer>

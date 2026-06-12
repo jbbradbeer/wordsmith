@@ -1,18 +1,20 @@
+import Reveal from "./Reveal";
+
 const STEPS = [
   {
-    number: 1,
+    number: "01",
     title: "Enter a Word",
     description:
       "Type any word you want to elevate. Common words, overused phrases, or anything that needs a fresh alternative.",
   },
   {
-    number: 2,
+    number: "02",
     title: "Get Curated Alternatives",
     description:
       "Our AI analyzes context and tone to deliver six handpicked alternatives, each categorized by style and voice.",
   },
   {
-    number: 3,
+    number: "03",
     title: "Elevate Your Writing",
     description:
       "Choose the perfect word with confidence. See example sentences, pronunciation guides, and style categories.",
@@ -21,101 +23,38 @@ const STEPS = [
 
 export default function HowItWorks() {
   return (
-    <section
-      style={{
-        maxWidth: "900px",
-        margin: "0 auto",
-        padding: "80px 24px",
-      }}
-    >
-      <div style={{ textAlign: "center", marginBottom: "48px" }}>
+    <section className="max-w-[900px] mx-auto px-6 py-20">
+      <Reveal className="text-center mb-14">
         <h2
-          style={{
-            fontFamily: "'Playfair Display', Georgia, serif",
-            fontSize: "clamp(28px, 4vw, 36px)",
-            fontWeight: 800,
-            color: "#1A1A18",
-            margin: "0 0 8px 0",
-            letterSpacing: "-0.02em",
-          }}
+          className="font-display font-extrabold text-parchment-900 tracking-[-0.02em] m-0 mb-2"
+          style={{ fontSize: "clamp(28px, 4vw, 38px)" }}
         >
           How It Works
         </h2>
-        <p
-          style={{
-            fontFamily: "'Playfair Display', Georgia, serif",
-            fontSize: "16px",
-            color: "#8A8478",
-            fontStyle: "italic",
-            margin: 0,
-          }}
-        >
+        <p className="font-display italic text-base text-parchment-600 m-0">
           Three steps to better writing
         </p>
-      </div>
+      </Reveal>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-          gap: "32px",
-        }}
-      >
+      <div className="grid gap-10 md:grid-cols-3">
         {STEPS.map((step, i) => (
-          <div
-            key={step.number}
-            style={{
-              textAlign: "center",
-              animation: "cardIn 0.4s ease both",
-              animationDelay: `${i * 0.1}s`,
-            }}
-          >
-            <div
-              style={{
-                width: "48px",
-                height: "48px",
-                borderRadius: "50%",
-                border: "2px solid #8B6914",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                margin: "0 auto 16px",
-              }}
-            >
+          <Reveal key={step.number} delay={i * 120}>
+            <div className="relative pt-10 text-center">
               <span
-                style={{
-                  fontFamily: "'Playfair Display', Georgia, serif",
-                  fontSize: "20px",
-                  fontWeight: 700,
-                  color: "#8B6914",
-                }}
+                aria-hidden="true"
+                className="absolute top-0 left-1/2 -translate-x-1/2 font-display font-black text-gold select-none leading-none"
+                style={{ fontSize: "88px", opacity: 0.1 }}
               >
                 {step.number}
               </span>
+              <h3 className="relative font-display font-bold text-lg text-parchment-900 m-0 mb-2">
+                {step.title}
+              </h3>
+              <p className="relative font-body text-sm leading-relaxed text-parchment-600 m-0">
+                {step.description}
+              </p>
             </div>
-            <h3
-              style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "18px",
-                fontWeight: 700,
-                color: "#1A1A18",
-                margin: "0 0 8px 0",
-              }}
-            >
-              {step.title}
-            </h3>
-            <p
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: "14px",
-                lineHeight: 1.6,
-                color: "#8A8478",
-                margin: 0,
-              }}
-            >
-              {step.description}
-            </p>
-          </div>
+          </Reveal>
         ))}
       </div>
     </section>

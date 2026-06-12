@@ -1,9 +1,7 @@
+import Reveal from "./Reveal";
+import { WORD_CATEGORIES } from "@/lib/constants";
+
 const FEATURES = [
-  {
-    title: "Categorized by Style",
-    description:
-      "Every word tagged as Elevated, Literary, Punchy, or Rare so you can match the tone you need instantly.",
-  },
   {
     title: "Context-Aware Suggestions",
     description:
@@ -22,7 +20,7 @@ const FEATURES = [
   {
     title: "Built for All Writers",
     description:
-      "Whether you write novels, blog posts, screenplays, or copy, Wordsmith adapts to your creative needs.",
+      "Novels, blog posts, screenplays, or copy — Wordsmith adapts to your creative needs.",
   },
   {
     title: "Instant Results",
@@ -33,99 +31,73 @@ const FEATURES = [
 
 export default function FeaturesSection() {
   return (
-    <section
-      style={{
-        maxWidth: "900px",
-        margin: "0 auto",
-        padding: "80px 24px",
-      }}
-    >
-      <div style={{ textAlign: "center", marginBottom: "48px" }}>
-        <span
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: "11px",
-            fontWeight: 600,
-            letterSpacing: "0.2em",
-            textTransform: "uppercase",
-            color: "#8B6914",
-            display: "block",
-            marginBottom: "8px",
-          }}
-        >
-          WHY WORDSMITH
+    <section className="max-w-[940px] mx-auto px-6 py-20">
+      <Reveal className="text-center mb-12">
+        <span className="font-body text-[11px] font-semibold tracking-[0.22em] uppercase text-gold block mb-2">
+          Why Wordsmith
         </span>
         <h2
-          style={{
-            fontFamily: "'Playfair Display', Georgia, serif",
-            fontSize: "clamp(28px, 4vw, 36px)",
-            fontWeight: 800,
-            color: "#1A1A18",
-            margin: "0 0 8px 0",
-            letterSpacing: "-0.02em",
-          }}
+          className="font-display font-extrabold text-parchment-900 tracking-[-0.02em] m-0 mb-2"
+          style={{ fontSize: "clamp(28px, 4vw, 38px)" }}
         >
           More Than a Thesaurus
         </h2>
-        <p
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: "15px",
-            color: "#8A8478",
-            margin: 0,
-            maxWidth: "520px",
-            marginLeft: "auto",
-            marginRight: "auto",
-            lineHeight: 1.6,
-          }}
-        >
-          Built specifically for writers who care about voice, tone, and
-          precision.
+        <p className="font-body text-[15px] text-parchment-600 leading-relaxed max-w-[520px] mx-auto m-0">
+          Built specifically for writers who care about voice, tone, and precision.
         </p>
-      </div>
+      </Reveal>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: "20px",
-        }}
-      >
-        {FEATURES.map((feature, i) => (
-          <div
-            key={feature.title}
-            style={{
-              background: "#FFFFFF",
-              border: "1px solid #E8E2D8",
-              borderRadius: "12px",
-              padding: "24px",
-              animation: "cardIn 0.4s ease both",
-              animationDelay: `${i * 0.08}s`,
-            }}
-          >
-            <h3
-              style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "16px",
-                fontWeight: 700,
-                color: "#1A1A18",
-                margin: "0 0 8px 0",
-              }}
-            >
-              {feature.title}
+      {/* Bento grid — featured cell with live category chips, the rest orbit it */}
+      <div className="grid gap-4 md:grid-cols-6">
+        <Reveal className="md:col-span-4">
+          <div className="bento-card h-full bg-white border border-parchment-300 rounded-2xl p-8">
+            <h3 className="font-display font-bold text-[22px] text-parchment-900 m-0 mb-2.5">
+              Categorized by Style
             </h3>
-            <p
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: "14px",
-                lineHeight: 1.6,
-                color: "#8A8478",
-                margin: 0,
-              }}
-            >
-              {feature.description}
+            <p className="font-body text-[15px] leading-relaxed text-parchment-600 m-0 mb-6 max-w-[440px]">
+              Every word is tagged so you can match the tone you need instantly —
+              from boardroom-polished to once-a-century rare.
+            </p>
+            <div className="flex flex-wrap gap-2.5">
+              {Object.entries(WORD_CATEGORIES).map(([key, cat]) => (
+                <span
+                  key={key}
+                  className="font-body text-xs font-semibold rounded-full px-3.5 py-1.5 border transition-transform duration-200 hover:-translate-y-0.5 cursor-default"
+                  style={{
+                    color: cat.color,
+                    borderColor: `${cat.color}55`,
+                    background: `${cat.color}0D`,
+                  }}
+                >
+                  {cat.label}
+                </span>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+
+        <Reveal delay={100} className="md:col-span-2">
+          <div className="bento-card h-full bg-white border border-parchment-300 rounded-2xl p-6">
+            <h3 className="font-display font-bold text-base text-parchment-900 m-0 mb-2">
+              {FEATURES[0].title}
+            </h3>
+            <p className="font-body text-sm leading-relaxed text-parchment-600 m-0">
+              {FEATURES[0].description}
             </p>
           </div>
+        </Reveal>
+
+        {FEATURES.slice(1).map((feature, i) => (
+          <Reveal key={feature.title} delay={i * 90} className="md:col-span-3">
+            <div className="bento-card h-full bg-white border border-parchment-300 rounded-2xl p-6">
+              <h3 className="font-display font-bold text-base text-parchment-900 m-0 mb-2">
+                {feature.title}
+              </h3>
+              <p className="font-body text-sm leading-relaxed text-parchment-600 m-0">
+                {feature.description}
+              </p>
+            </div>
+          </Reveal>
         ))}
       </div>
     </section>

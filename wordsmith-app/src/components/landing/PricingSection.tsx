@@ -1,14 +1,13 @@
-import {
-  FREE_SEARCH_LIMIT,
-  SUBSCRIPTION_PRICE_MONTHLY,
-} from "@/lib/constants";
+import { FREE_SEARCH_LIMIT, SUBSCRIPTION_PRICE_MONTHLY } from "@/lib/constants";
+import Reveal from "./Reveal";
+import MagneticButton from "./MagneticButton";
 
 interface PricingSectionProps {
   onGetStarted: () => void;
   onUpgrade: () => void;
 }
 
-const CHECK = "\u2713";
+const CHECK = "✓";
 
 const FREE_FEATURES = [
   `${FREE_SEARCH_LIMIT} word searches`,
@@ -24,243 +23,84 @@ const PRO_FEATURES = [
   "Cancel anytime",
 ];
 
-export default function PricingSection({
-  onGetStarted,
-  onUpgrade,
-}: PricingSectionProps) {
+export default function PricingSection({ onGetStarted, onUpgrade }: PricingSectionProps) {
   return (
-    <section
-      style={{
-        maxWidth: "900px",
-        margin: "0 auto",
-        padding: "80px 24px",
-      }}
-    >
-      <div style={{ textAlign: "center", marginBottom: "48px" }}>
+    <section className="max-w-[900px] mx-auto px-6 py-20">
+      <Reveal className="text-center mb-12">
         <h2
-          style={{
-            fontFamily: "'Playfair Display', Georgia, serif",
-            fontSize: "clamp(28px, 4vw, 36px)",
-            fontWeight: 800,
-            color: "#1A1A18",
-            margin: "0 0 8px 0",
-            letterSpacing: "-0.02em",
-          }}
+          className="font-display font-extrabold text-parchment-900 tracking-[-0.02em] m-0 mb-2"
+          style={{ fontSize: "clamp(28px, 4vw, 38px)" }}
         >
           Simple, Transparent Pricing
         </h2>
-        <p
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: "15px",
-            color: "#8A8478",
-            margin: 0,
-          }}
-        >
+        <p className="font-body text-[15px] text-parchment-600 m-0">
           Start free. Upgrade when you&apos;re ready.
         </p>
-      </div>
+      </Reveal>
 
-      <div
-        style={{
-          maxWidth: "680px",
-          margin: "0 auto",
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: "20px",
-        }}
-      >
-        {/* Free Card */}
-        <div
-          style={{
-            background: "#FFFFFF",
-            border: "1px solid #E8E2D8",
-            borderRadius: "12px",
-            padding: "32px 28px",
-            animation: "cardIn 0.4s ease both",
-          }}
-        >
-          <h3
-            style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
-              fontSize: "20px",
-              fontWeight: 700,
-              color: "#1A1A18",
-              margin: "0 0 4px 0",
-            }}
-          >
-            Free
-          </h3>
-          <div style={{ marginBottom: "24px" }}>
-            <span
-              style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "40px",
-                fontWeight: 800,
-                color: "#1A1A18",
-              }}
+      <div className="max-w-[700px] mx-auto grid gap-5 md:grid-cols-2 items-stretch">
+        {/* Free — the quiet option */}
+        <Reveal>
+          <div className="h-full bg-white/60 border border-parchment-300 rounded-2xl p-8 flex flex-col">
+            <h3 className="font-display font-bold text-xl text-parchment-900 m-0 mb-1">Free</h3>
+            <div className="mb-6">
+              <span className="font-display font-extrabold text-[40px] text-parchment-900">$0</span>
+              <span className="font-body text-sm text-parchment-500 ml-1.5">forever</span>
+            </div>
+            <ul className="list-none p-0 m-0 mb-7 flex-1">
+              {FREE_FEATURES.map((feature) => (
+                <li
+                  key={feature}
+                  className="font-body text-sm text-parchment-900 py-1.5 flex items-center gap-2.5"
+                >
+                  <span className="text-category-rare font-bold">{CHECK}</span>
+                  {feature}
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={onGetStarted}
+              className="btn-outline w-full bg-transparent border-2 border-gold rounded-lg px-6 py-3 font-body text-sm font-semibold text-gold cursor-pointer transition-colors duration-200"
             >
-              $0
-            </span>
-            <span
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: "14px",
-                color: "#B8B2A8",
-                marginLeft: "6px",
-              }}
-            >
-              forever
-            </span>
+              Get Started Free
+            </button>
           </div>
-          <ul style={{ listStyle: "none", padding: 0, margin: "0 0 28px 0" }}>
-            {FREE_FEATURES.map((feature) => (
-              <li
-                key={feature}
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "14px",
-                  color: "#1A1A18",
-                  padding: "6px 0",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                }}
-              >
-                <span style={{ color: "#1A7A6D", fontWeight: 700 }}>
-                  {CHECK}
-                </span>
-                {feature}
-              </li>
-            ))}
-          </ul>
-          <button
-            onClick={onGetStarted}
-            className="btn-outline"
-            style={{
-              width: "100%",
-              background: "transparent",
-              border: "2px solid #8B6914",
-              borderRadius: "8px",
-              padding: "12px 24px",
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "14px",
-              fontWeight: 600,
-              color: "#8B6914",
-              cursor: "pointer",
-              transition: "background 0.2s ease, color 0.2s ease, opacity 0.2s ease",
-            }}
-          >
-            Get Started Free
-          </button>
-        </div>
+        </Reveal>
 
-        {/* Pro Card */}
-        <div
-          style={{
-            background: "#FFFFFF",
-            border: "2px solid #8B6914",
-            borderRadius: "12px",
-            padding: "32px 28px",
-            position: "relative",
-            boxShadow: "0 4px 24px rgba(139, 105, 20, 0.1)",
-            animation: "cardIn 0.4s ease both",
-            animationDelay: "0.1s",
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              top: "-12px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              background: "#8B6914",
-              color: "#FFFFFF",
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "11px",
-              fontWeight: 700,
-              letterSpacing: "0.1em",
-              padding: "4px 14px",
-              borderRadius: "20px",
-              textTransform: "uppercase",
-            }}
-          >
-            MOST POPULAR
-          </div>
-          <h3
-            style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
-              fontSize: "20px",
-              fontWeight: 700,
-              color: "#1A1A18",
-              margin: "0 0 4px 0",
-            }}
-          >
-            Pro
-          </h3>
-          <div style={{ marginBottom: "24px" }}>
-            <span
-              style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "40px",
-                fontWeight: 800,
-                color: "#1A1A18",
-              }}
-            >
-              ${SUBSCRIPTION_PRICE_MONTHLY}
-            </span>
-            <span
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: "14px",
-                color: "#B8B2A8",
-                marginLeft: "6px",
-              }}
-            >
-              /month
-            </span>
-          </div>
-          <ul style={{ listStyle: "none", padding: 0, margin: "0 0 28px 0" }}>
-            {PRO_FEATURES.map((feature) => (
-              <li
-                key={feature}
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "14px",
-                  color: "#1A1A18",
-                  padding: "6px 0",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                }}
-              >
-                <span style={{ color: "#1A7A6D", fontWeight: 700 }}>
-                  {CHECK}
+        {/* Pro — center stage with animated gold border */}
+        <Reveal delay={120}>
+          <div className="gold-shift h-full rounded-2xl p-[2px] bg-gradient-to-br from-gold via-gold-light to-gold shadow-[0_8px_36px_rgba(139,105,20,0.22)]">
+            <div className="relative h-full bg-white rounded-[14px] p-8 flex flex-col">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gold text-white font-body text-[11px] font-bold tracking-[0.1em] uppercase px-3.5 py-1 rounded-full whitespace-nowrap">
+                Most Popular
+              </div>
+              <h3 className="font-display font-bold text-xl text-parchment-900 m-0 mb-1">Pro</h3>
+              <div className="mb-6">
+                <span className="font-display font-extrabold text-[40px] text-parchment-900">
+                  ${SUBSCRIPTION_PRICE_MONTHLY}
                 </span>
-                {feature}
-              </li>
-            ))}
-          </ul>
-          <button
-            onClick={onUpgrade}
-            className="btn-primary"
-            style={{
-              width: "100%",
-              background: "#8B6914",
-              border: "none",
-              borderRadius: "8px",
-              padding: "12px 24px",
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: "14px",
-              fontWeight: 600,
-              color: "#FFFFFF",
-              cursor: "pointer",
-              transition: "background 0.2s ease, opacity 0.2s ease",
-            }}
-          >
-            Upgrade to Pro
-          </button>
-        </div>
+                <span className="font-body text-sm text-parchment-500 ml-1.5">/month</span>
+              </div>
+              <ul className="list-none p-0 m-0 mb-7 flex-1">
+                {PRO_FEATURES.map((feature) => (
+                  <li
+                    key={feature}
+                    className="font-body text-sm text-parchment-900 py-1.5 flex items-center gap-2.5"
+                  >
+                    <span className="text-category-rare font-bold">{CHECK}</span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <MagneticButton
+                onClick={onUpgrade}
+                className="btn-primary w-full bg-gold border-none rounded-lg px-6 py-3 font-body text-sm font-semibold text-white cursor-pointer"
+              >
+                Upgrade to Pro
+              </MagneticButton>
+            </div>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

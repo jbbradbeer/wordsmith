@@ -9,13 +9,17 @@ import { FREE_SEARCH_LIMIT, WORD_CATEGORIES, ANON_COUNT_KEY } from "@/lib/consta
 import type { WordData, SearchResults, UserInfo } from "@/lib/types";
 
 // Landing page components
+import Hero from "@/components/landing/Hero";
 import SocialProofBar from "@/components/landing/SocialProofBar";
+import WordMarquee from "@/components/landing/WordMarquee";
 import HowItWorks from "@/components/landing/HowItWorks";
 import FeaturesSection from "@/components/landing/FeaturesSection";
 import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import PricingSection from "@/components/landing/PricingSection";
 import CtaSection from "@/components/landing/CtaSection";
 import Footer from "@/components/landing/Footer";
+import WordRain from "@/components/WordRain";
+import { useKonami } from "@/lib/use-konami";
 
 // Derive the category legend from the single source of truth
 const CATEGORY_LEGEND = Object.entries(WORD_CATEGORIES).map(([key, v]) => ({
@@ -55,6 +59,10 @@ export default function Home() {
 
   // Anonymous search tracking
   const [anonSearchCount, setAnonSearchCount] = useState(0);
+
+  // Easter egg — Konami code or the footer fleuron summons the secret lexicon
+  const [logophileMode, setLogophileMode] = useState(false);
+  useKonami(() => setLogophileMode(true));
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -305,7 +313,7 @@ export default function Home() {
       {/* Nav bar */}
       <nav
         aria-label="Site navigation"
-        className="max-w-[800px] mx-auto px-6 py-4 flex justify-end items-center gap-3 border-b border-gold/[.09] backdrop-blur"
+        className="sticky top-0 z-40 px-6 py-4 flex justify-end items-center gap-3 border-b border-gold/[.09] bg-[#f2ede2]/75 backdrop-blur-md"
       >
         {session ? (
           <>
@@ -365,28 +373,8 @@ export default function Home() {
         )}
       </nav>
 
-      {/* Header */}
-      <header
-        className="max-w-[720px] mx-auto px-6 pt-6 pb-2 text-center"
-        style={{ animation: "heroIn 0.6s ease both" }}
-      >
-        <div className="flex items-center justify-center gap-2.5 mb-1.5">
-          <div className="w-11 h-0.5 bg-gradient-to-r from-transparent to-gold" />
-          <span className="font-body text-[11px] font-semibold tracking-[0.2em] uppercase text-gold">
-            A Writer&apos;s Companion
-          </span>
-          <div className="w-11 h-0.5 bg-gradient-to-r from-gold to-transparent" />
-        </div>
-        <h1
-          className="font-display font-black text-parchment-900 m-0 mb-2 tracking-[-0.03em] leading-[1.1]"
-          style={{ fontSize: "clamp(38px, 6.5vw, 58px)" }}
-        >
-          Wordsmith
-        </h1>
-        <p className="font-display text-[17px] text-parchment-600 italic tracking-[-0.01em] mt-0 mb-8">
-          Trade the ordinary for the extraordinary
-        </p>
-      </header>
+      {/* Kinetic hero */}
+      <Hero />
 
       {/* Social Proof Bar */}
       <SocialProofBar />
@@ -606,6 +594,7 @@ export default function Home() {
       {/* Landing Page Sections — shown when no results are displayed */}
       {showLandingSections && (
         <>
+          <WordMarquee />
           <HowItWorks />
           <FeaturesSection />
           <TestimonialsSection />
@@ -618,7 +607,10 @@ export default function Home() {
       )}
 
       {/* Footer — always visible */}
-      <Footer />
+      <Footer onSecret={() => setLogophileMode(true)} />
+
+      {/* Logophile mode — the secret lexicon */}
+      {logophileMode && <WordRain onDone={() => setLogophileMode(false)} />}
 
       {/* Modals */}
       <AuthModal

@@ -1,3 +1,5 @@
+import Reveal from "./Reveal";
+
 // TODO: Replace with real testimonials
 const TESTIMONIALS = [
   {
@@ -22,82 +24,36 @@ const TESTIMONIALS = [
 
 export default function TestimonialsSection() {
   return (
-    <section
-      style={{
-        maxWidth: "900px",
-        margin: "0 auto",
-        padding: "80px 24px",
-      }}
-    >
-      <div style={{ textAlign: "center", marginBottom: "48px" }}>
+    <section className="max-w-[940px] mx-auto px-6 py-20">
+      <Reveal className="text-center mb-12">
         <h2
-          style={{
-            fontFamily: "'Playfair Display', Georgia, serif",
-            fontSize: "clamp(28px, 4vw, 36px)",
-            fontWeight: 800,
-            color: "#1A1A18",
-            margin: "0 0 8px 0",
-            letterSpacing: "-0.02em",
-          }}
+          className="font-display font-extrabold text-parchment-900 tracking-[-0.02em] m-0"
+          style={{ fontSize: "clamp(28px, 4vw, 38px)" }}
         >
           Writers Love Wordsmith
         </h2>
-      </div>
+      </Reveal>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-          gap: "20px",
-        }}
-      >
-        {TESTIMONIALS.map((testimonial, i) => (
-          <div
-            key={testimonial.name}
-            style={{
-              background: "#FFFFFF",
-              border: "1px solid #E8E2D8",
-              borderRadius: "12px",
-              padding: "28px 24px",
-              animation: "cardIn 0.4s ease both",
-              animationDelay: `${i * 0.1}s`,
-            }}
-          >
-            <p
-              style={{
-                fontFamily: "'Playfair Display', Georgia, serif",
-                fontSize: "15px",
-                fontStyle: "italic",
-                color: "#1A1A18",
-                lineHeight: 1.7,
-                margin: "0 0 20px 0",
-              }}
-            >
-              &ldquo;{testimonial.quote}&rdquo;
-            </p>
-            <div>
+      <div className="grid gap-10 md:grid-cols-3">
+        {TESTIMONIALS.map((t, i) => (
+          <Reveal key={t.name} delay={i * 120}>
+            <figure className="relative m-0 pt-8 border-t-2 border-gold/30">
               <span
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  color: "#8B6914",
-                }}
+                aria-hidden="true"
+                className="absolute -top-2 left-0 font-display font-black text-gold leading-none select-none"
+                style={{ fontSize: "64px", opacity: 0.18 }}
               >
-                {testimonial.name}
+                &ldquo;
               </span>
-              <span
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontSize: "13px",
-                  color: "#B8B2A8",
-                  marginLeft: "8px",
-                }}
-              >
-                {testimonial.role}
-              </span>
-            </div>
-          </div>
+              <blockquote className="relative font-display italic text-[16px] leading-relaxed text-parchment-900 m-0 mb-5">
+                {t.quote}
+              </blockquote>
+              <figcaption className="font-body text-sm m-0">
+                <span className="font-semibold text-gold">{t.name}</span>
+                <span className="text-parchment-500 ml-2">{t.role}</span>
+              </figcaption>
+            </figure>
+          </Reveal>
         ))}
       </div>
     </section>
