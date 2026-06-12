@@ -7,7 +7,9 @@ import PaywallModal from "@/components/PaywallModal";
 import WordCard from "@/components/WordCard";
 import UsageBar from "@/components/UsageBar";
 import { FREE_SEARCH_LIMIT, WORD_CATEGORIES, ANON_COUNT_KEY } from "@/lib/constants";
-import type { WordData, SearchResults, UserInfo } from "@/lib/types";
+import { useUserInfo } from "@/lib/use-user-info";
+import { useSseSearch } from "@/lib/use-sse-search";
+import type { WordData } from "@/lib/types";
 
 // Landing page components
 import Hero from "@/components/landing/Hero";
@@ -67,9 +69,6 @@ export default function Home() {
   const supabase = useSupabaseClient();
 
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResults | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<string[]>([]);
 
   // Auth & paywall state
@@ -78,10 +77,47 @@ export default function Home() {
   const [showPaywall, setShowPaywall] = useState(false);
 
   // User state
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const { userInfo, setUserInfo, refresh: refreshUserInfo } = useUserInfo();
 
   // Anonymous search tracking
   const [anonSearchCount, setAnonSearchCount] = useState(0);
+
+  const { results, setResults, loading, error, search } = useSseSearch({
+    onLimitReached: (kind) => {
+      if (kind === "paywall") {
+        setShowPaywall(true);
+      } else {
+        setAuthMode("signup");
+        setShowAuth(true);
+      }
+    },
+    onDone: (term, payload) => {
+      setHistory((prev) => [term, ...prev.filter((w) => w !== term)].slice(0, 12));
+      if (payload.isAnonymous && typeof payload.anonSearchCount === "number") {
+        setAnonSearchCount(payload.anonSearchCount);
+        try {
+          localStorage.setItem(ANON_COUNT_KEY, String(payload.anonSearchCount));
+        } catch {
+          // localStorage unavailable
+        }
+      }
+      if (payload.usage) {
+        const { searchCount, isPaid } = payload.usage;
+        setUserInfo((prev) =>
+          prev
+            ? {
+                ...prev,
+                searchCount,
+                isPaid,
+                searchesRemaining: isPaid
+                  ? null
+                  : Math.max(0, FREE_SEARCH_LIMIT - searchCount),
+              }
+            : prev
+        );
+      }
+    },
+  });
 
   // Easter egg — Konami code or the footer fleuron summons the secret lexicon
   const [logophileMode, setLogophileMode] = useState(false);
@@ -101,27 +137,6 @@ export default function Home() {
     }
   }, []);
 
-  // Fetch user info on session change
-  const fetchUserInfo = useCallback(async () => {
-    if (!session) {
-      setUserInfo(null);
-      return;
-    }
-    try {
-      const res = await fetch("/api/user");
-      if (res.ok) {
-        const data = await res.json();
-        setUserInfo(data);
-      }
-    } catch (err) {
-      console.error("Failed to fetch user info:", err);
-    }
-  }, [session]);
-
-  useEffect(() => {
-    fetchUserInfo();
-  }, [fetchUserInfo]);
-
   // Transfer anonymous search count (from server cookie) to profile on login
   useEffect(() => {
     if (!session) return;
@@ -131,10 +146,10 @@ export default function Home() {
         // Clear local display state now that it's been merged into the profile
         try { localStorage.removeItem(ANON_COUNT_KEY); } catch { /* unavailable */ }
         setAnonSearchCount(0);
-        fetchUserInfo();
+        refreshUserInfo();
       })
       .catch((err) => console.error("Failed to transfer anon count:", err));
-  }, [session, fetchUserInfo]);
+  }, [session, refreshUserInfo]);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -145,150 +160,23 @@ export default function Home() {
     const params = new URLSearchParams(window.location.search);
     if (params.get("upgraded") === "true") {
       // Refresh user info to get updated subscription
-      fetchUserInfo();
+      refreshUserInfo();
       window.history.replaceState({}, "", "/");
     }
-  }, [fetchUserInfo]);
+  }, [refreshUserInfo]);
 
   const searchWord = async (word: string) => {
-    if (!word.trim()) return;
     const searchTerm = word.trim().toLowerCase();
+    if (!searchTerm) return;
 
     // If not logged in, check anonymous limit before making any request
-    if (!session) {
-      if (anonSearchCount >= FREE_SEARCH_LIMIT) {
-        setAuthMode("signup");
-        setShowAuth(true);
-        return;
-      }
+    if (!session && anonSearchCount >= FREE_SEARCH_LIMIT) {
+      setAuthMode("signup");
+      setShowAuth(true);
+      return;
     }
 
-    setLoading(true);
-    setError(null);
-    setResults(null);
-
-    try {
-      const response = await fetch("/api/search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: searchTerm }),
-      });
-
-      // 403s are returned as plain JSON (before SSE headers are set on the server)
-      if (response.status === 403) {
-        const data = await response.json();
-        if (data.error === "free_limit_reached") {
-          setShowPaywall(true);
-          setLoading(false);
-          return;
-        }
-        if (data.error === "signup_required") {
-          setAuthMode("signup");
-          setShowAuth(true);
-          setLoading(false);
-          return;
-        }
-      }
-
-      if (!response.ok || !response.body) {
-        throw new Error("Search failed");
-      }
-
-      // Initialise results so the header and legend render immediately
-      setResults({ original: searchTerm, alternatives: [] });
-
-      // Consume the SSE stream
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let sseBuffer = "";
-
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
-
-        sseBuffer += decoder.decode(value, { stream: true });
-        const rawEvents = sseBuffer.split("\n\n");
-        sseBuffer = rawEvents.pop()!; // keep incomplete trailing event
-
-        for (const rawEvent of rawEvents) {
-          if (!rawEvent.trim()) continue;
-
-          let eventName = "";
-          let dataLine = "";
-          for (const line of rawEvent.split("\n")) {
-            if (line.startsWith("event: ")) eventName = line.slice(7).trim();
-            if (line.startsWith("data: ")) dataLine = line.slice(6);
-          }
-          if (!dataLine) continue;
-
-          try {
-            const payload = JSON.parse(dataLine);
-
-            if (eventName === "word") {
-              // Hide spinner and show results grid on first word
-              setLoading(false);
-              setResults((prev: any) => ({
-                ...prev,
-                alternatives: [...(prev?.alternatives ?? []), payload],
-              }));
-            }
-
-            if (eventName === "done") {
-              setHistory((prev) => {
-                const updated = [
-                  searchTerm,
-                  ...prev.filter((w) => w !== searchTerm),
-                ];
-                return updated.slice(0, 12);
-              });
-              if (
-                payload.isAnonymous &&
-                typeof payload.anonSearchCount === "number"
-              ) {
-                setAnonSearchCount(payload.anonSearchCount);
-                try {
-                  localStorage.setItem(
-                    ANON_COUNT_KEY,
-                    String(payload.anonSearchCount)
-                  );
-                } catch {
-                  // localStorage unavailable
-                }
-              }
-              if (payload.usage) {
-                setUserInfo((prev: any) =>
-                  prev
-                    ? {
-                        ...prev,
-                        searchCount: payload.usage.searchCount,
-                        isPaid: payload.usage.isPaid,
-                        searchesRemaining: payload.usage.isPaid
-                          ? null
-                          : Math.max(
-                              0,
-                              FREE_SEARCH_LIMIT - payload.usage.searchCount
-                            ),
-                      }
-                    : prev
-                );
-              }
-            }
-
-            if (eventName === "error") {
-              setError(
-                payload.message || "Something went wrong. Please try again."
-              );
-              setLoading(false);
-            }
-          } catch {
-            // Malformed SSE event — skip
-          }
-        }
-      }
-    } catch (err: any) {
-      setError(err.message || "Something went wrong. Please try again.");
-      setLoading(false);
-    }
+    await search(searchTerm);
   };
 
   const handleSubmit = () => {
@@ -318,6 +206,13 @@ export default function Home() {
     setAuthMode("signup");
     setShowAuth(true);
   };
+
+  // Stable references so memoized WordCards don't re-render on every keystroke
+  const requireAuth = useCallback(() => {
+    setAuthMode("signup");
+    setShowAuth(true);
+  }, []);
+  const requireUpgrade = useCallback(() => setShowPaywall(true), []);
 
   const handleUpgrade = () => {
     if (!session) {
@@ -579,11 +474,8 @@ export default function Home() {
                   index={i}
                   session={session}
                   isPaid={userInfo?.isPaid || false}
-                  onAuthRequired={() => {
-                    setAuthMode("signup");
-                    setShowAuth(true);
-                  }}
-                  onUpgradeRequired={() => setShowPaywall(true)}
+                  onAuthRequired={requireAuth}
+                  onUpgradeRequired={requireUpgrade}
                 />
               ))}
             </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import type { WordData } from "@/lib/types";
 import { WORD_CATEGORIES } from "@/lib/constants";
@@ -13,7 +13,7 @@ interface WordCardProps {
   onUpgradeRequired?: () => void;
 }
 
-export default function WordCard({
+function WordCard({
   word,
   index,
   session,
@@ -116,3 +116,7 @@ export default function WordCard({
     </div>
   );
 }
+
+// Rendered once per result in the grid — memo avoids re-rendering every card
+// on each parent state change (streaming words, query keystrokes).
+export default memo(WordCard);

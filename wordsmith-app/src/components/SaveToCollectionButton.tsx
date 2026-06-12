@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { memo, useState, useRef, useEffect } from "react";
 import type { Session } from "@supabase/supabase-js";
 import type { WordData, Collection } from "@/lib/types";
 
@@ -10,7 +10,7 @@ interface SaveToCollectionButtonProps {
   onUpgradeRequired: () => void;
 }
 
-export default function SaveToCollectionButton({
+function SaveToCollectionButton({
   word,
   session,
   isPaid,
@@ -420,3 +420,6 @@ export default function SaveToCollectionButton({
     </div>
   );
 }
+
+// Rendered inside every WordCard — memo for the same reason as WordCard.
+export default memo(SaveToCollectionButton);
