@@ -25,6 +25,10 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="description" content={DEFAULT_DESCRIPTION} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#F2EDE2" />
+        <meta
+          name="google-site-verification"
+          content="OqbD4oubDw9lArfh5Z9O0QbBqFX-o6xkclAjWuhBuEY"
+        />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
         {/* Social cards — pages can override title/description/url */}
