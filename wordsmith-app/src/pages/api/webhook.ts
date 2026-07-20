@@ -4,6 +4,7 @@ import { getServiceSupabase } from "@/lib/supabase";
 import { buffer } from "micro";
 import { missingEnv } from "@/lib/env";
 import { createRequestLogger } from "@/lib/logger";
+import { mapSubscriptionStatus, shouldActivateFromCheckout } from "@/lib/subscription";
 import Stripe from "stripe";
 
 // Disable body parsing — Stripe needs raw body for signature verification
@@ -72,7 +73,7 @@ export default async function handler(
         const subscriptionId = session.subscription as string;
         const userId = session.metadata?.supabase_user_id;
 
-        if (userId) {
+        if (userId && shouldActivateFromCheckout(session)) {
           // Use user ID (not customer ID) to match — this is the most reliable
           await serviceClient
             .from("profiles")
@@ -86,26 +87,38 @@ export default async function handler(
         break;
       }
 
-      // Subscription updated (renewals, plan changes, etc.)
+      // Subscription updated (renewals, plan changes, dunning outcomes)
       case "customer.subscription.updated": {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
-        const status = subscription.status;
 
-        // Map Stripe status to our status
-        let subStatus: string;
-        if (status === "active" || status === "trialing") subStatus = "active";
-        else if (status === "canceled") subStatus = "canceled";
-        else if (status === "past_due") subStatus = "past_due";
-        else break; // Skip "incomplete" and other transient statuses
+        const subStatus = mapSubscriptionStatus(subscription.status);
+        if (!subStatus) break; // Skip "incomplete" and other transient statuses
 
         await serviceClient
           .from("profiles")
           .update({
             subscription_status: subStatus,
-            subscription_id: subscription.id,
+            subscription_id: subStatus === "canceled" ? null : subscription.id,
+            // Fresh free tier on downgrade — the counter kept the pre-upgrade
+            // value, which would leave an ex-subscriber with zero searches
+            ...(subStatus === "canceled" ? { search_count: 0 } : {}),
           })
           .eq("stripe_customer_id", customerId);
+
+        break;
+      }
+
+      // Payment recovered after a failure — restore full active status
+      case "invoice.paid": {
+        const invoice = event.data.object as Stripe.Invoice;
+        const customerId = invoice.customer as string;
+
+        await serviceClient
+          .from("profiles")
+          .update({ subscription_status: "active" })
+          .eq("stripe_customer_id", customerId)
+          .eq("subscription_status", "past_due");
 
         break;
       }
@@ -128,13 +141,15 @@ export default async function handler(
           .update({
             subscription_status: "canceled",
             subscription_id: null,
+            search_count: 0,
           })
           .eq("stripe_customer_id", customerId);
 
         break;
       }
 
-      // Payment failed
+      // Payment failed — mark past_due for visibility; access is kept while
+      // Stripe retries (hasActiveAccess treats past_due as paid)
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice;
         const customerId = invoice.customer as string;

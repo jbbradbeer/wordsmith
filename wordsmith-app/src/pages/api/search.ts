@@ -10,6 +10,7 @@ import { LRUCache } from "lru-cache";
 import type { WordData } from "@/lib/types";
 import { FREE_SEARCH_LIMIT } from "@/lib/constants";
 import { missingEnv } from "@/lib/env";
+import { hasActiveAccess } from "@/lib/subscription";
 
 // Disable Vercel response buffering so SSE events are flushed immediately
 export const config = {
@@ -260,7 +261,7 @@ export default async function handler(
     });
   }
 
-  const isPaid = rpcResult.subscription_status === "active";
+  const isPaid = hasActiveAccess(rpcResult.subscription_status);
   const newSearchCount: number = rpcResult.search_count;
 
   openSSE(res);

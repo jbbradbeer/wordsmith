@@ -159,9 +159,22 @@ export default function Home() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("upgraded") === "true") {
-      // Refresh user info to get updated subscription
-      refreshUserInfo();
+      const sessionId = params.get("session_id");
       window.history.replaceState({}, "", "/");
+
+      // The redirect can beat Stripe's webhook — verify the session directly
+      // so the user is Pro the moment they land back, then refresh
+      if (sessionId) {
+        fetch("/api/checkout-verify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sessionId }),
+        })
+          .catch((err) => console.error("Checkout verification failed:", err))
+          .finally(() => refreshUserInfo());
+      } else {
+        refreshUserInfo();
+      }
     }
   }, [refreshUserInfo]);
 

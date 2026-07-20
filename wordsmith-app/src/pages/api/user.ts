@@ -5,6 +5,7 @@ import { getServiceSupabase } from "@/lib/supabase";
 import { withAuth } from "@/lib/api";
 import { getAnonCount, clearAnonCookie } from "@/lib/anon-cookie";
 import { missingEnv } from "@/lib/env";
+import { hasActiveAccess } from "@/lib/subscription";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { createRequestLogger } from "@/lib/logger";
 import type { User } from "@supabase/supabase-js";
@@ -77,7 +78,7 @@ async function handler(
     return res.status(404).json({ error: "Profile not found" });
   }
 
-  const isPaid = profile.subscription_status === "active";
+  const isPaid = hasActiveAccess(profile.subscription_status);
 
   return res.status(200).json({
     email: user.email,

@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { getServiceSupabase } from "@/lib/supabase";
+import { hasActiveAccess } from "@/lib/subscription";
 import type { User } from "@supabase/supabase-js";
 
 type AuthedHandler = (
@@ -38,7 +39,7 @@ export function withSubscription(handler: AuthedHandler) {
       .eq("id", user.id)
       .single();
 
-    if (profile?.subscription_status !== "active") {
+    if (!hasActiveAccess(profile?.subscription_status)) {
       return res.status(403).json({ error: "subscription_required" });
     }
 

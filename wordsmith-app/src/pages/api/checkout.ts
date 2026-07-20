@@ -4,10 +4,33 @@ import { getServiceSupabase } from "@/lib/supabase";
 import { withAuth } from "@/lib/api";
 import { missingEnv } from "@/lib/env";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { createRequestLogger } from "@/lib/logger";
+import { createRequestLogger, type RequestLogger } from "@/lib/logger";
+import { SUBSCRIPTION_PRICE_MONTHLY } from "@/lib/constants";
+import type Stripe from "stripe";
 import type { User } from "@supabase/supabase-js";
 
 const CHECKOUTS_PER_MINUTE = 5;
+
+// The UI displays SUBSCRIPTION_PRICE_MONTHLY but Stripe charges STRIPE_PRICE_ID.
+// Verify the two agree once per instance and log loudly if they've drifted.
+let priceChecked = false;
+function warnOnPriceMismatch(stripe: Stripe, log: RequestLogger): void {
+  if (priceChecked) return;
+  priceChecked = true;
+  stripe.prices
+    .retrieve(process.env.STRIPE_PRICE_ID!)
+    .then((price) => {
+      const expectedCents = SUBSCRIPTION_PRICE_MONTHLY * 100;
+      if (price.unit_amount !== expectedCents || price.recurring?.interval !== "month") {
+        log.error("STRIPE_PRICE_ID does not match the displayed price", undefined, {
+          displayedCents: expectedCents,
+          stripeCents: price.unit_amount,
+          interval: price.recurring?.interval,
+        });
+      }
+    })
+    .catch((err) => log.error("price verification failed", err));
+}
 
 async function handler(
   req: NextApiRequest,
@@ -40,6 +63,7 @@ async function handler(
 
   try {
     const stripe = getStripe();
+    warnOnPriceMismatch(stripe, log);
 
     // Check if user already has a Stripe customer ID
     const serviceClient = getServiceSupabase();
