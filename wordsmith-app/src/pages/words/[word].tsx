@@ -4,7 +4,7 @@ import Link from "next/link";
 import Footer from "@/components/landing/Footer";
 import { isSeedWord, relatedWords } from "@/lib/seed-words";
 import { getWordPageData } from "@/lib/word-pages";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_URL, jsonLdSerialize } from "@/lib/seo";
 import { WORD_CATEGORIES } from "@/lib/constants";
 import type { WordData } from "@/lib/types";
 
@@ -83,7 +83,7 @@ export default function WordPage({ word, alternatives, related }: WordPageProps)
         <meta property="og:url" content={canonical} />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdSerialize(jsonLd) }}
         />
       </Head>
 

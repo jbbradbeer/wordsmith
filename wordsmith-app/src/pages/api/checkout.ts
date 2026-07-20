@@ -1,33 +1,46 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { getServiceSupabase } from "@/lib/supabase";
-import { validateEnv } from "@/lib/env";
+import { withAuth } from "@/lib/api";
+import { missingEnv } from "@/lib/env";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { createRequestLogger } from "@/lib/logger";
+import type { User } from "@supabase/supabase-js";
 
-validateEnv();
+const CHECKOUTS_PER_MINUTE = 5;
 
-export default async function handler(
+async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
+  user: User
 ) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const supabase = createServerSupabaseClient({ req, res });
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const log = createRequestLogger("/api/checkout", user.id);
 
-  if (!session) {
-    return res.status(401).json({ error: "Not authenticated" });
+  const missing = missingEnv("stripe", "supabase", "app");
+  if (missing.length > 0) {
+    log.error("checkout unavailable — missing env vars", undefined, { missing });
+    return res.status(503).json({
+      error: "server_misconfigured",
+      message: "Checkout is temporarily unavailable. Please try again later.",
+    });
   }
 
-  const userId = session.user.id;
-  const userEmail = session.user.email;
+  const limit = checkRateLimit(`checkout:${user.id}`, CHECKOUTS_PER_MINUTE, 60_000);
+  if (!limit.allowed) {
+    res.setHeader("Retry-After", String(limit.retryAfterSeconds));
+    return res.status(429).json({ error: "rate_limited" });
+  }
+
+  const userId = user.id;
+  const userEmail = user.email;
 
   try {
+    const stripe = getStripe();
+
     // Check if user already has a Stripe customer ID
     const serviceClient = getServiceSupabase();
     const { data: profile } = await serviceClient
@@ -69,7 +82,7 @@ export default async function handler(
           quantity: 1,
         },
       ],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/?upgraded=true`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/?upgraded=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/?canceled=true`,
       metadata: {
         supabase_user_id: userId,
@@ -82,8 +95,10 @@ export default async function handler(
     });
 
     return res.status(200).json({ url: checkoutSession.url });
-  } catch (err: any) {
-    createRequestLogger("/api/checkout", userId).error("checkout session creation failed", err);
+  } catch (err: unknown) {
+    log.error("checkout session creation failed", err);
     return res.status(500).json({ error: "Failed to create checkout session" });
   }
 }
+
+export default withAuth(handler);

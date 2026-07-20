@@ -1,27 +1,45 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { getServiceSupabase } from "@/lib/supabase";
 import { withAuth } from "@/lib/api";
-import { validateEnv } from "@/lib/env";
+import { missingEnv } from "@/lib/env";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { createRequestLogger } from "@/lib/logger";
-import type { Session } from "@supabase/supabase-js";
+import type { User } from "@supabase/supabase-js";
 
-validateEnv();
+const PORTAL_SESSIONS_PER_MINUTE = 5;
 
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
-  session: Session
+  user: User
 ) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const log = createRequestLogger("/api/portal", user.id);
+
+  const missing = missingEnv("stripe", "supabase", "app");
+  if (missing.length > 0) {
+    log.error("portal unavailable — missing env vars", undefined, { missing });
+    return res.status(503).json({
+      error: "server_misconfigured",
+      message: "Billing portal is temporarily unavailable. Please try again later.",
+    });
+  }
+
+  const limit = checkRateLimit(`portal:${user.id}`, PORTAL_SESSIONS_PER_MINUTE, 60_000);
+  if (!limit.allowed) {
+    res.setHeader("Retry-After", String(limit.retryAfterSeconds));
+    return res.status(429).json({ error: "rate_limited" });
   }
 
   const serviceClient = getServiceSupabase();
   const { data: profile } = await serviceClient
     .from("profiles")
     .select("stripe_customer_id")
-    .eq("id", session.user.id)
+    .eq("id", user.id)
     .single();
 
   if (!profile?.stripe_customer_id) {
@@ -29,14 +47,14 @@ async function handler(
   }
 
   try {
-    const portalSession = await stripe.billingPortal.sessions.create({
+    const portalSession = await getStripe().billingPortal.sessions.create({
       customer: profile.stripe_customer_id,
       return_url: `${process.env.NEXT_PUBLIC_APP_URL}/`,
     });
 
     return res.status(200).json({ url: portalSession.url });
   } catch (err: unknown) {
-    createRequestLogger("/api/portal", session.user.id).error("portal session creation failed", err);
+    log.error("portal session creation failed", err);
     return res.status(500).json({ error: "Failed to create portal session" });
   }
 }

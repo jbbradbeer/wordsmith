@@ -23,7 +23,7 @@ import CtaSection from "@/components/landing/CtaSection";
 import Footer from "@/components/landing/Footer";
 import WordRain from "@/components/WordRain";
 import { useKonami } from "@/lib/use-konami";
-import { SITE_URL } from "@/lib/seo";
+import { SITE_URL, jsonLdSerialize } from "@/lib/seo";
 import { SUBSCRIPTION_PRICE_MONTHLY } from "@/lib/constants";
 
 const LANDING_JSON_LD = {
@@ -233,7 +233,7 @@ export default function Home() {
         <meta property="og:url" content={`${SITE_URL}/`} />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(LANDING_JSON_LD) }}
+          dangerouslySetInnerHTML={{ __html: jsonLdSerialize(LANDING_JSON_LD) }}
         />
       </Head>
 

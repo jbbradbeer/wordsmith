@@ -1,4 +1,5 @@
 import { LRUCache } from "lru-cache";
+import { createHmac } from "crypto";
 import type { NextApiRequest } from "next";
 
 interface Bucket {
@@ -46,4 +47,12 @@ export function getClientIp(req: NextApiRequest): string {
   const fwd = req.headers["x-forwarded-for"];
   const first = Array.isArray(fwd) ? fwd[0] : fwd?.split(",")[0];
   return first?.trim() || req.socket.remoteAddress || "unknown";
+}
+
+/** Keyed HMAC of an IP for server-side anon usage tracking — raw IPs never hit the DB. */
+export function hashIp(ip: string): string {
+  return createHmac("sha256", process.env.COOKIE_SECRET!)
+    .update(ip)
+    .digest("hex")
+    .slice(0, 32);
 }

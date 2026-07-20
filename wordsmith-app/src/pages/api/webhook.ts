@@ -1,12 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { getServiceSupabase } from "@/lib/supabase";
 import { buffer } from "micro";
-import { validateEnv } from "@/lib/env";
+import { missingEnv } from "@/lib/env";
 import { createRequestLogger } from "@/lib/logger";
 import Stripe from "stripe";
-
-validateEnv();
 
 // Disable body parsing — Stripe needs raw body for signature verification
 export const config = {
@@ -25,13 +23,20 @@ export default async function handler(
 
   const log = createRequestLogger("/api/webhook");
 
+  const missing = missingEnv("stripe", "supabase");
+  if (missing.length > 0) {
+    // 500 (not 200) so Stripe retries once the deploy is fixed
+    log.error("webhook unavailable — missing env vars", undefined, { missing });
+    return res.status(500).json({ error: "server_misconfigured" });
+  }
+
   const buf = await buffer(req);
   const sig = req.headers["stripe-signature"] as string;
 
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = getStripe().webhooks.constructEvent(
       buf,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET!

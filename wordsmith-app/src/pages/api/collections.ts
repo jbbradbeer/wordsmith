@@ -1,18 +1,31 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getServiceSupabase } from "@/lib/supabase";
 import { withSubscription } from "@/lib/api";
-import { validateEnv } from "@/lib/env";
-import type { Session } from "@supabase/supabase-js";
+import { missingEnv } from "@/lib/env";
+import { checkRateLimit } from "@/lib/rate-limit";
+import type { User } from "@supabase/supabase-js";
 
-validateEnv();
+const WRITES_PER_MINUTE = 30;
 
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
-  session: Session
+  user: User
 ) {
+  if (missingEnv("supabase").length > 0) {
+    return res.status(503).json({ error: "server_misconfigured" });
+  }
+
+  if (req.method !== "GET") {
+    const limit = checkRateLimit(`collections:${user.id}`, WRITES_PER_MINUTE, 60_000);
+    if (!limit.allowed) {
+      res.setHeader("Retry-After", String(limit.retryAfterSeconds));
+      return res.status(429).json({ error: "rate_limited" });
+    }
+  }
+
   const serviceClient = getServiceSupabase();
-  const userId = session.user.id;
+  const userId = user.id;
 
   // GET: List collections with word counts
   if (req.method === "GET") {

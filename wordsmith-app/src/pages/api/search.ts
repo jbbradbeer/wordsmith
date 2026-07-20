@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createServerSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { getServiceSupabase } from "@/lib/supabase";
 import { getAnonCount, setAnonCount } from "@/lib/anon-cookie";
-import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { checkRateLimit, getClientIp, hashIp } from "@/lib/rate-limit";
 import { createRequestLogger, type RequestLogger } from "@/lib/logger";
 import { buildWordPrompt } from "@/lib/word-prompt";
 import Anthropic from "@anthropic-ai/sdk";
@@ -28,6 +28,9 @@ const wordCache = new LRUCache<string, WordData[]>({
 
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const ANON_SEARCHES_PER_MINUTE = 10;
+// Daily per-IP cap is deliberately looser than the 3-search cookie limit —
+// offices/CGNAT share IPs; this bounds cost abuse, not the free-tier UX.
+const ANON_SEARCHES_PER_IP_PER_DAY = 15;
 const USER_SEARCHES_PER_MINUTE = 30;
 
 function rateLimited(
@@ -125,7 +128,6 @@ export default async function handler(
     return res.status(503).json({
       error: "server_misconfigured",
       message: "Search is temporarily unavailable. Please try again later.",
-      missing,
     });
   }
 
@@ -141,14 +143,16 @@ export default async function handler(
   }
 
   const supabase = createServerSupabaseClient({ req, res });
+  // getUser() revalidates the JWT with the auth server; getSession() would
+  // trust the cookie's embedded claims unverified.
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const log = createRequestLogger("/api/search", session?.user.id);
+  const log = createRequestLogger("/api/search", user?.id);
 
   // --- Anonymous search path ---
-  if (!session) {
+  if (!user) {
     const ipLimit = checkRateLimit(
       `ip:${getClientIp(req)}`,
       ANON_SEARCHES_PER_MINUTE,
@@ -164,6 +168,23 @@ export default async function handler(
       return res.status(403).json({
         error: "signup_required",
         message: `You've used all ${FREE_SEARCH_LIMIT} free searches. Sign up to continue.`,
+      });
+    }
+
+    // Server-side backstop: the cookie resets with a cleared browser, so cap
+    // total anonymous searches per IP per day in the DB (Claude cost bound).
+    // Fails open if the migration hasn't run — the cookie stays the primary UX.
+    const anonService = getServiceSupabase();
+    const { data: anonRpc, error: anonRpcError } = await anonService.rpc(
+      "try_increment_anon_count",
+      { p_ip_hash: hashIp(getClientIp(req)), p_limit: ANON_SEARCHES_PER_IP_PER_DAY }
+    );
+    if (anonRpcError) {
+      log.error("try_increment_anon_count RPC failed (failing open)", anonRpcError);
+    } else if (anonRpc && !anonRpc.allowed) {
+      return res.status(403).json({
+        error: "signup_required",
+        message: "Daily free search limit reached for this network. Sign up to continue.",
       });
     }
 
@@ -206,7 +227,7 @@ export default async function handler(
   }
 
   // --- Authenticated search path ---
-  const userId = session.user.id;
+  const userId = user.id;
 
   const userLimit = checkRateLimit(
     `user:${userId}`,
