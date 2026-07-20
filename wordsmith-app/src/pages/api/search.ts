@@ -9,9 +9,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { LRUCache } from "lru-cache";
 import type { WordData } from "@/lib/types";
 import { FREE_SEARCH_LIMIT } from "@/lib/constants";
-import { validateEnv } from "@/lib/env";
-
-validateEnv();
+import { missingEnv } from "@/lib/env";
 
 // Disable Vercel response buffering so SSE events are flushed immediately
 export const config = {
@@ -115,6 +113,20 @@ export default async function handler(
 ) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  // Search only needs Anthropic + Supabase + the cookie secret — not Stripe.
+  // Surface the exact missing var so a misconfigured deploy is self-diagnosing
+  // instead of returning an opaque 500.
+  const missing = missingEnv("anthropic", "supabase", "cookie");
+  if (missing.length > 0) {
+    const log = createRequestLogger("/api/search");
+    log.error("search unavailable — missing env vars", undefined, { missing });
+    return res.status(503).json({
+      error: "server_misconfigured",
+      message: "Search is temporarily unavailable. Please try again later.",
+      missing,
+    });
   }
 
   const { query } = req.body;
