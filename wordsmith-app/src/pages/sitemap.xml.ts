@@ -1,5 +1,6 @@
 import type { GetServerSideProps } from "next";
 import { SEED_WORDS } from "@/lib/seed-words";
+import { WORD_HUBS } from "@/lib/word-hubs";
 import { SYNONYM_VOLUMES } from "@/lib/synonym-volumes";
 import { SITE_URL } from "@/lib/seo";
 
@@ -16,6 +17,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
   const staticEntries = [
     { path: "", priority: "1.0" },
     { path: "/words", priority: "0.8" },
+    ...WORD_HUBS.map((h) => ({ path: `/words/category/${h.slug}`, priority: "0.8" })),
     { path: "/privacy", priority: "0.3" },
   ];
   // Both page types share the word_pages data but target different queries

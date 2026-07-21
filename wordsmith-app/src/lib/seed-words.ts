@@ -79,7 +79,7 @@ export const SEED_WORDS = [
   "fact", "hit", "keep", "number", "ride", "superb", "tear", "terrific",
   "win", "world", "alright", "next", "submit", "forget", "irritated", "sell",
   "set", "swim", "throw", "early", "bring", "cheerful", "fly", "put",
-  "ring", "year",
+  "ring", "year", "suddenly", "very", "really",
 ] as const;
 
 const SEED_SET = new Set<string>(SEED_WORDS);

@@ -2,6 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import Footer from "@/components/landing/Footer";
 import { SEED_WORDS } from "@/lib/seed-words";
+import { WORD_HUBS } from "@/lib/word-hubs";
 import { SITE_URL } from "@/lib/seo";
 
 const TITLE = `Word Library — Better Words for ${SEED_WORDS.length} Common Words | Wordsmith`;
@@ -46,6 +47,23 @@ export default function WordLibrary() {
             elevated, literary, punchy, and rare.
           </p>
         </header>
+
+        <section aria-label="Browse by category" className="mb-12">
+          <h2 className="font-body text-[11px] font-semibold tracking-[0.22em] uppercase text-gold m-0 mb-4 text-center">
+            Browse by category
+          </h2>
+          <div className="flex flex-wrap justify-center gap-2">
+            {WORD_HUBS.map((h) => (
+              <Link
+                key={h.slug}
+                href={`/words/category/${h.slug}`}
+                className="history-chip bg-white border border-gold/30 rounded-full px-5 py-2 font-body text-[14px] font-semibold text-parchment-800 no-underline transition-colors duration-150"
+              >
+                {h.title}
+              </Link>
+            ))}
+          </div>
+        </section>
 
         {Object.entries(groups).map(([letter, words]) => (
           <section key={letter} className="mb-8">
