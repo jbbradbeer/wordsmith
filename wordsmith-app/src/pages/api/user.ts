@@ -79,7 +79,7 @@ async function handler(
   const supabase = createServerSupabaseClient({ req, res });
   const { data: profile } = await supabase
     .from("profiles")
-    .select("subscription_status, search_count, last_search_reset, created_at")
+    .select("subscription_status, search_count, last_search_reset, scan_count, last_scan_reset, created_at")
     .eq("id", user.id)
     .single();
 
@@ -90,6 +90,7 @@ async function handler(
   const isPaid = hasActiveAccess(profile.subscription_status);
   // Reflect the daily reset in the UI even before the day's first search
   const todayCount = effectiveDailyCount(profile.search_count, profile.last_search_reset);
+  const todayScans = effectiveDailyCount(profile.scan_count, profile.last_scan_reset);
 
   return res.status(200).json({
     email: user.email,
@@ -97,6 +98,7 @@ async function handler(
     subscriptionStatus: profile.subscription_status,
     searchCount: todayCount,
     searchesRemaining: isPaid ? null : Math.max(0, FREE_SEARCH_LIMIT - todayCount),
+    scansRemaining: isPaid ? null : Math.max(0, 1 - todayScans),
     limit: isPaid ? null : FREE_SEARCH_LIMIT,
     memberSince: profile.created_at,
   });
