@@ -1,0 +1,2592 @@
+{
+  "description": "Validated keyword backlog for the weekly SEO loop. Each entry passed: >=1,900/mo US volume, KD<=30, informational intent (DataForSEO via OpenSEO). The weekly routine consumes the top entries into SEED_WORDS + SYNONYM_VOLUMES. Refill via a new get_keyword_metrics batch when low.",
+  "researched_at": "2026-07-20",
+  "source": "openseo project 6edf5c1c-b451-444f-b378-2f3a1061c3f9",
+  "words": [
+    {
+      "word": "analyze",
+      "volume": 60500,
+      "kd": 0
+    },
+    {
+      "word": "comfort",
+      "volume": 60500,
+      "kd": 1
+    },
+    {
+      "word": "emphasize",
+      "volume": 60500,
+      "kd": 7
+    },
+    {
+      "word": "desire",
+      "volume": 49500,
+      "kd": 1
+    },
+    {
+      "word": "foster",
+      "volume": 49500,
+      "kd": 0
+    },
+    {
+      "word": "care",
+      "volume": 40500,
+      "kd": 0
+    },
+    {
+      "word": "cause",
+      "volume": 40500,
+      "kd": 0
+    },
+    {
+      "word": "determine",
+      "volume": 40500,
+      "kd": 7
+    },
+    {
+      "word": "fear",
+      "volume": 40500,
+      "kd": 4
+    },
+    {
+      "word": "inspire",
+      "volume": 40500,
+      "kd": 1
+    },
+    {
+      "word": "struggle",
+      "volume": 40500,
+      "kd": 4
+    },
+    {
+      "word": "allow",
+      "volume": 33100,
+      "kd": 4
+    },
+    {
+      "word": "approach",
+      "volume": 33100,
+      "kd": 7
+    },
+    {
+      "word": "celebrate",
+      "volume": 33100,
+      "kd": 2
+    },
+    {
+      "word": "continue",
+      "volume": 33100,
+      "kd": 3
+    },
+    {
+      "word": "evolve",
+      "volume": 33100,
+      "kd": 0
+    },
+    {
+      "word": "complex",
+      "volume": 33100,
+      "kd": 1
+    },
+    {
+      "word": "confusing",
+      "volume": 33100,
+      "kd": 0
+    },
+    {
+      "word": "eager",
+      "volume": 33100,
+      "kd": 0
+    },
+    {
+      "word": "helpful",
+      "volume": 33100,
+      "kd": 4
+    },
+    {
+      "word": "agree",
+      "volume": 27100,
+      "kd": 4
+    },
+    {
+      "word": "build",
+      "volume": 27100,
+      "kd": 0
+    },
+    {
+      "word": "complete",
+      "volume": 27100,
+      "kd": 10
+    },
+    {
+      "word": "consider",
+      "volume": 27100,
+      "kd": 0
+    },
+    {
+      "word": "decide",
+      "volume": 27100,
+      "kd": 3
+    },
+    {
+      "word": "describe",
+      "volume": 27100,
+      "kd": 1
+    },
+    {
+      "word": "discuss",
+      "volume": 27100,
+      "kd": 2
+    },
+    {
+      "word": "navigate",
+      "volume": 27100,
+      "kd": 0
+    },
+    {
+      "word": "persist",
+      "volume": 27100,
+      "kd": 0
+    },
+    {
+      "word": "protect",
+      "volume": 27100,
+      "kd": 5
+    },
+    {
+      "word": "respect",
+      "volume": 27100,
+      "kd": 0
+    },
+    {
+      "word": "critical",
+      "volume": 27100,
+      "kd": 0
+    },
+    {
+      "word": "thrive",
+      "volume": 27100,
+      "kd": 0
+    },
+    {
+      "word": "intense",
+      "volume": 27100,
+      "kd": 0
+    },
+    {
+      "word": "address",
+      "volume": 22200,
+      "kd": 4
+    },
+    {
+      "word": "balance",
+      "volume": 22200,
+      "kd": 5
+    },
+    {
+      "word": "design",
+      "volume": 22200,
+      "kd": 6
+    },
+    {
+      "word": "differ",
+      "volume": 22200,
+      "kd": 0
+    },
+    {
+      "word": "embrace",
+      "volume": 22200,
+      "kd": 0
+    },
+    {
+      "word": "enforce",
+      "volume": 22200,
+      "kd": 0
+    },
+    {
+      "word": "evaluate",
+      "volume": 22200,
+      "kd": 3
+    },
+    {
+      "word": "include",
+      "volume": 22200,
+      "kd": 7
+    },
+    {
+      "word": "preserve",
+      "volume": 22200,
+      "kd": 3
+    },
+    {
+      "word": "scare",
+      "volume": 22200,
+      "kd": 0
+    },
+    {
+      "word": "shift",
+      "volume": 22200,
+      "kd": 2
+    },
+    {
+      "word": "emotional",
+      "volume": 22200,
+      "kd": 20
+    },
+    {
+      "word": "fake",
+      "volume": 22200,
+      "kd": 9
+    },
+    {
+      "word": "stop",
+      "volume": 22200,
+      "kd": 0
+    },
+    {
+      "word": "immense",
+      "volume": 22200,
+      "kd": 2
+    },
+    {
+      "word": "adapt",
+      "volume": 18100,
+      "kd": 5
+    },
+    {
+      "word": "assess",
+      "volume": 18100,
+      "kd": 0
+    },
+    {
+      "word": "assist",
+      "volume": 18100,
+      "kd": 3
+    },
+    {
+      "word": "assume",
+      "volume": 18100,
+      "kd": 2
+    },
+    {
+      "word": "attempt",
+      "volume": 18100,
+      "kd": 4
+    },
+    {
+      "word": "avoid",
+      "volume": 18100,
+      "kd": 0
+    },
+    {
+      "word": "capture",
+      "volume": 18100,
+      "kd": 0
+    },
+    {
+      "word": "confirm",
+      "volume": 18100,
+      "kd": 1
+    },
+    {
+      "word": "confront",
+      "volume": 18100,
+      "kd": 0
+    },
+    {
+      "word": "connect",
+      "volume": 18100,
+      "kd": 3
+    },
+    {
+      "word": "correct",
+      "volume": 18100,
+      "kd": 0
+    },
+    {
+      "word": "criticize",
+      "volume": 18100,
+      "kd": 0
+    },
+    {
+      "word": "demand",
+      "volume": 18100,
+      "kd": 0
+    },
+    {
+      "word": "display",
+      "volume": 18100,
+      "kd": 2
+    },
+    {
+      "word": "empower",
+      "volume": 18100,
+      "kd": 1
+    },
+    {
+      "word": "form",
+      "volume": 18100,
+      "kd": 0
+    },
+    {
+      "word": "ignore",
+      "volume": 18100,
+      "kd": 0
+    },
+    {
+      "word": "master",
+      "volume": 18100,
+      "kd": 0
+    },
+    {
+      "word": "move",
+      "volume": 18100,
+      "kd": 0
+    },
+    {
+      "word": "praise",
+      "volume": 18100,
+      "kd": 1
+    },
+    {
+      "word": "prevent",
+      "volume": 18100,
+      "kd": 4
+    },
+    {
+      "word": "equal",
+      "volume": 18100,
+      "kd": 0
+    },
+    {
+      "word": "trust",
+      "volume": 18100,
+      "kd": 0
+    },
+    {
+      "word": "try",
+      "volume": 18100,
+      "kd": 1
+    },
+    {
+      "word": "innocent",
+      "volume": 18100,
+      "kd": 0
+    },
+    {
+      "word": "aware",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "bless",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "collect",
+      "volume": 14800,
+      "kd": 3
+    },
+    {
+      "word": "discover",
+      "volume": 14800,
+      "kd": 25
+    },
+    {
+      "word": "dream",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "escape",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "fail",
+      "volume": 14800,
+      "kd": 2
+    },
+    {
+      "word": "follow",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "fulfill",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "function",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "invest",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "mix",
+      "volume": 14800,
+      "kd": 3
+    },
+    {
+      "word": "open",
+      "volume": 14800,
+      "kd": 3
+    },
+    {
+      "word": "operate",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "overcome",
+      "volume": 14800,
+      "kd": 1
+    },
+    {
+      "word": "play",
+      "volume": 14800,
+      "kd": 6
+    },
+    {
+      "word": "point",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "regret",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "resist",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "bold",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "defiant",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "dramatic",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "expert",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "friendly",
+      "volume": 14800,
+      "kd": 1
+    },
+    {
+      "word": "spread",
+      "volume": 14800,
+      "kd": 6
+    },
+    {
+      "word": "suffer",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "test",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "view",
+      "volume": 14800,
+      "kd": 1
+    },
+    {
+      "word": "handsome",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "ideal",
+      "volume": 14800,
+      "kd": 0
+    },
+    {
+      "word": "argue",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "break",
+      "volume": 12100,
+      "kd": 4
+    },
+    {
+      "word": "close",
+      "volume": 12100,
+      "kd": 3
+    },
+    {
+      "word": "damage",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "deal",
+      "volume": 12100,
+      "kd": 2
+    },
+    {
+      "word": "disappear",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "face",
+      "volume": 12100,
+      "kd": 2
+    },
+    {
+      "word": "fix",
+      "volume": 12100,
+      "kd": 2
+    },
+    {
+      "word": "interact",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "interpret",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "limit",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "list",
+      "volume": 12100,
+      "kd": 2
+    },
+    {
+      "word": "measure",
+      "volume": 12100,
+      "kd": 3
+    },
+    {
+      "word": "persuade",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "practice",
+      "volume": 12100,
+      "kd": 25
+    },
+    {
+      "word": "prohibit",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "react",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "release",
+      "volume": 12100,
+      "kd": 5
+    },
+    {
+      "word": "rely",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "remind",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "restore",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "scream",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "search",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "shape",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "authentic",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "capable",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "cautious",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "colorful",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "diligent",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "treat",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "watch",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "wonder",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "worry",
+      "volume": 12100,
+      "kd": 1
+    },
+    {
+      "word": "hidden",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "insecure",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "lovely",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "massive",
+      "volume": 12100,
+      "kd": 0
+    },
+    {
+      "word": "admire",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "attend",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "blame",
+      "volume": 9900,
+      "kd": 1
+    },
+    {
+      "word": "broad",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "claim",
+      "volume": 9900,
+      "kd": 4
+    },
+    {
+      "word": "decrease",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "devote",
+      "volume": 9900,
+      "kd": 7
+    },
+    {
+      "word": "disagree",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "dislike",
+      "volume": 9900,
+      "kd": 1
+    },
+    {
+      "word": "doubt",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "elevate",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "eliminate",
+      "volume": 9900,
+      "kd": 3
+    },
+    {
+      "word": "expose",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "finish",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "flow",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "force",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "gain",
+      "volume": 9900,
+      "kd": 1
+    },
+    {
+      "word": "heal",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "insult",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "justify",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "lack",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "neglect",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "nurture",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "oppose",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "possess",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "reject",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "scold",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "ambitious",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "blissful",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "energetic",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "ethical",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "frantic",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "travel",
+      "volume": 9900,
+      "kd": 4
+    },
+    {
+      "word": "vary",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "whisper",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "yell",
+      "volume": 9900,
+      "kd": 0
+    },
+    {
+      "word": "attract",
+      "volume": 8100,
+      "kd": 13
+    },
+    {
+      "word": "awful",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "beg",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "burn",
+      "volume": 8100,
+      "kd": 5
+    },
+    {
+      "word": "command",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "compete",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "consist",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "contain",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "declare",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "delay",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "deny",
+      "volume": 8100,
+      "kd": 3
+    },
+    {
+      "word": "disturb",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "divide",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "entertain",
+      "volume": 8100,
+      "kd": 4
+    },
+    {
+      "word": "experiment",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "gaze",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "grant",
+      "volume": 8100,
+      "kd": 2
+    },
+    {
+      "word": "guarantee",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "handle",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "harm",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "imagine",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "judge",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "matter",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "modify",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "object",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "plant",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "push",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "recall",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "retain",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "satisfy",
+      "volume": 8100,
+      "kd": 1
+    },
+    {
+      "word": "shout",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "adorable",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "cunning",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "delicate",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "eerie",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "enchanting",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "firm",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "flexible",
+      "volume": 8100,
+      "kd": 2
+    },
+    {
+      "word": "surrender",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "tolerate",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "trick",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "verify",
+      "volume": 8100,
+      "kd": 5
+    },
+    {
+      "word": "yield",
+      "volume": 8100,
+      "kd": 1
+    },
+    {
+      "word": "harsh",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "logical",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "mature",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "notable",
+      "volume": 8100,
+      "kd": 0
+    },
+    {
+      "word": "advance",
+      "volume": 6600,
+      "kd": 4
+    },
+    {
+      "word": "approve",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "cheer",
+      "volume": 6600,
+      "kd": 2
+    },
+    {
+      "word": "combine",
+      "volume": 6600,
+      "kd": 1
+    },
+    {
+      "word": "defend",
+      "volume": 6600,
+      "kd": 2
+    },
+    {
+      "word": "emerge",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "excuse",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "exercise",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "exist",
+      "volume": 6600,
+      "kd": 2
+    },
+    {
+      "word": "invite",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "link",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "mark",
+      "volume": 6600,
+      "kd": 2
+    },
+    {
+      "word": "pause",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "plead",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "reach",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "recover",
+      "volume": 6600,
+      "kd": 6
+    },
+    {
+      "word": "refuse",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "remain",
+      "volume": 6600,
+      "kd": 3
+    },
+    {
+      "word": "report",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "resemble",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "resign",
+      "volume": 6600,
+      "kd": 2
+    },
+    {
+      "word": "reward",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "secure",
+      "volume": 6600,
+      "kd": 1
+    },
+    {
+      "word": "seem",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "classic",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "cozy",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "fierce",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "fit",
+      "volume": 6600,
+      "kd": 4
+    },
+    {
+      "word": "surround",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "switch",
+      "volume": 6600,
+      "kd": 1
+    },
+    {
+      "word": "wait",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "wander",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "wave",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "gloomy",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "grand",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "helpless",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "humble",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "keen",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "noble",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "novel",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "obedient",
+      "volume": 6600,
+      "kd": 0
+    },
+    {
+      "word": "acknowledge",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "assure",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "boast",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "compare",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "cope",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "cover",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "depend",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "drop",
+      "volume": 5400,
+      "kd": 1
+    },
+    {
+      "word": "grieve",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "happen",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "hesitate",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "imitate",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "label",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "mourn",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "obey",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "pity",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "ponder",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "punish",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "refine",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "ample",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "average",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "crowded",
+      "volume": 5400,
+      "kd": 1
+    },
+    {
+      "word": "cruel",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "distant",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "faithful",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "foolish",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "genuine",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "soar",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "stretch",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "strike",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "tremble",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "gracious",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "greedy",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "grim",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "lavish",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "narrow",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "outgoing",
+      "volume": 5400,
+      "kd": 0
+    },
+    {
+      "word": "adjust",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "admit",
+      "volume": 4400,
+      "kd": 2
+    },
+    {
+      "word": "anticipate",
+      "volume": 4400,
+      "kd": 1
+    },
+    {
+      "word": "apply",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "arrive",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "attach",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "basic",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "climb",
+      "volume": 4400,
+      "kd": 2
+    },
+    {
+      "word": "comment",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "donate",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "drag",
+      "volume": 4400,
+      "kd": 1
+    },
+    {
+      "word": "endure",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "exclaim",
+      "volume": 4400,
+      "kd": 2
+    },
+    {
+      "word": "frighten",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "glance",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "incorporate",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "live",
+      "volume": 4400,
+      "kd": 2
+    },
+    {
+      "word": "locate",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "melt",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "miss",
+      "volume": 4400,
+      "kd": 2
+    },
+    {
+      "word": "protest",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "remark",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "reply",
+      "volume": 4400,
+      "kd": 1
+    },
+    {
+      "word": "agile",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "barren",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "considerate",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "decent",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "earnest",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "flat",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "stumble",
+      "volume": 4400,
+      "kd": 4
+    },
+    {
+      "word": "summon",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "supply",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "survive",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "twist",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "visit",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "glorious",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "gruesome",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "hilarious",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "hollow",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "moist",
+      "volume": 4400,
+      "kd": 0
+    },
+    {
+      "word": "advise",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "brag",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "charge",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "clarify",
+      "volume": 3600,
+      "kd": 1
+    },
+    {
+      "word": "complain",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "cook",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "decline",
+      "volume": 3600,
+      "kd": 1
+    },
+    {
+      "word": "deliver",
+      "volume": 3600,
+      "kd": 5
+    },
+    {
+      "word": "direct",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "employ",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "fill",
+      "volume": 3600,
+      "kd": 3
+    },
+    {
+      "word": "instruct",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "interfere",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "join",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "lecture",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "lift",
+      "volume": 3600,
+      "kd": 1
+    },
+    {
+      "word": "murmur",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "negotiate",
+      "volume": 3600,
+      "kd": 1
+    },
+    {
+      "word": "note",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "postpone",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "prefer",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "quarrel",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "quit",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "raise",
+      "volume": 3600,
+      "kd": 2
+    },
+    {
+      "word": "rebuild",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "retreat",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "sense",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "shrink",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "angelic",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "awkward",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "bewildered",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "exotic",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "frequent",
+      "volume": 3600,
+      "kd": 4
+    },
+    {
+      "word": "slam",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "spin",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "starve",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "stun",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "unite",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "vanish",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "warn",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "hasty",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "lush",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "luxurious",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "neat",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "noisy",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "ordinary",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "pale",
+      "volume": 3600,
+      "kd": 0
+    },
+    {
+      "word": "accomplish",
+      "volume": 2900,
+      "kd": 2
+    },
+    {
+      "word": "announce",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "chase",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "classify",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "convince",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "count",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "crash",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "deserve",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "distribute",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "freeze",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "glow",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "greet",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "impress",
+      "volume": 2900,
+      "kd": 2
+    },
+    {
+      "word": "intend",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "lock",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "oblige",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "order",
+      "volume": 2900,
+      "kd": 8
+    },
+    {
+      "word": "paint",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "pledge",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "prescribe",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "proclaim",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "regard",
+      "volume": 2900,
+      "kd": 7
+    },
+    {
+      "word": "repair",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "repeat",
+      "volume": 2900,
+      "kd": 3
+    },
+    {
+      "word": "rescue",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "reserve",
+      "volume": 2900,
+      "kd": 1
+    },
+    {
+      "word": "return",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "save",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "seize",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "signal",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "dizzy",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "dreary",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "dull",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "filthy",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "fragile",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "skip",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "spring",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "squeeze",
+      "volume": 2900,
+      "kd": 1
+    },
+    {
+      "word": "taste",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "trace",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "urge",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "venture",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "gross",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "lame",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "ornate",
+      "volume": 2900,
+      "kd": 0
+    },
+    {
+      "word": "apologize",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "belong",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "bother",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "cling",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "creep",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "dig",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "drift",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "enroll",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "expect",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "extend",
+      "volume": 2400,
+      "kd": 1
+    },
+    {
+      "word": "feed",
+      "volume": 2400,
+      "kd": 5
+    },
+    {
+      "word": "flee",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "float",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "grab",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "grin",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "guess",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "hurry",
+      "volume": 2400,
+      "kd": 2
+    },
+    {
+      "word": "land",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "mind",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "narrate",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "occur",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "reunite",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "roar",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "rush",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "settle",
+      "volume": 2400,
+      "kd": 2
+    },
+    {
+      "word": "athletic",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "bashful",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "blunt",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "bouncy",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "careless",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "clumsy",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "colossal",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "creepy",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "dismal",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "frigid",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "snap",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "sob",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "suspect",
+      "volume": 2400,
+      "kd": 1
+    },
+    {
+      "word": "sweep",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "swell",
+      "volume": 2400,
+      "kd": 2
+    },
+    {
+      "word": "weep",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "humid",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "idle",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "lofty",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "low",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "mellow",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "mighty",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "moody",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "murky",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "nosy",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "numb",
+      "volume": 2400,
+      "kd": 2
+    },
+    {
+      "word": "orderly",
+      "volume": 2400,
+      "kd": 0
+    },
+    {
+      "word": "borrow",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "brief",
+      "volume": 1900,
+      "kd": 2
+    },
+    {
+      "word": "earn",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "enclose",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "interrupt",
+      "volume": 1900,
+      "kd": 2
+    },
+    {
+      "word": "lay",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "nod",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "pick",
+      "volume": 1900,
+      "kd": 3
+    },
+    {
+      "word": "pitch",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "pray",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "roam",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "bare",
+      "volume": 1900,
+      "kd": 4
+    },
+    {
+      "word": "brisk",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "coarse",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "compact",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "dusty",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "flimsy",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "fluffy",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "foggy",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "formal",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "slide",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "smash",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "sparkle",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "stare",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "stay",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "transfer",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "turn",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "waste",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "gifted",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "gritty",
+      "volume": 1900,
+      "kd": 0
+    },
+    {
+      "word": "lively",
+      "volume": 1900,
+      "kd": 0
+    }
+  ]
+}
