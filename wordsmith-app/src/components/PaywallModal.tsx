@@ -15,7 +15,6 @@ interface PaywallModalProps {
 const PRO_FEATURES = [
   "Unlimited Slop Score scans",
   "10,000-word drafts (free: 1,500)",
-  "Scan history",
   "Unlimited word searches",
   "Save words to collections",
   "Cancel anytime",
