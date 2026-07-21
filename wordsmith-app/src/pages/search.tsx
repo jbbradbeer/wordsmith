@@ -157,33 +157,6 @@ export default function Home() {
     inputRef.current?.focus();
   }, []);
 
-  // Check for upgrade success in URL
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("upgraded") === "true") {
-      const sessionId = params.get("session_id");
-      window.history.replaceState({}, "", "/");
-
-      // The redirect can beat Stripe's webhook — verify the session directly
-      // so the user is Pro the moment they land back, then refresh
-      if (sessionId) {
-        fetch("/api/checkout-verify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId }),
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            if (data?.activated) trackEvent("upgrade_complete");
-          })
-          .catch((err) => console.error("Checkout verification failed:", err))
-          .finally(() => refreshUserInfo());
-      } else {
-        refreshUserInfo();
-      }
-    }
-  }, [refreshUserInfo]);
-
   // Funnel: fire once each time the paywall becomes visible
   useEffect(() => {
     if (showPaywall) trackEvent("paywall_view");

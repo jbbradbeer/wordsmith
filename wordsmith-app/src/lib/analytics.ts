@@ -12,7 +12,10 @@ export type FunnelEvent =
   | "limit_hit"
   | "paywall_view"
   | "checkout_start"
-  | "upgrade_complete";
+  | "upgrade_complete"
+  | "scan_started"
+  | "scan_completed"
+  | "span_clicked";
 
 type EventProps = Record<string, string | number | boolean | null>;
 
