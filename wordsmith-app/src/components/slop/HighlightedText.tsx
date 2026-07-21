@@ -18,6 +18,7 @@ export default function HighlightedText({ text, spans, activeIndex, onSpanClick 
     parts.push(
       <button
         key={`s${i}`}
+        type="button"
         onClick={() => onSpanClick(i)}
         className={`inline bg-transparent border-none p-0 cursor-pointer font-inherit text-inherit rounded-sm ${
           activeIndex === i ? "bg-gold/30" : "bg-gold/15"

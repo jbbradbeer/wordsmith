@@ -21,7 +21,7 @@ const DESCRIPTION =
 
 export default function Analyzer() {
   const session = useSession();
-  const { result, error, loading, limit, analyze } = useAnalyze();
+  const { result, setResult, error, loading, limit, analyze } = useAnalyze();
   const [draft, setDraft] = useState("");
   const [editing, setEditing] = useState(true);
   const [activeSpan, setActiveSpan] = useState<number | null>(null);
@@ -70,12 +70,17 @@ export default function Analyzer() {
     analyzedText.current = draft;
     setEditing(false);
     setActiveSpan(null);
+    // Clear the stale scan synchronously so we never render this new text
+    // against the previous result's spans while the SSE response is in flight.
+    setResult(null);
     await analyze(draft);
   };
 
   // Live rules-only re-score while the user edits after a scan (free, client-side)
+  // Invariant: result always describes analyzedText.current (cleared synchronously on re-analyze).
   const liveResult = useMemo(() => {
-    if (!result || editing === false || draft === analyzedText.current) return result;
+    if (!result) return result;
+    if (!editing) return result;
     return computeScan(runRules(draft), [], true);
   }, [draft, editing, result]);
 

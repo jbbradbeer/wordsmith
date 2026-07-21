@@ -10,7 +10,7 @@ export default function SpanCard({ span, onClose }: { span: SlopSpan; onClose: (
     <div className="bg-white border border-gold/40 rounded-xl p-5 shadow-sm">
       <div className="flex justify-between items-start mb-2">
         <span className="font-display italic text-[15px] text-parchment-900">&ldquo;{span.text}&rdquo;</span>
-        <button onClick={onClose} aria-label="Close" className="bg-transparent border-none cursor-pointer text-parchment-500">✕</button>
+        <button type="button" onClick={onClose} aria-label="Close" className="bg-transparent border-none cursor-pointer text-parchment-500">✕</button>
       </div>
       <p className="font-body text-[13px] text-parchment-800 m-0 mb-1.5">
         <span className="font-bold text-gold uppercase text-[11px] tracking-wider mr-1.5">Why</span>
