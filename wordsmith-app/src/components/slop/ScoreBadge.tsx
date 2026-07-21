@@ -35,6 +35,14 @@ export default function ScoreBadge({ result }: { result: ScanResult }) {
           </div>
         ))}
       </div>
+      <a
+        href={`/score?v=${result.score}`}
+        target="_blank"
+        rel="noreferrer"
+        className="font-body text-[12px] text-gold font-semibold no-underline block mt-3"
+      >
+        Share this score →
+      </a>
     </div>
   );
 }
