@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { FREE_SEARCH_LIMIT, SUBSCRIPTION_PRICE_MONTHLY } from "@/lib/constants";
+import {
+  FREE_SEARCH_LIMIT,
+  SUBSCRIPTION_PRICE_MONTHLY,
+  SUBSCRIPTION_PRICE_ANNUAL,
+  type BillingPlan,
+} from "@/lib/constants";
 import { trackEvent } from "@/lib/analytics";
 import Modal from "./Modal";
 
@@ -16,15 +21,25 @@ const PRO_FEATURES = [
   "Cancel anytime",
 ];
 
+const ANNUAL_MONTHLY_EQUIV = Math.round((SUBSCRIPTION_PRICE_ANNUAL / 12) * 100) / 100;
+const ANNUAL_SAVINGS_PCT = Math.round(
+  (1 - SUBSCRIPTION_PRICE_ANNUAL / (SUBSCRIPTION_PRICE_MONTHLY * 12)) * 100
+);
+
 export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
   const [loading, setLoading] = useState(false);
+  const [plan, setPlan] = useState<BillingPlan>("annual");
   const headingId = "paywall-modal-title";
 
   const handleUpgrade = async () => {
     setLoading(true);
-    trackEvent("checkout_start");
+    trackEvent("checkout_start", { plan });
     try {
-      const res = await fetch("/api/checkout", { method: "POST" });
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
@@ -75,12 +90,44 @@ export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
           ))}
         </div>
 
-        {/* Price + CTA */}
-        <div className="mb-3">
-          <span className="font-display font-black text-4xl text-parchment-900">
-            ${SUBSCRIPTION_PRICE_MONTHLY}
-          </span>
-          <span className="font-body text-sm text-parchment-600 ml-1">/ month</span>
+        {/* Plan toggle */}
+        <div
+          role="radiogroup"
+          aria-label="Billing plan"
+          className="flex gap-2 mb-4"
+        >
+          <button
+            type="button"
+            role="radio"
+            aria-checked={plan === "annual"}
+            onClick={() => setPlan("annual")}
+            className={`flex-1 rounded-xl border p-3 text-left transition-colors ${plan === "annual" ? "border-gold bg-gold/[0.06]" : "border-parchment-300 bg-white"}`}
+          >
+            <span className="block font-body text-[11px] font-bold uppercase tracking-[0.1em] text-gold">
+              Annual · save {ANNUAL_SAVINGS_PCT}%
+            </span>
+            <span className="font-display font-black text-2xl text-parchment-900">
+              ${ANNUAL_MONTHLY_EQUIV}
+            </span>
+            <span className="font-body text-xs text-parchment-600">
+              /mo · ${SUBSCRIPTION_PRICE_ANNUAL} billed yearly
+            </span>
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={plan === "monthly"}
+            onClick={() => setPlan("monthly")}
+            className={`flex-1 rounded-xl border p-3 text-left transition-colors ${plan === "monthly" ? "border-gold bg-gold/[0.06]" : "border-parchment-300 bg-white"}`}
+          >
+            <span className="block font-body text-[11px] font-bold uppercase tracking-[0.1em] text-parchment-500">
+              Monthly
+            </span>
+            <span className="font-display font-black text-2xl text-parchment-900">
+              ${SUBSCRIPTION_PRICE_MONTHLY}
+            </span>
+            <span className="font-body text-xs text-parchment-600">/mo</span>
+          </button>
         </div>
 
         <button

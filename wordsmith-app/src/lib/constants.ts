@@ -2,6 +2,8 @@
 // Anonymous users: this many LIFETIME (cookie + anon_usage IP cap).
 export const FREE_SEARCH_LIMIT = 3;
 export const SUBSCRIPTION_PRICE_MONTHLY = 10; // dollars
+export const SUBSCRIPTION_PRICE_ANNUAL = 96; // dollars/year — $8/mo effective, ~20% off
+export type BillingPlan = "monthly" | "annual";
 export const APP_NAME = "Wordsmith";
 export const APP_TAGLINE = "Trade the ordinary for the extraordinary";
 export const ANON_COUNT_KEY = "wordsmith_anon_searches";

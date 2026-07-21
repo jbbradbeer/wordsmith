@@ -61,6 +61,15 @@ async function handler(
   const userId = user.id;
   const userEmail = user.email;
 
+  // Plan selection — annual falls back to a clear error if its price isn't set
+  const plan = req.body?.plan === "annual" ? "annual" : "monthly";
+  const priceId =
+    plan === "annual" ? process.env.STRIPE_PRICE_ID_ANNUAL : process.env.STRIPE_PRICE_ID;
+  if (!priceId) {
+    log.error("checkout price id missing", undefined, { plan });
+    return res.status(503).json({ error: "server_misconfigured" });
+  }
+
   try {
     const stripe = getStripe();
     warnOnPriceMismatch(stripe, log);
@@ -100,9 +109,10 @@ async function handler(
       customer: customerId,
       mode: "subscription",
       payment_method_types: ["card"],
+      allow_promotion_codes: true,
       line_items: [
         {
-          price: process.env.STRIPE_PRICE_ID!,
+          price: priceId,
           quantity: 1,
         },
       ],

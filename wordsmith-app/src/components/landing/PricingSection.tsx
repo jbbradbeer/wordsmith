@@ -1,4 +1,8 @@
-import { FREE_SEARCH_LIMIT, SUBSCRIPTION_PRICE_MONTHLY } from "@/lib/constants";
+import {
+  FREE_SEARCH_LIMIT,
+  SUBSCRIPTION_PRICE_MONTHLY,
+  SUBSCRIPTION_PRICE_ANNUAL,
+} from "@/lib/constants";
 import Reveal from "./Reveal";
 import MagneticButton from "./MagneticButton";
 
@@ -80,6 +84,10 @@ export default function PricingSection({ onGetStarted, onUpgrade }: PricingSecti
                   ${SUBSCRIPTION_PRICE_MONTHLY}
                 </span>
                 <span className="font-body text-sm text-parchment-500 ml-1.5">/month</span>
+                <span className="block font-body text-xs text-gold mt-1">
+                  or ${SUBSCRIPTION_PRICE_ANNUAL}/year — save{" "}
+                  {Math.round((1 - SUBSCRIPTION_PRICE_ANNUAL / (SUBSCRIPTION_PRICE_MONTHLY * 12)) * 100)}%
+                </span>
               </div>
               <ul className="list-none p-0 m-0 mb-7 flex-1">
                 {PRO_FEATURES.map((feature) => (
