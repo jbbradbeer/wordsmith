@@ -4,131 +4,6 @@
   "source": "openseo project 6edf5c1c-b451-444f-b378-2f3a1061c3f9",
   "words": [
     {
-      "word": "analyze",
-      "volume": 60500,
-      "kd": 0
-    },
-    {
-      "word": "comfort",
-      "volume": 60500,
-      "kd": 1
-    },
-    {
-      "word": "emphasize",
-      "volume": 60500,
-      "kd": 7
-    },
-    {
-      "word": "desire",
-      "volume": 49500,
-      "kd": 1
-    },
-    {
-      "word": "foster",
-      "volume": 49500,
-      "kd": 0
-    },
-    {
-      "word": "care",
-      "volume": 40500,
-      "kd": 0
-    },
-    {
-      "word": "cause",
-      "volume": 40500,
-      "kd": 0
-    },
-    {
-      "word": "determine",
-      "volume": 40500,
-      "kd": 7
-    },
-    {
-      "word": "fear",
-      "volume": 40500,
-      "kd": 4
-    },
-    {
-      "word": "inspire",
-      "volume": 40500,
-      "kd": 1
-    },
-    {
-      "word": "struggle",
-      "volume": 40500,
-      "kd": 4
-    },
-    {
-      "word": "allow",
-      "volume": 33100,
-      "kd": 4
-    },
-    {
-      "word": "approach",
-      "volume": 33100,
-      "kd": 7
-    },
-    {
-      "word": "celebrate",
-      "volume": 33100,
-      "kd": 2
-    },
-    {
-      "word": "continue",
-      "volume": 33100,
-      "kd": 3
-    },
-    {
-      "word": "evolve",
-      "volume": 33100,
-      "kd": 0
-    },
-    {
-      "word": "complex",
-      "volume": 33100,
-      "kd": 1
-    },
-    {
-      "word": "confusing",
-      "volume": 33100,
-      "kd": 0
-    },
-    {
-      "word": "eager",
-      "volume": 33100,
-      "kd": 0
-    },
-    {
-      "word": "helpful",
-      "volume": 33100,
-      "kd": 4
-    },
-    {
-      "word": "agree",
-      "volume": 27100,
-      "kd": 4
-    },
-    {
-      "word": "build",
-      "volume": 27100,
-      "kd": 0
-    },
-    {
-      "word": "complete",
-      "volume": 27100,
-      "kd": 10
-    },
-    {
-      "word": "consider",
-      "volume": 27100,
-      "kd": 0
-    },
-    {
-      "word": "decide",
-      "volume": 27100,
-      "kd": 3
-    },
-    {
       "word": "describe",
       "volume": 27100,
       "kd": 1
@@ -2588,5 +2463,6 @@
       "volume": 1900,
       "kd": 0
     }
-  ]
+  ],
+  "last_consumed_at": "2026-07-21"
 }

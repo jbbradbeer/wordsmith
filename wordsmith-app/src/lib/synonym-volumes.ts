@@ -101,6 +101,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   submit: 2400, forget: 2400, irritated: 2400, sell: 2400, set: 2400,
   swim: 2400, throw: 2400, early: 1900, bring: 1900, cheerful: 1900,
   fly: 1900, put: 1900, ring: 1900, year: 1900,
+  analyze: 60500, comfort: 60500, emphasize: 60500, desire: 49500, foster: 49500,
+  care: 40500, cause: 40500, determine: 40500, fear: 40500, inspire: 40500,
+  struggle: 40500, allow: 33100, approach: 33100, celebrate: 33100, continue: 33100,
+  evolve: 33100, complex: 33100, confusing: 33100, eager: 33100, helpful: 33100,
+  agree: 27100, build: 27100, complete: 27100, consider: 27100, decide: 27100,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
