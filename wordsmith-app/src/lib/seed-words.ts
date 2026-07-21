@@ -25,6 +25,20 @@ export const SEED_WORDS = [
   "eat", "drink", "sleep", "cry", "laugh", "smile", "jump", "dance", "sing",
   "write", "read", "talk", "speak", "listen", "give", "take", "make",
   "start", "end", "change", "help", "want", "need",
+  // High-volume additions (validated via keyword research, July 2026) — every
+  // one has strong "synonyms for X" demand and low difficulty. See
+  // synonym-volumes.ts for the numbers behind this list.
+  "experience", "excited", "showed", "understand", "explain", "improve",
+  "create", "increase", "comfortable", "significant", "unique", "confident",
+  "effective", "determined", "efficient", "successful", "wonderful",
+  "dangerous", "confused", "incredible", "obvious", "essential", "boring",
+  "difficult", "curious", "creative", "powerful", "achieve", "delicious",
+  "generous", "gorgeous", "horrible", "loyal", "nervous", "surprised",
+  "terrible", "reliable", "destroy", "fantastic", "honest",
+  "serious", "begin", "excellent", "famous", "peaceful",
+  "stunning", "ancient", "cheap", "common", "gigantic",
+  "journey", "popular", "expensive", "enormous", "talented",
+  "intelligent", "modern", "patient", "went", "got",
 ] as const;
 
 const SEED_SET = new Set<string>(SEED_WORDS);

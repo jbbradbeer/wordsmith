@@ -8,52 +8,52 @@ import { SITE_URL, jsonLdSerialize } from "@/lib/seo";
 import { WORD_CATEGORIES } from "@/lib/constants";
 import type { WordData } from "@/lib/types";
 
-interface WordPageProps {
+interface SynonymPageProps {
   word: string;
   alternatives: WordData[];
   related: string[];
 }
 
 export const getStaticPaths: GetStaticPaths = async () => ({
-  // Pages generate on first request (then persist via word_pages) — keeps
-  // builds fast and limits Claude calls to one per seed word, ever.
+  // Generate on first request, then persist via word_pages (shared with
+  // /words/[word]) — one Claude call per word, ever, across both routes.
   paths: [],
   fallback: "blocking",
 });
 
-export const getStaticProps: GetStaticProps<WordPageProps> = async ({ params }) => {
+export const getStaticProps: GetStaticProps<SynonymPageProps> = async ({ params }) => {
   const word = String(params?.word || "").toLowerCase();
 
-  // Only curated seed words get pages — bounds generation cost
   if (!isSeedWord(word)) {
     return { notFound: true };
   }
 
   const alternatives = await getWordPageData(word);
   if (!alternatives) {
-    // Transient generation failure — retry on a later request
     return { notFound: true, revalidate: 60 };
   }
 
-  return { props: { word, alternatives, related: relatedWords(word, 8) } };
+  return { props: { word, alternatives, related: relatedWords(word, 10) } };
 };
 
 function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export default function WordPage({ word, alternatives, related }: WordPageProps) {
-  const canonical = `${SITE_URL}/words/${word}`;
-  const top = alternatives.slice(0, 3).map((a) => a.word);
-  const title = `Better Words for "${capitalize(word)}" — ${alternatives.length} Elevated Alternatives | Wordsmith`;
-  const description = `Stop writing "${word}." Try ${top.join(", ")} — ${alternatives.length} curated alternatives with definitions, pronunciation, and example sentences.`;
+export default function SynonymPage({ word, alternatives, related }: SynonymPageProps) {
+  const canonical = `${SITE_URL}/synonyms-for/${word}`;
+  const synonymList = alternatives.map((a) => a.word);
+  const title = `Synonyms for "${capitalize(word)}" — ${alternatives.length} Better Alternatives | Wordsmith`;
+  const description = `${alternatives.length} synonyms for "${word}": ${synonymList
+    .slice(0, 5)
+    .join(", ")}. Each with its meaning, pronunciation, and an example sentence.`;
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "DefinedTermSet",
-        name: `Alternatives for "${word}"`,
+        name: `Synonyms for "${word}"`,
         url: canonical,
         hasDefinedTerm: alternatives.map((a) => ({
           "@type": "DefinedTerm",
@@ -66,7 +66,12 @@ export default function WordPage({ word, alternatives, related }: WordPageProps)
         itemListElement: [
           { "@type": "ListItem", position: 1, name: "Wordsmith", item: SITE_URL },
           { "@type": "ListItem", position: 2, name: "Word Library", item: `${SITE_URL}/words` },
-          { "@type": "ListItem", position: 3, name: capitalize(word), item: canonical },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: `Synonyms for ${capitalize(word)}`,
+            item: canonical,
+          },
         ],
       },
     ],
@@ -102,15 +107,15 @@ export default function WordPage({ word, alternatives, related }: WordPageProps)
           </li>
           <li aria-hidden="true">/</li>
           <li aria-current="page" className="text-gold font-semibold">
-            {word}
+            synonyms for {word}
           </li>
         </ol>
       </nav>
 
       <main className="max-w-[720px] mx-auto px-6 pt-10 pb-16">
-        <header className="mb-10">
+        <header className="mb-8">
           <span className="font-body text-[11px] font-semibold tracking-[0.22em] uppercase text-gold block mb-3">
-            Better words for
+            Synonyms for
           </span>
           <h1
             className="font-display font-black text-parchment-900 m-0 mb-4 tracking-[-0.03em] leading-none"
@@ -119,19 +124,36 @@ export default function WordPage({ word, alternatives, related }: WordPageProps)
             &ldquo;{word}&rdquo;
           </h1>
           <p className="font-body text-[15px] leading-relaxed text-parchment-600 m-0 max-w-[560px]">
-            &ldquo;{capitalize(word)}&rdquo; does the job — but the right alternative does
-            more. Here are {alternatives.length} curated replacements, each with a
-            definition, pronunciation, and an example of it working on the page.
+            {alternatives.length} synonyms for &ldquo;{word},&rdquo; each with its precise
+            meaning and an example so you pick the one that actually fits — not just the
+            nearest match.
           </p>
         </header>
 
-        <section aria-label={`Alternatives for ${word}`}>
+        {/* Quick-scan synonym list — the thesaurus answer, above the fold */}
+        <section aria-label={`Synonym list for ${word}`} className="mb-10">
+          <div className="flex flex-wrap gap-2">
+            {synonymList.map((w) => (
+              <a
+                key={w}
+                href={`#${w}`}
+                className="history-chip bg-parchment-200 border border-parchment-300 rounded-full px-4 py-1.5 font-body text-[14px] text-parchment-800 no-underline transition-colors duration-150"
+              >
+                {w}
+              </a>
+            ))}
+          </div>
+        </section>
+
+        {/* Detailed entries */}
+        <section aria-label={`Synonyms for ${word} with definitions`}>
           {alternatives.map((a) => {
             const cat = WORD_CATEGORIES[a.category] ?? WORD_CATEGORIES.elevated;
             return (
               <article
                 key={a.word}
-                className="bg-white border border-parchment-300 rounded-2xl p-7 mb-4"
+                id={a.word}
+                className="bg-white border border-parchment-300 rounded-2xl p-7 mb-4 scroll-mt-6"
               >
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-1.5">
                   <h2 className="font-display font-bold text-[26px] text-parchment-900 m-0">
@@ -171,21 +193,21 @@ export default function WordPage({ word, alternatives, related }: WordPageProps)
           })}
         </section>
 
-        {/* Cross-link to the sibling synonyms page */}
+        {/* Cross-link to the sibling "better words" page */}
         <p className="font-body text-sm text-parchment-600 mt-6 mb-0">
-          Just want a quick list?{" "}
-          <Link href={`/synonyms-for/${word}`} className="footer-link text-gold font-semibold">
-            See all synonyms for &ldquo;{word}&rdquo; →
+          Looking to upgrade your writing, not just swap a word?{" "}
+          <Link href={`/words/${word}`} className="footer-link text-gold font-semibold">
+            See better words for &ldquo;{word}&rdquo; →
           </Link>
         </p>
 
         {/* CTA */}
         <section className="bg-gradient-to-b from-gold/[0.05] to-gold/[0.1] border border-gold/20 rounded-2xl p-8 text-center mt-8 mb-12">
           <h2 className="font-display font-extrabold text-[24px] text-parchment-900 m-0 mb-2">
-            Need a better word for anything else?
+            Need synonyms for another word?
           </h2>
           <p className="font-body text-sm text-parchment-600 m-0 mb-5">
-            Wordsmith finds six curated alternatives for any word — free to try.
+            Wordsmith finds curated synonyms for any word — free to try.
           </p>
           <Link
             href="/"
@@ -195,16 +217,16 @@ export default function WordPage({ word, alternatives, related }: WordPageProps)
           </Link>
         </section>
 
-        {/* Related words */}
+        {/* Related */}
         <section aria-label="Related words">
           <h2 className="font-body text-[11px] font-semibold tracking-[0.22em] uppercase text-gold m-0 mb-4">
-            More words to upgrade
+            Synonyms for more words
           </h2>
           <div className="flex flex-wrap gap-2">
             {related.map((w) => (
               <Link
                 key={w}
-                href={`/words/${w}`}
+                href={`/synonyms-for/${w}`}
                 className="history-chip bg-parchment-200 border border-parchment-300 rounded-full px-4 py-1.5 font-body text-[13px] text-parchment-700 no-underline transition-colors duration-150"
               >
                 {w}
