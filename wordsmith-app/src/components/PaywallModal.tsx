@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  FREE_SEARCH_LIMIT,
   SUBSCRIPTION_PRICE_MONTHLY,
   SUBSCRIPTION_PRICE_ANNUAL,
   type BillingPlan,
