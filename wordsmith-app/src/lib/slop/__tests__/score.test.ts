@@ -27,6 +27,17 @@ describe("computeScan", () => {
     expect(after.score).toBeLessThanOrEqual(before.score);
   });
 
+  it("is monotonic under pure deletion across phrases and categories", () => {
+    const phrases = ["game-changer", "it's important to note that", "Moreover", "very", "Furthermore", "unlock the power of"];
+    for (const phrase of phrases) {
+      if (!SLOPPY.toLowerCase().includes(phrase.toLowerCase())) continue;
+      const before = computeScan(runRules(SLOPPY), [], false);
+      const re = new RegExp(phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+      const after = computeScan(runRules(SLOPPY.replace(re, "")), [], false);
+      expect(after.score, `removing "${phrase}" raised the score`).toBeLessThanOrEqual(before.score);
+    }
+  });
+
   it("merges claude spans, dedupes overlaps with rule spans", () => {
     const rules = runRules(SLOPPY);
     const overlap = { ...rules.spans[0], source: "claude" as const, category: "generic-voice" as const };
