@@ -9,6 +9,7 @@ import UsageBar from "@/components/UsageBar";
 import { FREE_SEARCH_LIMIT, WORD_CATEGORIES, ANON_COUNT_KEY } from "@/lib/constants";
 import { useUserInfo } from "@/lib/use-user-info";
 import { useSseSearch } from "@/lib/use-sse-search";
+import { trackEvent } from "@/lib/analytics";
 import type { WordData } from "@/lib/types";
 
 // Landing page components
@@ -84,6 +85,7 @@ export default function Home() {
 
   const { results, setResults, loading, error, search } = useSseSearch({
     onLimitReached: (kind) => {
+      trackEvent("limit_hit", { kind });
       if (kind === "paywall") {
         setShowPaywall(true);
       } else {
@@ -170,6 +172,10 @@ export default function Home() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ sessionId }),
         })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data?.activated) trackEvent("upgrade_complete");
+          })
           .catch((err) => console.error("Checkout verification failed:", err))
           .finally(() => refreshUserInfo());
       } else {
@@ -178,17 +184,24 @@ export default function Home() {
     }
   }, [refreshUserInfo]);
 
+  // Funnel: fire once each time the paywall becomes visible
+  useEffect(() => {
+    if (showPaywall) trackEvent("paywall_view");
+  }, [showPaywall]);
+
   const searchWord = async (word: string) => {
     const searchTerm = word.trim().toLowerCase();
     if (!searchTerm) return;
 
     // If not logged in, check anonymous limit before making any request
     if (!session && anonSearchCount >= FREE_SEARCH_LIMIT) {
+      trackEvent("limit_hit", { kind: "signup" });
       setAuthMode("signup");
       setShowAuth(true);
       return;
     }
 
+    trackEvent("search_started", { auth: session ? "authed" : "anon" });
     await search(searchTerm);
   };
 

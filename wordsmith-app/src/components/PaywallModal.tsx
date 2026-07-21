@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FREE_SEARCH_LIMIT, SUBSCRIPTION_PRICE_MONTHLY } from "@/lib/constants";
+import { trackEvent } from "@/lib/analytics";
 import Modal from "./Modal";
 
 interface PaywallModalProps {
@@ -21,6 +22,7 @@ export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
 
   const handleUpgrade = async () => {
     setLoading(true);
+    trackEvent("checkout_start");
     try {
       const res = await fetch("/api/checkout", { method: "POST" });
       const data = await res.json();
