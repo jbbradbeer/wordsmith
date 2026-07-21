@@ -10,7 +10,7 @@ interface PricingSectionProps {
 const CHECK = "✓";
 
 const FREE_FEATURES = [
-  `${FREE_SEARCH_LIMIT} word searches`,
+  `${FREE_SEARCH_LIMIT} word searches a day`,
   "All word categories",
   "Pronunciation guides",
   "Example sentences",

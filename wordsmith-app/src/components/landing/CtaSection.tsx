@@ -26,7 +26,7 @@ export default function CtaSection({ onGetStarted }: CtaSectionProps) {
           Start Writing Better
         </MagneticButton>
         <p className="font-body text-xs text-parchment-500 mt-4 m-0">
-          No credit card required. 3 free searches included.
+          No credit card required. 3 free searches every day.
         </p>
       </Reveal>
     </section>

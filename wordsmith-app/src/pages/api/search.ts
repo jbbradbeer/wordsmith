@@ -255,7 +255,7 @@ export default async function handler(
   if (!rpcResult.allowed) {
     return res.status(403).json({
       error: "free_limit_reached",
-      message: `You've used all ${FREE_SEARCH_LIMIT} free searches. Upgrade to Wordsmith Pro for unlimited access.`,
+      message: `You've used all ${FREE_SEARCH_LIMIT} free searches for today. Upgrade to Wordsmith Pro for unlimited access.`,
       searchCount: rpcResult.search_count,
       limit: FREE_SEARCH_LIMIT,
     });

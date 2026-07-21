@@ -94,7 +94,7 @@ export default function AuthModal({
         {mode === "signup" ? "Create Account" : "Welcome Back"}
       </h2>
       <p className="font-body text-sm text-parchment-600 text-center m-0 mb-6">
-        {mode === "signup" ? "Start with 3 free word searches" : "Sign in to continue"}
+        {mode === "signup" ? "Start with 3 free word searches a day" : "Sign in to continue"}
       </p>
 
       {/* Google OAuth */}

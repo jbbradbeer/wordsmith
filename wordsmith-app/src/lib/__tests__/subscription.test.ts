@@ -3,6 +3,7 @@ import {
   hasActiveAccess,
   mapSubscriptionStatus,
   shouldActivateFromCheckout,
+  effectiveDailyCount,
 } from "../subscription";
 import type Stripe from "stripe";
 
@@ -47,6 +48,28 @@ describe("mapSubscriptionStatus", () => {
     for (const s of transient) {
       expect(mapSubscriptionStatus(s)).toBeNull();
     }
+  });
+});
+
+describe("effectiveDailyCount", () => {
+  const today = new Date().toISOString().slice(0, 10);
+  const yesterday = new Date(Date.now() - 86_400_000).toISOString().slice(0, 10);
+
+  it("returns 0 when never searched (null reset)", () => {
+    expect(effectiveDailyCount(5, null)).toBe(0);
+    expect(effectiveDailyCount(0, undefined)).toBe(0);
+  });
+
+  it("returns 0 when the last reset was before today (allowance renewed)", () => {
+    expect(effectiveDailyCount(3, yesterday)).toBe(0);
+  });
+
+  it("returns the stored count when last reset is today", () => {
+    expect(effectiveDailyCount(2, today)).toBe(2);
+  });
+
+  it("treats a missing count as 0", () => {
+    expect(effectiveDailyCount(null, today)).toBe(0);
   });
 });
 

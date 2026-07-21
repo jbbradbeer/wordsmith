@@ -56,8 +56,8 @@ export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
           Unlock unlimited words
         </h2>
         <p className="font-body text-sm leading-normal text-parchment-600 m-0 mb-7">
-          You&apos;ve used your {FREE_SEARCH_LIMIT} free searches. Upgrade to keep
-          discovering the perfect words for your writing.
+          You&apos;ve used your {FREE_SEARCH_LIMIT} free searches for today. Upgrade for
+          unlimited access and keep discovering the perfect words for your writing.
         </p>
 
         {/* Features */}

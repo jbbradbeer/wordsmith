@@ -11,6 +11,22 @@ export function hasActiveAccess(status: string | null | undefined): boolean {
 }
 
 /**
+ * Free searches used *today* for a signed-in user. The daily allowance renews
+ * lazily: a last_search_reset before today means the stored count is stale, so
+ * today's usage is 0 until the next counted search stamps the date. Mirrors the
+ * reset logic in try_increment_search_count (migration 006).
+ */
+export function effectiveDailyCount(
+  searchCount: number | null | undefined,
+  lastSearchReset: string | null | undefined
+): number {
+  const count = searchCount || 0;
+  if (!lastSearchReset) return 0;
+  const today = new Date().toISOString().slice(0, 10); // UTC, matches CURRENT_DATE
+  return lastSearchReset < today ? 0 : count;
+}
+
+/**
  * Map a Stripe subscription status to our profiles.subscription_status.
  * Returns null for transient states (incomplete, etc.) that should be skipped.
  */

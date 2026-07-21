@@ -65,7 +65,7 @@ export default function UsageBar({
         aria-valuenow={searchCount}
         aria-valuemin={0}
         aria-valuemax={FREE_SEARCH_LIMIT}
-        aria-label={`${remaining} of ${FREE_SEARCH_LIMIT} free searches remaining`}
+        aria-label={`${remaining} of ${FREE_SEARCH_LIMIT} daily free searches remaining`}
         style={{
           flex: 1,
           maxWidth: "120px",
@@ -102,7 +102,7 @@ export default function UsageBar({
         {remaining === 0 ? (
           <button
             onClick={onUpgrade}
-            aria-label="You've used all free searches. Upgrade to Pro for unlimited access."
+            aria-label="You've used all of today's free searches. Upgrade to Pro for unlimited access."
             style={{
               background: "none",
               border: "none",
@@ -117,7 +117,7 @@ export default function UsageBar({
             0 left — Upgrade
           </button>
         ) : (
-          `${remaining} of ${FREE_SEARCH_LIMIT} free searches left`
+          `${remaining} of ${FREE_SEARCH_LIMIT} free searches left today`
         )}
       </span>
     </div>

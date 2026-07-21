@@ -5,7 +5,7 @@ import { getServiceSupabase } from "@/lib/supabase";
 import { withAuth } from "@/lib/api";
 import { getAnonCount, clearAnonCookie } from "@/lib/anon-cookie";
 import { missingEnv } from "@/lib/env";
-import { hasActiveAccess } from "@/lib/subscription";
+import { hasActiveAccess, effectiveDailyCount } from "@/lib/subscription";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { createRequestLogger } from "@/lib/logger";
 import type { User } from "@supabase/supabase-js";
@@ -44,14 +44,23 @@ async function handler(
 
       const { data: profile } = await serviceClient
         .from("profiles")
-        .select("search_count")
+        .select("search_count, last_search_reset")
         .eq("id", user.id)
         .single();
 
-      const currentCount = profile?.search_count || 0;
+      // Merge into TODAY's usage (respecting the daily reset) so anon+authed
+      // in one day can't exceed the daily allowance, and cap at the limit
+      const todayCount = effectiveDailyCount(
+        profile?.search_count,
+        profile?.last_search_reset
+      );
+      const merged = Math.min(FREE_SEARCH_LIMIT, todayCount + anonCount);
       await serviceClient
         .from("profiles")
-        .update({ search_count: currentCount + anonCount })
+        .update({
+          search_count: merged,
+          last_search_reset: new Date().toISOString().slice(0, 10),
+        })
         .eq("id", user.id);
     }
 
@@ -70,7 +79,7 @@ async function handler(
   const supabase = createServerSupabaseClient({ req, res });
   const { data: profile } = await supabase
     .from("profiles")
-    .select("subscription_status, search_count, created_at")
+    .select("subscription_status, search_count, last_search_reset, created_at")
     .eq("id", user.id)
     .single();
 
@@ -79,15 +88,15 @@ async function handler(
   }
 
   const isPaid = hasActiveAccess(profile.subscription_status);
+  // Reflect the daily reset in the UI even before the day's first search
+  const todayCount = effectiveDailyCount(profile.search_count, profile.last_search_reset);
 
   return res.status(200).json({
     email: user.email,
     isPaid,
     subscriptionStatus: profile.subscription_status,
-    searchCount: profile.search_count || 0,
-    searchesRemaining: isPaid
-      ? null
-      : Math.max(0, FREE_SEARCH_LIMIT - (profile.search_count || 0)),
+    searchCount: todayCount,
+    searchesRemaining: isPaid ? null : Math.max(0, FREE_SEARCH_LIMIT - todayCount),
     limit: isPaid ? null : FREE_SEARCH_LIMIT,
     memberSince: profile.created_at,
   });

@@ -1,3 +1,5 @@
+// Signed-in users: this many free searches PER DAY (renews daily, migration 006).
+// Anonymous users: this many LIFETIME (cookie + anon_usage IP cap).
 export const FREE_SEARCH_LIMIT = 3;
 export const SUBSCRIPTION_PRICE_MONTHLY = 10; // dollars
 export const APP_NAME = "Wordsmith";
