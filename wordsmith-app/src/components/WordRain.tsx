@@ -86,7 +86,7 @@ export default function WordRain({ onDone }: WordRainProps) {
         className="fixed bottom-8 left-1/2 bg-parchment-900 text-parchment-100 font-body text-sm rounded-full px-6 py-3 shadow-xl"
         style={{ animation: "toastIn 0.4s ease both", transform: "translateX(-50%)" }}
       >
-        <span aria-hidden="true">&#129718;</span> You found the secret lexicon — logophile
+        <span aria-hidden="true">&#129718;</span> You found the secret lexicon. Logophile
         mode engaged.
       </div>
     </div>

@@ -7,8 +7,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        display: ['"Playfair Display"', "Georgia", "serif"],
-        body: ['"DM Sans"', "system-ui", "sans-serif"],
+        display: ['var(--font-display)', '"Playfair Display"', "Georgia", "serif"],
+        body: ['var(--font-body)', '"DM Sans"', "system-ui", "sans-serif"],
       },
       colors: {
         parchment: {

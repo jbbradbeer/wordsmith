@@ -43,7 +43,7 @@ function capitalize(s: string): string {
 export default function SynonymPage({ word, alternatives, related }: SynonymPageProps) {
   const canonical = `${SITE_URL}/synonyms-for/${word}`;
   const synonymList = alternatives.map((a) => a.word);
-  const title = `Synonyms for "${capitalize(word)}" — ${alternatives.length} Better Alternatives | Wordsmith`;
+  const title = `Synonyms for "${capitalize(word)}": ${alternatives.length} Better Alternatives | Wordsmith`;
   const description = `${alternatives.length} synonyms for "${word}": ${synonymList
     .slice(0, 5)
     .join(", ")}. Each with its meaning, pronunciation, and an example sentence.`;
@@ -125,7 +125,7 @@ export default function SynonymPage({ word, alternatives, related }: SynonymPage
           </h1>
           <p className="font-body text-[15px] leading-relaxed text-parchment-600 m-0 max-w-[560px]">
             {alternatives.length} synonyms for &ldquo;{word},&rdquo; each with its precise
-            meaning and an example so you pick the one that actually fits — not just the
+            meaning and an example so you pick the one that actually fits, not just the
             nearest match.
           </p>
         </header>
@@ -207,7 +207,7 @@ export default function SynonymPage({ word, alternatives, related }: SynonymPage
             Need synonyms for another word?
           </h2>
           <p className="font-body text-sm text-parchment-600 m-0 mb-5">
-            Wordsmith finds curated synonyms for any word — free to try.
+            Wordsmith finds curated synonyms for any word, free to try.
           </p>
           <Link
             href="/search"

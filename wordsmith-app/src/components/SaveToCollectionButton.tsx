@@ -170,7 +170,7 @@ function SaveToCollectionButton({
             : !isPaid
             ? "Upgrade to save words"
             : isSaved
-            ? "Saved — manage collections"
+            ? "Saved. Manage collections"
             : "Save to collection"
         }
         style={{

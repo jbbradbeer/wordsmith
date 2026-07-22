@@ -20,7 +20,7 @@ export const WORD_HUBS: WordHub[] = [
     title: "Emotion Words",
     noun: "emotions and feelings",
     description:
-      "Words for every shade of feeling — from mildly annoyed to utterly overjoyed. Swap the flat 'happy' or 'sad' for something that carries real weight.",
+      "Words for every shade of feeling, from mildly annoyed to utterly overjoyed. Swap the flat 'happy' or 'sad' for something that carries real weight.",
     words: [
       "happy", "sad", "angry", "scared", "afraid", "lonely", "proud", "calm",
       "mad", "shy", "excited", "nervous", "confused", "surprised", "worried",
@@ -77,7 +77,7 @@ export const WORD_HUBS: WordHub[] = [
     title: "Action Verbs",
     noun: "stronger verbs",
     description:
-      "Verbs carry sentences. Replace 'said', 'went', and 'got' with verbs that show motion, intent, and voice — the fastest upgrade any draft can get.",
+      "Verbs carry sentences. Replace 'said', 'went', and 'got' with verbs that show motion, intent, and voice. The fastest upgrade any draft can get.",
     words: [
       "said", "showed", "went", "got", "walk", "run", "look", "see", "think",
       "know", "make", "give", "take", "help", "want", "need", "start", "end",
@@ -96,7 +96,7 @@ export const WORD_HUBS: WordHub[] = [
     title: "Transitions & Connectors",
     noun: "smoother transitions",
     description:
-      "However, therefore, additionally — the connective tissue of clear writing. Vary your transitions so every paragraph doesn't open the same way.",
+      "However, therefore, additionally: the connective tissue of clear writing. Vary your transitions so every paragraph doesn't open the same way.",
     words: [
       "however", "therefore", "moreover", "furthermore", "additionally",
       "although", "because", "especially", "exactly", "finally",
@@ -110,7 +110,7 @@ export const WORD_HUBS: WordHub[] = [
     title: "Everyday Words",
     noun: "everyday vocabulary",
     description:
-      "The words everyone reaches for first — house, food, friend, fun. Perfectly fine words, each with richer alternatives when the moment calls for one.",
+      "The words everyone reaches for first: house, food, friend, fun. Perfectly fine words, each with richer alternatives when the moment calls for one.",
     words: [
       "house", "food", "water", "money", "time", "day", "night", "year",
       "friend", "family", "man", "woman", "people", "place", "thing",

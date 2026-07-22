@@ -4,7 +4,7 @@ import Reveal from "./Reveal";
 const TESTIMONIALS = [
   {
     quote:
-      "Wordsmith finds the perfect word in seconds. It's like having a literary editor on call — my writing has never felt more precise.",
+      "Wordsmith finds the perfect word in seconds. It's like having a literary editor on call. My writing has never felt more precise.",
     name: "Sarah M.",
     role: "Novelist",
   },

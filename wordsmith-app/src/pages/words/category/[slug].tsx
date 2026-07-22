@@ -36,7 +36,7 @@ export const getStaticProps: GetStaticProps<HubPageProps> = async ({ params }) =
 
 export default function HubPage({ hub, words, otherHubs }: HubPageProps) {
   const canonical = `${SITE_URL}/words/category/${hub.slug}`;
-  const title = `${hub.title} — Synonyms for ${words.length} Common Words | Wordsmith`;
+  const title = `${hub.title}: Synonyms for ${words.length} Common Words | Wordsmith`;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -134,7 +134,7 @@ export default function HubPage({ hub, words, otherHubs }: HubPageProps) {
             Need {hub.noun} on demand?
           </h2>
           <p className="font-body text-sm text-parchment-600 m-0 mb-5">
-            Wordsmith finds six curated alternatives for any word — free to try.
+            Wordsmith finds six curated alternatives for any word, free to try.
           </p>
           <Link
             href="/search"
