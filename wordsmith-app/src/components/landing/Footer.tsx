@@ -22,16 +22,28 @@ export default function Footer({ onSecret }: FooterProps) {
   return (
     <footer className="border-t border-parchment-300 pt-10 pb-8 px-6">
       <div className="max-w-[900px] mx-auto flex justify-between items-start flex-wrap gap-6">
-        <div>
+        <Link href="/" className="no-underline">
           <div className="font-display font-extrabold text-lg text-parchment-900 mb-1">
             Wordsmith
           </div>
           <div className="font-body text-[13px] text-parchment-500">
-            A Writer&apos;s Companion
+            De-slop your writing
           </div>
-        </div>
+        </Link>
 
-        <div className="flex gap-6 items-center">
+        <div className="flex flex-wrap gap-x-6 gap-y-2 items-center">
+          <Link
+            href="/"
+            className="footer-link font-body text-[13px] text-parchment-600 no-underline transition-colors duration-200"
+          >
+            Slop Score
+          </Link>
+          <Link
+            href="/search"
+            className="footer-link font-body text-[13px] text-parchment-600 no-underline transition-colors duration-200"
+          >
+            Word Search
+          </Link>
           <Link
             href="/words"
             className="footer-link font-body text-[13px] text-parchment-600 no-underline transition-colors duration-200"
@@ -42,7 +54,7 @@ export default function Footer({ onSecret }: FooterProps) {
             href="/privacy"
             className="footer-link font-body text-[13px] text-parchment-600 no-underline transition-colors duration-200"
           >
-            Privacy Policy
+            Privacy
           </Link>
           <a
             href="mailto:privacy@trywordsmith.com"

@@ -144,7 +144,9 @@ export default function Analyzer() {
         aria-label="Site navigation"
         className="sticky top-0 z-40 h-[64px] px-6 flex justify-between items-center border-b border-gold/[.09] bg-[#f2ede2]/80 backdrop-blur-md"
       >
-        <span className="font-display font-black text-lg text-parchment-900">Wordsmith</span>
+        <Link href="/" className="font-display font-black text-lg text-parchment-900 no-underline">
+          Wordsmith
+        </Link>
         <div className="flex gap-5 items-center font-body text-sm">
           <Link href="/search" className="footer-link text-parchment-700 no-underline hidden sm:inline">
             Word Search

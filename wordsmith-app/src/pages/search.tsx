@@ -239,8 +239,20 @@ export default function Home() {
       {/* Nav bar */}
       <nav
         aria-label="Site navigation"
-        className="sticky top-0 z-40 px-6 py-4 flex justify-end items-center gap-3 border-b border-gold/[.09] bg-[#f2ede2]/75 backdrop-blur-md"
+        className="sticky top-0 z-40 px-6 py-4 flex justify-between items-center gap-3 border-b border-gold/[.09] bg-[#f2ede2]/75 backdrop-blur-md"
       >
+        <div className="flex items-center gap-5">
+          <Link href="/" className="font-display font-black text-lg text-parchment-900 no-underline">
+            Wordsmith
+          </Link>
+          <Link
+            href="/"
+            className="footer-link font-body text-sm text-parchment-700 no-underline hidden sm:inline"
+          >
+            Slop Score
+          </Link>
+        </div>
+        <div className="flex items-center gap-3">
         {session ? (
           <>
             <UsageBar
@@ -248,7 +260,6 @@ export default function Home() {
               isPaid={userInfo?.isPaid || false}
               onUpgrade={() => setShowPaywall(true)}
             />
-            <div className="flex-1" />
             {userInfo?.isPaid && (
               <Link
                 href="/collections"
@@ -297,6 +308,7 @@ export default function Home() {
             </button>
           </>
         )}
+        </div>
       </nav>
 
       {/* Kinetic hero */}
