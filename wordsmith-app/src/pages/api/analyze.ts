@@ -9,10 +9,19 @@ import { getScanUsed, markScanUsed } from "@/lib/scan-cookie";
 import { runRules } from "@/lib/slop/rules";
 import { runClaudePass } from "@/lib/slop/claude-pass";
 import { computeScan } from "@/lib/slop/score";
-import { SCAN_WORD_CAP_FREE, SCAN_WORD_CAP_PRO } from "@/lib/slop/types";
+import {
+  SCAN_WORD_CAP_FREE,
+  SCAN_WORD_CAP_PRO,
+  SCAN_CHAR_CAP_FREE,
+  SCAN_CHAR_CAP_PRO,
+} from "@/lib/slop/types";
 import { PRO_SCAN_LIMIT_DAILY } from "@/lib/constants";
 
-export const config = { api: { responseLimit: false } };
+// Hard body ceiling so an oversized payload is rejected at parse time, before
+// the handler (and any Claude call) runs. Covers the Pro char cap + JSON overhead.
+export const config = {
+  api: { responseLimit: false, bodyParser: { sizeLimit: "160kb" } },
+};
 
 const SCANS_PER_MINUTE = 4;          // per IP or user — Claude calls are expensive
 const FREE_SCANS_PER_DAY = 1;
@@ -68,7 +77,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   let scanClaimed = false; // true when a free-account scan was consumed (refundable)
 
   if (!user) {
-    if (wordCount > SCAN_WORD_CAP_FREE) {
+    if (wordCount > SCAN_WORD_CAP_FREE || text.length > SCAN_CHAR_CAP_FREE) {
       return res.status(400).json({ error: "too_long", cap: SCAN_WORD_CAP_FREE });
     }
     if (getScanUsed(req)) {
@@ -119,7 +128,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // Paid scans count against the fair-use ceiling now, so they're refundable too
     scanClaimed = true;
     const cap = isPaid ? SCAN_WORD_CAP_PRO : SCAN_WORD_CAP_FREE;
-    if (wordCount > cap) {
+    const charCap = isPaid ? SCAN_CHAR_CAP_PRO : SCAN_CHAR_CAP_FREE;
+    if (wordCount > cap || text.length > charCap) {
       if (scanClaimed) await serviceClient.rpc("refund_scan", { p_user_id: user.id });
       return res.status(400).json({ error: "too_long", cap });
     }

@@ -52,6 +52,11 @@ export interface ScanResult {
 
 export const SCAN_WORD_CAP_FREE = 1500;
 export const SCAN_WORD_CAP_PRO = 10000;
+// Character caps bound the actual Claude input-token cost. Word count alone is
+// bypassable (a whitespace-free 1 MB blob counts as one "word" but bills ~250k
+// input tokens), so both are enforced. ~10 chars per allowed word, generous.
+export const SCAN_CHAR_CAP_FREE = 15000;
+export const SCAN_CHAR_CAP_PRO = 100000;
 
 export function bandFor(score: number): SlopBand {
   if (score <= 20) return "clean";

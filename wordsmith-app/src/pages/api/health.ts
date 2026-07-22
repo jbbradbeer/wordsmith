@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { timingSafeEqual } from "crypto";
 import Anthropic from "@anthropic-ai/sdk";
 import { missingEnv } from "@/lib/env";
 import { getServiceSupabase } from "@/lib/supabase";
@@ -49,6 +50,13 @@ async function supabaseCheck(): Promise<CheckState> {
   }
 }
 
+function validToken(supplied: unknown, expected: string | undefined): boolean {
+  if (!expected || typeof supplied !== "string") return false;
+  const a = Buffer.from(supplied);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== "GET") {
     return res.status(405).json({ error: "Method not allowed" });
@@ -62,11 +70,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // Detailed diagnostics (missing var names, canary notes) only with the token.
-  const token = req.query.token;
-  const detailed =
-    !!process.env.HEALTH_TOKEN &&
-    typeof token === "string" &&
-    token === process.env.HEALTH_TOKEN;
+  const detailed = validToken(req.query.token, process.env.HEALTH_TOKEN);
 
   const envMissing = missingEnv();
   const envState: CheckState = envMissing.length === 0 ? "ok" : "fail";
