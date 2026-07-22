@@ -1,6 +1,10 @@
 // Signed-in users: this many free searches PER DAY (renews daily, migration 006).
 // Anonymous users: this many LIFETIME (cookie + anon_usage IP cap).
 export const FREE_SEARCH_LIMIT = 3;
+// Pro fair-use ceilings (migration 008): far above any honest human's usage,
+// they exist so a scripted Pro account can't make unbounded Claude calls.
+export const PRO_SEARCH_LIMIT_DAILY = 300;
+export const PRO_SCAN_LIMIT_DAILY = 100;
 export const SUBSCRIPTION_PRICE_MONTHLY = 10; // dollars
 export const SUBSCRIPTION_PRICE_ANNUAL = 96; // dollars/year — $8/mo effective, ~20% off
 export type BillingPlan = "monthly" | "annual";
