@@ -44,7 +44,7 @@ export default async function handler(
     );
   } catch (err: any) {
     log.error("signature verification failed", err);
-    return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+    return res.status(400).json({ error: "Invalid signature" });
   }
 
   const serviceClient = getServiceSupabase();
