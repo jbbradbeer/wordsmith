@@ -34,6 +34,7 @@ export interface UserInfo {
   subscriptionStatus: string | null;
   searchCount: number;
   searchesRemaining: number | null;
+  scansRemaining: number | null;
   limit: number | null;
   memberSince: string;
 }

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  FREE_SEARCH_LIMIT,
   SUBSCRIPTION_PRICE_MONTHLY,
   SUBSCRIPTION_PRICE_ANNUAL,
   type BillingPlan,
@@ -14,10 +13,10 @@ interface PaywallModalProps {
 }
 
 const PRO_FEATURES = [
+  "Unlimited Slop Score scans",
+  "10,000-word drafts (free: 1,500)",
   "Unlimited word searches",
   "Save words to collections",
-  "Full search history",
-  "Priority response speed",
   "Cancel anytime",
 ];
 
@@ -73,8 +72,8 @@ export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
           Unlock unlimited words
         </h2>
         <p className="font-body text-sm leading-normal text-parchment-600 m-0 mb-7">
-          You&apos;ve used your {FREE_SEARCH_LIMIT} free searches for today. Upgrade for
-          unlimited access and keep discovering the perfect words for your writing.
+          You&apos;ve hit today&apos;s free limit. Upgrade for unlimited scans and
+          searches, and keep your writing unmistakably yours.
         </p>
 
         {/* Features */}

@@ -210,7 +210,7 @@ export default function SynonymPage({ word, alternatives, related }: SynonymPage
             Wordsmith finds curated synonyms for any word — free to try.
           </p>
           <Link
-            href="/"
+            href="/search"
             className="btn-primary inline-block bg-gold text-white no-underline rounded-xl px-8 py-3.5 font-body text-[15px] font-semibold tracking-[0.02em]"
           >
             Try Wordsmith Free
