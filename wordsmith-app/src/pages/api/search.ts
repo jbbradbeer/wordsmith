@@ -8,7 +8,7 @@ import { buildWordPrompt } from "@/lib/word-prompt";
 import Anthropic from "@anthropic-ai/sdk";
 import { LRUCache } from "lru-cache";
 import type { WordData } from "@/lib/types";
-import { FREE_SEARCH_LIMIT } from "@/lib/constants";
+import { FREE_SEARCH_LIMIT, PRO_SEARCH_LIMIT_DAILY } from "@/lib/constants";
 import { missingEnv } from "@/lib/env";
 import { hasActiveAccess } from "@/lib/subscription";
 
@@ -103,6 +103,51 @@ async function streamFromClaude(
   return words;
 }
 
+type ServiceClient = ReturnType<typeof getServiceSupabase>;
+
+/**
+ * Two-level result cache. L1 is the per-instance LRU; L2 is the word_pages
+ * table (the same generate-once store behind /words/[word]), so a term is a
+ * single Claude call ever across all serverless instances.
+ */
+async function getCachedWords(
+  serviceClient: ServiceClient,
+  term: string
+): Promise<WordData[] | null> {
+  const mem = wordCache.get(term);
+  if (mem) return mem;
+  const { data } = await serviceClient
+    .from("word_pages")
+    .select("alternatives")
+    .eq("word", term)
+    .maybeSingle();
+  if (data?.alternatives) {
+    const words = data.alternatives as WordData[];
+    wordCache.set(term, words);
+    return words;
+  }
+  return null;
+}
+
+function persistWords(
+  serviceClient: ServiceClient,
+  term: string,
+  words: WordData[],
+  log: RequestLogger
+): void {
+  wordCache.set(term, words);
+  // Quality gate mirrors word-pages.ts: don't persist truncated generations
+  if (words.length < 4) return;
+  Promise.resolve(serviceClient.from("word_pages").insert({ word: term, alternatives: words }))
+    .then(({ error }) => {
+      // 23505 = another request persisted it first — fine
+      if (error && error.code !== "23505") {
+        log.error("search cache persist failed", error, { term });
+      }
+    })
+    .catch((err) => log.error("search cache persist failed", err, { term }));
+}
+
 function openSSE(res: NextApiResponse) {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache, no-transform");
@@ -195,7 +240,7 @@ export default async function handler(
     openSSE(res);
 
     try {
-      const cached = wordCache.get(searchTerm);
+      const cached = await getCachedWords(anonService, searchTerm);
       if (cached) {
         for (const word of cached) {
           writeSSEEvent(res, "word", word);
@@ -209,7 +254,7 @@ export default async function handler(
       }
 
       const words = await streamFromClaude(res, searchTerm, log);
-      wordCache.set(searchTerm, words);
+      persistWords(anonService, searchTerm, words, log);
 
       writeSSEEvent(res, "done", {
         isAnonymous: true,
@@ -244,7 +289,11 @@ export default async function handler(
   // Atomic check-and-increment — prevents concurrent request bypass
   const { data: rpcResult, error: rpcError } = await serviceClient.rpc(
     "try_increment_search_count",
-    { p_user_id: userId, p_limit: FREE_SEARCH_LIMIT }
+    {
+      p_user_id: userId,
+      p_limit: FREE_SEARCH_LIMIT,
+      p_paid_limit: PRO_SEARCH_LIMIT_DAILY,
+    }
   );
 
   if (rpcError || !rpcResult) {
@@ -253,6 +302,14 @@ export default async function handler(
   }
 
   if (!rpcResult.allowed) {
+    if (hasActiveAccess(rpcResult.subscription_status)) {
+      // Pro fair-use ceiling, not a paywall — resets at midnight UTC
+      res.setHeader("Retry-After", "3600");
+      return res.status(429).json({
+        error: "rate_limited",
+        message: `You've hit today's fair-use limit of ${PRO_SEARCH_LIMIT_DAILY} searches. It resets tomorrow.`,
+      });
+    }
     return res.status(403).json({
       error: "free_limit_reached",
       message: `You've used all ${FREE_SEARCH_LIMIT} free searches for today. Upgrade to Wordsmith Pro for unlimited access.`,
@@ -275,7 +332,7 @@ export default async function handler(
       },
     };
 
-    const cached = wordCache.get(searchTerm);
+    const cached = await getCachedWords(serviceClient, searchTerm);
     if (cached) {
       for (const word of cached) {
         writeSSEEvent(res, "word", word);
@@ -290,7 +347,7 @@ export default async function handler(
     }
 
     const words = await streamFromClaude(res, searchTerm, log);
-    wordCache.set(searchTerm, words);
+    persistWords(serviceClient, searchTerm, words, log);
 
     Promise.resolve(
       serviceClient.from("searches").insert({ user_id: userId, query: searchTerm })

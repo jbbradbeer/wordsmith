@@ -10,6 +10,7 @@ import { runRules } from "@/lib/slop/rules";
 import { runClaudePass } from "@/lib/slop/claude-pass";
 import { computeScan } from "@/lib/slop/score";
 import { SCAN_WORD_CAP_FREE, SCAN_WORD_CAP_PRO } from "@/lib/slop/types";
+import { PRO_SCAN_LIMIT_DAILY } from "@/lib/constants";
 
 export const config = { api: { responseLimit: false } };
 
@@ -94,6 +95,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { data: rpc, error: rpcError } = await serviceClient.rpc("try_increment_scan_count", {
       p_user_id: user.id,
       p_limit: FREE_SCANS_PER_DAY,
+      p_paid_limit: PRO_SCAN_LIMIT_DAILY,
     });
     if (rpcError || !rpc) {
       log.error("try_increment_scan_count RPC failed", rpcError);
@@ -101,12 +103,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     isPaid = hasActiveAccess(rpc.subscription_status);
     if (!rpc.allowed) {
+      if (isPaid) {
+        // Pro fair-use ceiling, not a paywall — resets at midnight UTC
+        res.setHeader("Retry-After", "3600");
+        return res.status(429).json({
+          error: "rate_limited",
+          message: `You've hit today's fair-use limit of ${PRO_SCAN_LIMIT_DAILY} scans. It resets tomorrow.`,
+        });
+      }
       return res.status(403).json({
         error: "scan_limit_reached",
         message: "You've used today's free scan. Upgrade to Wordsmith Pro for unlimited scans.",
       });
     }
-    scanClaimed = !isPaid;
+    // Paid scans count against the fair-use ceiling now, so they're refundable too
+    scanClaimed = true;
     const cap = isPaid ? SCAN_WORD_CAP_PRO : SCAN_WORD_CAP_FREE;
     if (wordCount > cap) {
       if (scanClaimed) await serviceClient.rpc("refund_scan", { p_user_id: user.id });
