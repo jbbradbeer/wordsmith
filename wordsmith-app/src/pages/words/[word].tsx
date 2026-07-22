@@ -45,8 +45,8 @@ function capitalize(s: string): string {
 export default function WordPage({ word, alternatives, related }: WordPageProps) {
   const canonical = `${SITE_URL}/words/${word}`;
   const top = alternatives.slice(0, 3).map((a) => a.word);
-  const title = `Better Words for "${capitalize(word)}" — ${alternatives.length} Elevated Alternatives | Wordsmith`;
-  const description = `Stop writing "${word}." Try ${top.join(", ")} — ${alternatives.length} curated alternatives with definitions, pronunciation, and example sentences.`;
+  const title = `Better Words for "${capitalize(word)}": ${alternatives.length} Elevated Alternatives | Wordsmith`;
+  const description = `Stop writing "${word}." Try ${top.join(", ")}. ${alternatives.length} curated alternatives with definitions, pronunciation, and example sentences.`;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -119,7 +119,7 @@ export default function WordPage({ word, alternatives, related }: WordPageProps)
             &ldquo;{word}&rdquo;
           </h1>
           <p className="font-body text-[15px] leading-relaxed text-parchment-600 m-0 max-w-[560px]">
-            &ldquo;{capitalize(word)}&rdquo; does the job — but the right alternative does
+            &ldquo;{capitalize(word)}&rdquo; does the job, but the right alternative does
             more. Here are {alternatives.length} curated replacements, each with a
             definition, pronunciation, and an example of it working on the page.
           </p>
@@ -185,7 +185,7 @@ export default function WordPage({ word, alternatives, related }: WordPageProps)
             Need a better word for anything else?
           </h2>
           <p className="font-body text-sm text-parchment-600 m-0 mb-5">
-            Wordsmith finds six curated alternatives for any word — free to try.
+            Wordsmith finds six curated alternatives for any word, free to try.
           </p>
           <Link
             href="/search"

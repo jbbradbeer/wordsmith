@@ -5,9 +5,9 @@ import { SEED_WORDS } from "@/lib/seed-words";
 import { WORD_HUBS } from "@/lib/word-hubs";
 import { SITE_URL } from "@/lib/seo";
 
-const TITLE = `Word Library — Better Words for ${SEED_WORDS.length} Common Words | Wordsmith`;
+const TITLE = `Word Library: Better Words for ${SEED_WORDS.length} Common Words | Wordsmith`;
 const DESCRIPTION =
-  "Browse curated alternatives for the most overused words in English — elevated, literary, punchy, and rare replacements with definitions and examples.";
+  "Browse curated alternatives for the most overused words in English: elevated, literary, punchy, and rare replacements with definitions and examples.";
 
 export default function WordLibrary() {
   const sorted = [...SEED_WORDS].sort();
@@ -43,7 +43,7 @@ export default function WordLibrary() {
             The Word Library
           </h1>
           <p className="font-body text-[15px] leading-relaxed text-parchment-600 m-0 max-w-[540px] mx-auto">
-            The most overused words in English, each with six curated alternatives —
+            The most overused words in English, each with six curated alternatives:
             elevated, literary, punchy, and rare.
           </p>
         </header>

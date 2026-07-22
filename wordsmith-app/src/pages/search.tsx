@@ -35,7 +35,7 @@ const LANDING_JSON_LD = {
   applicationCategory: "UtilitiesApplication",
   operatingSystem: "Web",
   description:
-    "AI-powered word discovery for writers — six curated alternatives for any word, categorized by style with definitions, pronunciation, and examples.",
+    "AI-powered word discovery for writers: six curated alternatives for any word, categorized by style with definitions, pronunciation, and examples.",
   offers: [
     { "@type": "Offer", price: "0", priceCurrency: "USD", name: "Free" },
     {
@@ -493,7 +493,7 @@ export default function Home() {
               and the almost right word…
             </p>
             <p className="text-[13px] text-[#A8A298] m-0 mb-7">
-              — is the difference between lightning and a lightning bug.
+              , is the difference between lightning and a lightning bug.
             </p>
 
             <div className="flex flex-wrap justify-center gap-2">

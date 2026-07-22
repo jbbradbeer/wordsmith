@@ -4,13 +4,29 @@ import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { useState } from "react";
 import Head from "next/head";
+import { Playfair_Display, DM_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { SITE_URL } from "@/lib/seo";
 
-const DEFAULT_TITLE = "Wordsmith — A Writer's Companion";
+// Self-hosted via next/font (no render-blocking Google Fonts <link>, no leak)
+const display = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "700", "900"],
+  style: ["normal", "italic"],
+  variable: "--font-display",
+  display: "swap",
+});
+const body = DM_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-body",
+  display: "swap",
+});
+
+const DEFAULT_TITLE = "Wordsmith: De-slop Your Writing";
 const DEFAULT_DESCRIPTION =
-  "Find alternative, elevated words to improve your vocabulary and writing. Trade the ordinary for the extraordinary.";
+  "Paste your draft and get a Slop Score. Wordsmith flags the AI tells in your writing, explains each one, and helps you rewrite in your own voice. It never writes for you.";
 
 export default function App({ Component, pageProps }: AppProps) {
   const [supabaseClient] = useState(() => createBrowserSupabaseClient());
@@ -42,9 +58,11 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta name="twitter:description" content={DEFAULT_DESCRIPTION} />
         <meta name="twitter:image" content={`${SITE_URL}/og.png`} />
       </Head>
-      <ErrorBoundary>
-        <Component {...pageProps} />
-      </ErrorBoundary>
+      <div className={`${display.variable} ${body.variable} font-body`}>
+        <ErrorBoundary>
+          <Component {...pageProps} />
+        </ErrorBoundary>
+      </div>
       <Analytics />
     </SessionContextProvider>
   );

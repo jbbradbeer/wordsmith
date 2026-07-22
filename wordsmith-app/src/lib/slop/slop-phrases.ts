@@ -10,7 +10,7 @@ export interface PhraseEntry {
 
 const AIISM = (phrase: string, hint: string): PhraseEntry => ({
   phrase, category: "ai-ism",
-  why: "Stock AI phrasing — readers now recognize it as machine-generated filler.",
+  why: "Stock AI phrasing. Readers now recognize it as machine-generated filler.",
   hint,
 });
 const HEDGE = (phrase: string): PhraseEntry => ({
@@ -20,17 +20,17 @@ const HEDGE = (phrase: string): PhraseEntry => ({
 });
 const INT = (phrase: string): PhraseEntry => ({
   phrase, category: "intensifier",
-  why: "Empty intensity — it asserts strength instead of showing it.",
+  why: "Empty intensity. It asserts strength instead of showing it.",
   hint: "Delete it, or replace the whole phrase with a specific detail.",
 });
 const TRANS = (phrase: string): PhraseEntry => ({
   phrase, category: "transition",
-  why: "Stock connective — overuse flattens your paragraph rhythm.",
+  why: "Stock connective. Overuse flattens your paragraph rhythm.",
   hint: "Cut it, or connect the ideas with content instead of a signpost.",
 });
 const CLICHE = (phrase: string, hint: string): PhraseEntry => ({
   phrase, category: "cliche",
-  why: "Tired figurative framing — it was vivid once, now it is wallpaper.",
+  why: "Tired figurative framing. It was vivid once, now it is wallpaper.",
   hint,
 });
 
@@ -38,8 +38,8 @@ export const SLOP_PHRASES: PhraseEntry[] = [
   AIISM("delve into", "Say what you actually do: examine, unpack, measure."),
   AIISM("delves into", "Say what it actually does: examines, unpacks, measures."),
   AIISM("tapestry of", "Name the actual parts instead of the weave."),
-  AIISM("it's important to note that", "Just state the point — importance shows itself."),
-  AIISM("it is important to note that", "Just state the point — importance shows itself."),
+  AIISM("it's important to note that", "Just state the point. Importance shows itself."),
+  AIISM("it is important to note that", "Just state the point. Importance shows itself."),
   AIISM("it's worth noting that", "Just state the point."),
   AIISM("in today's fast-paced world", "Cut the throat-clearing; start with your claim."),
   AIISM("in the ever-evolving landscape", "Name the specific change you mean."),
@@ -57,7 +57,7 @@ export const SLOP_PHRASES: PhraseEntry[] = [
   AIISM("dive deep into", "Say what you examine and what you found."),
   AIISM("deep dive", "Name what you examined and what you found."),
   AIISM("robust solution", "Robust how? Survives what failure?"),
-  AIISM("cutting-edge", "Name the technique — 'new' is not a feature."),
+  AIISM("cutting-edge", "Name the technique. 'New' is not a feature."),
   AIISM("state-of-the-art", "Name the technique and the benchmark."),
   AIISM("revolutionize", "Say what becomes possible that wasn't."),
   AIISM("empower you to", "Say what the reader can now do, plainly."),

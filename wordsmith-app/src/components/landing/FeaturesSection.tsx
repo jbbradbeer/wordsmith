@@ -20,7 +20,7 @@ const FEATURES = [
   {
     title: "Built for All Writers",
     description:
-      "Novels, blog posts, screenplays, or copy — Wordsmith adapts to your creative needs.",
+      "Novels, blog posts, screenplays, or copy. Wordsmith adapts to your creative needs.",
   },
   {
     title: "Instant Results",
@@ -55,7 +55,7 @@ export default function FeaturesSection() {
               Categorized by Style
             </h3>
             <p className="font-body text-[15px] leading-relaxed text-parchment-600 m-0 mb-6 max-w-[440px]">
-              Every word is tagged so you can match the tone you need instantly —
+              Every word is tagged so you can match the tone you need instantly,
               from boardroom-polished to once-a-century rare.
             </p>
             <div className="flex flex-wrap gap-2.5">

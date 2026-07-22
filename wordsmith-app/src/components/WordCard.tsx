@@ -29,7 +29,7 @@ function WordCard({
       role="button"
       tabIndex={0}
       aria-pressed={flipped}
-      aria-label={`${word.word} — ${flipped ? "collapse" : "show example"}`}
+      aria-label={`${word.word}: ${flipped ? "collapse" : "show example"}`}
       onClick={() => setFlipped(!flipped)}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setFlipped(!flipped)}
       className="cursor-pointer"

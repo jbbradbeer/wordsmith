@@ -85,7 +85,7 @@ export default function PricingSection({ onGetStarted, onUpgrade }: PricingSecti
                 </span>
                 <span className="font-body text-sm text-parchment-500 ml-1.5">/month</span>
                 <span className="block font-body text-xs text-gold mt-1">
-                  or ${SUBSCRIPTION_PRICE_ANNUAL}/year — save{" "}
+                  or ${SUBSCRIPTION_PRICE_ANNUAL}/year, save{" "}
                   {Math.round((1 - SUBSCRIPTION_PRICE_ANNUAL / (SUBSCRIPTION_PRICE_MONTHLY * 12)) * 100)}%
                 </span>
               </div>

@@ -114,7 +114,7 @@ export default function UsageBar({
               padding: 0,
             }}
           >
-            0 left — Upgrade
+            0 left. Upgrade
           </button>
         ) : (
           `${remaining} of ${FREE_SEARCH_LIMIT} free searches left today`

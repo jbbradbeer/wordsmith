@@ -71,7 +71,7 @@ export default function PrivacyPage() {
   return (
     <>
       <Head>
-        <title>Privacy Policy — Wordsmith</title>
+        <title>Privacy Policy | Wordsmith</title>
         <meta
           name="description"
           content="Privacy Policy for Wordsmith, a writer's companion for finding elevated word alternatives."

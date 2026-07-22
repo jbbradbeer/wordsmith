@@ -1,4 +1,4 @@
-// src/pages/index.tsx — the de-slop analyzer (new core surface)
+// src/pages/index.tsx — the de-slop analyzer landing (core surface)
 import { useEffect, useMemo, useRef, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
@@ -8,16 +8,21 @@ import { useAnalyze } from "@/lib/use-analyze";
 import { runRules } from "@/lib/slop/rules";
 import { computeScan } from "@/lib/slop/score";
 import { trackEvent } from "@/lib/analytics";
-import ScoreBadge from "@/components/slop/ScoreBadge";
+import ScoreReveal from "@/components/slop/ScoreReveal";
 import SpanCard from "@/components/slop/SpanCard";
 import HighlightedText from "@/components/slop/HighlightedText";
 import AuthModal from "@/components/AuthModal";
 import PaywallModal from "@/components/PaywallModal";
 import Footer from "@/components/landing/Footer";
+import SlopExamples from "@/components/home/SlopExamples";
+import HowItWorks from "@/components/home/HowItWorks";
+import WhatItCatches from "@/components/home/WhatItCatches";
+import HomePricing from "@/components/home/HomePricing";
+import ClosingCta from "@/components/home/ClosingCta";
 
-const TITLE = "Wordsmith — De-slop your writing. Get your Slop Score.";
+const TITLE = "Wordsmith: De-slop Your Writing. Get Your Slop Score.";
 const DESCRIPTION =
-  "Paste your draft. Wordsmith flags AI-slop tells — stock phrases, hedging, flat rhythm — explains each one, and helps you rewrite in your own voice. It never writes for you.";
+  "Paste your draft and get a Slop Score. Wordsmith flags the AI tells in your writing, stock phrases, hedging, flat rhythm, explains each one, and helps you rewrite in your own voice. It never writes for you.";
 
 export default function Analyzer() {
   const session = useSession();
@@ -26,30 +31,33 @@ export default function Analyzer() {
   const [editing, setEditing] = useState(true);
   const [activeSpan, setActiveSpan] = useState<number | null>(null);
   const [showAuth, setShowAuth] = useState(false);
+  const [authMode, setAuthMode] = useState<"signin" | "signup">("signup");
   const [showPaywall, setShowPaywall] = useState(false);
   const analyzedText = useRef("");
+  const analyzerRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // 403 from the API → the right modal
   useEffect(() => {
-    if (limit === "signup") setShowAuth(true);
+    if (limit === "signup") {
+      setAuthMode("signup");
+      setShowAuth(true);
+    }
     if (limit === "paywall") setShowPaywall(true);
     if (limit) trackEvent("limit_hit", { kind: "scan" });
   }, [limit]);
 
-  // Funnel: fire once each time the paywall becomes visible
   useEffect(() => {
     if (showPaywall) trackEvent("paywall_view");
   }, [showPaywall]);
 
-  // Check for upgrade success in URL (Stripe redirects to "/" — moved here from search.tsx)
+  // Stripe redirects to "/" after checkout; verify the session so the user is
+  // Pro the moment they land, before the webhook necessarily arrives.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("upgraded") === "true") {
       const sessionId = params.get("session_id");
       window.history.replaceState({}, "", "/");
-
-      // The redirect can beat Stripe's webhook — verify the session directly
-      // so the user is Pro the moment they land back
       if (sessionId) {
         fetch("/api/checkout-verify", {
           method: "POST",
@@ -70,14 +78,14 @@ export default function Analyzer() {
     analyzedText.current = draft;
     setEditing(false);
     setActiveSpan(null);
-    // Clear the stale scan synchronously so we never render this new text
-    // against the previous result's spans while the SSE response is in flight.
+    // Clear the stale scan synchronously so we never render new text against
+    // the previous result's spans while the SSE response is in flight.
     setResult(null);
     await analyze(draft);
   };
 
-  // Live rules-only re-score while the user edits after a scan (free, client-side)
-  // Invariant: result always describes analyzedText.current (cleared synchronously on re-analyze).
+  // Live rules-only re-score while editing after a scan (free, client-side).
+  // Invariant: result always describes analyzedText.current.
   const liveResult = useMemo(() => {
     if (!result) return result;
     if (!editing) return result;
@@ -91,6 +99,20 @@ export default function Analyzer() {
   }, [result, loading]);
 
   const shown = liveResult ?? result;
+
+  const focusAnalyzer = () => {
+    setEditing(true);
+    analyzerRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.setTimeout(() => textareaRef.current?.focus(), 400);
+  };
+
+  const goPro = () => {
+    if (session) setShowPaywall(true);
+    else {
+      setAuthMode("signup");
+      setShowAuth(true);
+    }
+  };
 
   return (
     <div className="min-h-screen">
@@ -116,47 +138,70 @@ export default function Analyzer() {
         />
       </Head>
 
+      <div className="grain fixed inset-0 z-[60] pointer-events-none" aria-hidden="true" />
+
       <nav
         aria-label="Site navigation"
-        className="sticky top-0 z-40 px-6 py-4 flex justify-between items-center border-b border-gold/[.09] bg-[#f2ede2]/75 backdrop-blur-md"
+        className="sticky top-0 z-40 h-[64px] px-6 flex justify-between items-center border-b border-gold/[.09] bg-[#f2ede2]/80 backdrop-blur-md"
       >
-        <span className="font-display font-black text-parchment-900">Wordsmith</span>
-        <div className="flex gap-4 items-center">
-          <Link href="/search" className="font-body text-sm text-parchment-700 no-underline">
+        <span className="font-display font-black text-lg text-parchment-900">Wordsmith</span>
+        <div className="flex gap-5 items-center font-body text-sm">
+          <Link href="/search" className="footer-link text-parchment-700 no-underline hidden sm:inline">
             Word Search
           </Link>
-          <Link href="/words" className="font-body text-sm text-parchment-700 no-underline">
+          <Link href="/words" className="footer-link text-parchment-700 no-underline hidden sm:inline">
             Word Library
           </Link>
+          {session ? (
+            <Link href="/search" className="footer-link text-parchment-800 font-semibold no-underline">
+              Account
+            </Link>
+          ) : (
+            <button
+              onClick={() => {
+                setAuthMode("signin");
+                setShowAuth(true);
+              }}
+              className="footer-link text-parchment-800 font-semibold bg-transparent border-none cursor-pointer font-body text-sm"
+            >
+              Sign in
+            </button>
+          )}
         </div>
       </nav>
 
-      <main className="max-w-[980px] mx-auto px-6 pt-14 pb-16">
-        <header className="text-center mb-10">
+      {/* Hero + live analyzer */}
+      <header ref={analyzerRef} className="max-w-[1000px] mx-auto px-6 pt-16 md:pt-20 pb-4">
+        <div className="text-center mb-10">
           <h1
-            className="font-display font-black text-parchment-900 m-0 mb-4 tracking-[-0.03em]"
-            style={{ fontSize: "clamp(38px, 6vw, 64px)" }}
+            className="font-display font-black text-parchment-900 tracking-[-0.03em] m-0 mb-4"
+            style={{ fontSize: "clamp(40px, 7vw, 72px)", lineHeight: 1.02 }}
           >
-            Sound like you. Not like a bot.
+            Sound like you.
+            <br />
+            Not like a <span className="italic text-gold">bot</span>.
           </h1>
-          <p className="font-body text-[16px] text-parchment-600 max-w-[560px] mx-auto m-0">
-            Paste your draft. Wordsmith flags the slop — stock phrases, hedging, flat
-            rhythm — explains every tell, and you rewrite it in your own voice.
-            It never writes a word for you.
+          <p className="font-body text-[17px] leading-relaxed text-parchment-600 max-w-[540px] mx-auto m-0">
+            Paste your draft. Wordsmith flags the slop, explains every tell, and
+            you rewrite it in your own voice. It never writes a word for you.
           </p>
-        </header>
+        </div>
 
-        <div className="grid gap-6" style={{ gridTemplateColumns: shown ? "1fr 260px" : "1fr" }}>
-          <section>
+        <div
+          className="grid gap-5"
+          style={{ gridTemplateColumns: shown && !editing ? "minmax(0,1fr) 300px" : "1fr" }}
+        >
+          <section className="min-w-0">
             {editing || !shown ? (
               <textarea
+                ref={textareaRef}
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
-                placeholder="Paste your draft here (at least 100 characters)…"
-                className="w-full min-h-[320px] bg-white border border-parchment-300 rounded-2xl p-6 font-body text-[15px] leading-relaxed text-parchment-900 resize-y"
+                placeholder="Paste your draft here. At least 100 characters, and try something that sounds a little too polished."
+                className="w-full min-h-[300px] bg-white border border-parchment-300 rounded-3xl p-6 font-body text-[15px] leading-relaxed text-parchment-900 resize-y shadow-[0_4px_28px_rgba(26,26,24,0.05)]"
               />
             ) : (
-              <div className="bg-white border border-parchment-300 rounded-2xl p-6">
+              <div className="bg-white border border-parchment-300 rounded-3xl p-6 shadow-[0_4px_28px_rgba(26,26,24,0.05)]">
                 <HighlightedText
                   text={analyzedText.current}
                   spans={shown.spans}
@@ -169,12 +214,14 @@ export default function Analyzer() {
               </div>
             )}
 
-            <div className="flex gap-3 mt-4 items-center">
+            <div className="flex flex-wrap gap-3 mt-4 items-center">
               <button
                 onClick={handleAnalyze}
                 disabled={loading || draft.trim().length < 100}
-                className={`btn-primary px-8 py-3 rounded-xl border-none font-body text-[15px] font-semibold text-white ${
-                  loading ? "bg-parchment-500 cursor-wait" : "bg-gold cursor-pointer"
+                className={`btn-primary px-8 py-3.5 rounded-xl border-none font-body text-[15px] font-semibold text-white transition-colors ${
+                  loading || draft.trim().length < 100
+                    ? "bg-parchment-500 cursor-not-allowed"
+                    : "bg-gold cursor-pointer"
                 }`}
               >
                 {loading ? "Analyzing…" : shown ? "Re-analyze" : "Get my Slop Score"}
@@ -190,7 +237,14 @@ export default function Analyzer() {
                   Edit draft
                 </button>
               )}
-              {error && <span className="font-body text-sm text-category-punchy">{error}</span>}
+              {editing && draft.trim().length > 0 && draft.trim().length < 100 && (
+                <span className="font-body text-[13px] text-parchment-500">
+                  {100 - draft.trim().length} more characters to scan
+                </span>
+              )}
+              {error && (
+                <span className="font-body text-sm text-category-punchy">{error}</span>
+              )}
             </div>
 
             {activeSpan !== null && shown?.spans[activeSpan] && (
@@ -200,19 +254,25 @@ export default function Analyzer() {
             )}
           </section>
 
-          {shown && (
-            <aside className="flex flex-col gap-4 items-center">
-              <ScoreBadge result={shown} />
+          {shown && !editing && (
+            <aside className="flex flex-col gap-3">
+              <ScoreReveal result={shown} />
               <p className="font-body text-[12px] text-parchment-500 text-center m-0">
-                Your draft is analyzed in-flight and never stored.
+                Analyzed in-flight. Your draft is never stored.
               </p>
             </aside>
           )}
         </div>
-      </main>
+      </header>
+
+      <SlopExamples />
+      <HowItWorks />
+      <WhatItCatches />
+      <HomePricing onStartFree={focusAnalyzer} onGoPro={goPro} />
+      <ClosingCta onStartFree={focusAnalyzer} />
 
       <Footer />
-      <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} initialMode="signup" />
+      <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} initialMode={authMode} />
       <PaywallModal isOpen={showPaywall} onClose={() => setShowPaywall(false)} />
     </div>
   );
