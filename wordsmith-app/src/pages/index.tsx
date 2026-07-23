@@ -143,6 +143,13 @@ export default function Analyzer() {
 
       <div className="grain fixed inset-0 z-[60] pointer-events-none" aria-hidden="true" />
 
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-white focus:text-parchment-900 focus:px-4 focus:py-2 focus:rounded-lg focus:border focus:border-gold"
+      >
+        Skip to content
+      </a>
+
       <nav
         aria-label="Site navigation"
         className="sticky top-0 z-40 h-[64px] px-6 flex justify-between items-center border-b border-gold/[.09] bg-[#f2ede2]/80 backdrop-blur-md"
@@ -175,6 +182,7 @@ export default function Analyzer() {
         </div>
       </nav>
 
+      <main id="main-content">
       {session && pro && stats && <CompanionHome recent={recent} stats={stats} />}
       {session && !pro && (
         <div className="max-w-[1000px] mx-auto px-6 pt-8">
@@ -207,16 +215,27 @@ export default function Analyzer() {
         </div>
 
         <div
-          className="grid gap-5"
-          style={{ gridTemplateColumns: shown && !editing ? "minmax(0,1fr) 300px" : "1fr" }}
+          className={`grid gap-5 ${
+            shown && !editing ? "md:grid-cols-[minmax(0,1fr)_300px]" : ""
+          }`}
         >
           <section className="min-w-0">
+            <p className="sr-only" role="status" aria-live="polite">
+              {loading
+                ? "Analyzing your draft."
+                : error
+                ? error
+                : shown && !editing
+                ? `Slop Score ${shown.score}, ${shown.band}.`
+                : ""}
+            </p>
             {editing || !shown ? (
               <textarea
                 ref={textareaRef}
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
-                placeholder="Paste your draft here. At least 100 characters, and try something that sounds a little too polished."
+                aria-label="Your draft"
+                placeholder="Paste your draft here. At least 100 characters, and try something that sounds a little too polished…"
                 className="w-full min-h-[300px] bg-white border border-parchment-300 rounded-3xl p-6 font-body text-[15px] leading-relaxed text-parchment-900 resize-y shadow-[0_4px_28px_rgba(26,26,24,0.05)]"
               />
             ) : (
@@ -289,6 +308,7 @@ export default function Analyzer() {
       <WhatItCatches />
       <HomePricing onStartFree={focusAnalyzer} onGoPro={goPro} />
       <ClosingCta onStartFree={focusAnalyzer} />
+      </main>
 
       <Footer />
       <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} initialMode={authMode} />

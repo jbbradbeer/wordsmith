@@ -244,6 +244,8 @@ function SaveToCollectionButton({
           {/* Feedback */}
           {feedback && (
             <div
+              role="status"
+              aria-live="polite"
               style={{
                 padding: "6px 14px",
                 fontFamily: "'DM Sans', sans-serif",

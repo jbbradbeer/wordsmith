@@ -39,7 +39,7 @@ export default function UsageBar({
           style={{
             fontSize: "12px",
             fontFamily: "'DM Sans', sans-serif",
-            color: "#8A8478",
+            color: "#6A6460",
           }}
         >
           Unlimited searches
@@ -94,7 +94,7 @@ export default function UsageBar({
         style={{
           fontSize: "12px",
           fontFamily: "'DM Sans', sans-serif",
-          color: remaining === 0 ? "#C0392B" : "#8A8478",
+          color: remaining === 0 ? "#C0392B" : "#6A6460",
           whiteSpace: "nowrap",
           fontVariantNumeric: "tabular-nums",
         }}

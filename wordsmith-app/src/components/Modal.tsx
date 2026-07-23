@@ -25,6 +25,11 @@ export default function Modal({
 }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
+  // Keep the latest onClose without making it an effect dependency — callers
+  // pass inline arrows, so depending on it would re-run the effect (stealing
+  // focus back to the first control) on every parent render.
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -36,7 +41,7 @@ export default function Modal({
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        onClose();
+        onCloseRef.current();
         return;
       }
       if (e.key !== "Tab") return;
@@ -62,7 +67,7 @@ export default function Modal({
       document.body.style.overflow = prevOverflow;
       previouslyFocused.current?.focus();
     };
-  }, [isOpen, onClose]);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 

@@ -83,7 +83,7 @@ export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
               key={feature}
               className="flex items-center gap-2.5 py-1.5 font-body text-sm text-parchment-800"
             >
-              <span className="text-category-rare text-base">✓</span>
+              <span aria-hidden="true" className="text-category-rare text-base">✓</span>
               {feature}
             </div>
           ))}
