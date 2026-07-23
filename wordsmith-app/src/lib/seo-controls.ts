@@ -1,0 +1,45 @@
+// Data-only SEO levers edited exclusively by the monthly /seo-review PR.
+// Pruned words: noindex + dropped from sitemap (still live for direct visitors).
+// Boosted words: FAQ block + extra inbound internal links (additive; core
+// content never regenerated).
+
+export const PRUNED_WORDS: ReadonlySet<string> = new Set<string>([
+  // Added by the monthly review when a page fails to index. Empty until then.
+]);
+
+export const BOOSTED_WORDS: ReadonlySet<string> = new Set<string>([
+  // Added by the monthly review for position 5-20 striking-distance pages.
+]);
+
+export function isPruned(word: string): boolean {
+  return PRUNED_WORDS.has(word);
+}
+
+export function isBoosted(word: string): boolean {
+  return BOOSTED_WORDS.has(word);
+}
+
+/**
+ * Inject up to `maxBoosted` boosted words into a page's related-word list so
+ * boosted pages gain inbound internal links from across the site. Replaces the
+ * tail of `related`, preserving length and the higher-priority head entries.
+ * The boosted set is injectable for testing; defaults to BOOSTED_WORDS.
+ */
+export function boostRelated(
+  related: string[],
+  currentWord: string,
+  maxBoosted: number,
+  boosted: ReadonlySet<string> = BOOSTED_WORDS
+): string[] {
+  if (maxBoosted <= 0 || boosted.size === 0) return related;
+  const present = new Set(related);
+  const toInject: string[] = [];
+  for (const w of Array.from(boosted)) {
+    if (toInject.length >= maxBoosted) break;
+    if (w === currentWord || present.has(w)) continue;
+    toInject.push(w);
+  }
+  if (toInject.length === 0) return related;
+  const keep = related.slice(0, Math.max(0, related.length - toInject.length));
+  return [...keep, ...toInject];
+}
