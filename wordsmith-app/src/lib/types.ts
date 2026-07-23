@@ -38,3 +38,22 @@ export interface UserInfo {
   limit: number | null;
   memberSince: string;
 }
+
+export interface Scan {
+  score: number;
+  band: string;
+  wordCount: number;
+  createdAt: string; // ISO
+}
+
+export interface ScanStats {
+  total: number;
+  earlyAvg: number | null;   // null when total < 4
+  recentAvg: number | null;  // null when total < 4
+  best: number | null;       // lowest score; null when total === 0
+  streakDays: number;        // consecutive UTC days ending today/yesterday
+}
+
+export type ScansResponse =
+  | { pro: false }
+  | { pro: true; recent: Scan[]; stats: ScanStats };
