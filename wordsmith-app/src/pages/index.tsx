@@ -22,9 +22,9 @@ import WhatItCatches from "@/components/home/WhatItCatches";
 import HomePricing from "@/components/home/HomePricing";
 import ClosingCta from "@/components/home/ClosingCta";
 
-const TITLE = "Wordsmith: De-slop Your Writing. Get Your Slop Score.";
+const TITLE = "Wordsmith: The AI Writing Companion That Keeps You Human";
 const DESCRIPTION =
-  "Paste your draft and get a Slop Score. Wordsmith flags the AI tells in your writing, stock phrases, hedging, flat rhythm, explains each one, and helps you rewrite in your own voice. It never writes for you.";
+  "The AI writing companion that keeps you sounding like you, not like AI. It reads your draft, flags the tells, and never writes a word for you.";
 
 export default function Analyzer() {
   const session = useSession();
@@ -200,8 +200,9 @@ export default function Analyzer() {
             Not like a <span className="italic text-gold">bot</span>.
           </h1>
           <p className="font-body text-[17px] leading-relaxed text-parchment-600 max-w-[540px] mx-auto m-0">
-            Paste your draft. Wordsmith flags the slop, explains every tell, and
-            you rewrite it in your own voice. It never writes a word for you.
+            Your AI writing companion. It reads every draft, flags the slop, and
+            explains each tell. You rewrite in your own voice. It never writes a
+            word for you.
           </p>
         </div>
 

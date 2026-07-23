@@ -24,11 +24,15 @@ export default function HowItWorks() {
       <div className="max-w-[1100px] mx-auto px-6 py-20 md:py-28">
         <Reveal>
           <h2
-            className="font-display font-black text-parchment-900 tracking-[-0.02em] text-center m-0 mb-14"
+            className="font-display font-black text-parchment-900 tracking-[-0.02em] text-center m-0"
             style={{ fontSize: "clamp(28px, 4.5vw, 44px)" }}
           >
             It coaches. It never ghostwrites.
           </h2>
+          <p className="font-body text-[15px] text-parchment-600 text-center max-w-[520px] mx-auto m-0 mb-14 -mt-8">
+            An AI whose entire job is making sure you do not sound like AI. It
+            points; you write.
+          </p>
         </Reveal>
 
         <div className="grid gap-10 md:grid-cols-3">
