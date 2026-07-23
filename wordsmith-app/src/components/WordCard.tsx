@@ -31,7 +31,12 @@ function WordCard({
       aria-pressed={flipped}
       aria-label={`${word.word}: ${flipped ? "collapse" : "show example"}`}
       onClick={() => setFlipped(!flipped)}
-      onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setFlipped(!flipped)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setFlipped(!flipped);
+        }
+      }}
       className="cursor-pointer"
       style={{
         animation: "cardIn 0.4s ease both",

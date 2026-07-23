@@ -80,8 +80,8 @@ export default function CompanionHome({ recent, stats }: { recent: Scan[]; stats
 
         {recent.length > 0 && (
           <div className="mt-5 pt-4 border-t border-parchment-200 flex flex-wrap gap-x-6 gap-y-2">
-            {recent.slice(0, 6).map((s, i) => (
-              <span key={i} className="font-body text-[13px] text-parchment-600 inline-flex items-center gap-2">
+            {recent.slice(0, 6).map((s) => (
+              <span key={s.createdAt} className="font-body text-[13px] text-parchment-600 inline-flex items-center gap-2">
                 {new Date(s.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
                 <span className="font-semibold" style={{ color: BAND_COLOR[s.band] ?? "#8A8478" }}>
                   {s.score}

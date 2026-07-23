@@ -154,7 +154,10 @@ export default function Home() {
   }, [session, refreshUserInfo]);
 
   useEffect(() => {
-    inputRef.current?.focus();
+    // Desktop only — autofocusing on mobile pops the keyboard and jumps the viewport.
+    if (window.matchMedia("(min-width: 768px)").matches) {
+      inputRef.current?.focus();
+    }
   }, []);
 
   // Funnel: fire once each time the paywall becomes visible
@@ -276,7 +279,7 @@ export default function Home() {
                 Manage
               </button>
             )}
-            <span className="font-body text-xs text-parchment-600">
+            <span className="font-body text-xs text-parchment-600 truncate max-w-[140px] hidden sm:inline">
               {session.user.email}
             </span>
             <button
@@ -332,6 +335,7 @@ export default function Home() {
             type="search"
             name="q"
             autoComplete="off"
+            spellCheck={false}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}

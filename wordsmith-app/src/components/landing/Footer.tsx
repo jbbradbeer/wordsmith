@@ -67,7 +67,7 @@ export default function Footer({ onSecret }: FooterProps) {
 
       <div className="max-w-[900px] mx-auto mt-6 pt-5 text-center border-t border-parchment-300">
         <p className="font-body text-xs text-parchment-500 m-0">
-          &copy; 2026 Wordsmith{" "}
+          &copy; {new Date().getFullYear()} Wordsmith{" "}
           <button
             onClick={handleFleuron}
             aria-label="A decorative flourish"

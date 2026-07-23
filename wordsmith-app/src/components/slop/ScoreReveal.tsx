@@ -70,7 +70,7 @@ export default function ScoreReveal({ result }: { result: ScanResult }) {
             <span className="text-[12px] text-parchment-600">{label}</span>
             <span
               className="text-[15px] font-bold tabular-nums"
-              style={{ color: v > 0 ? band.color : "#B8B2A8" }}
+              style={{ color: v > 0 ? band.color : "#6A6460" }}
             >
               {v > 0 ? v : "0"}
             </span>
