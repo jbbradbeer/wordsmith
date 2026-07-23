@@ -24,9 +24,9 @@ const body = DM_Sans({
   display: "swap",
 });
 
-const DEFAULT_TITLE = "Wordsmith: De-slop Your Writing";
+const DEFAULT_TITLE = "Wordsmith: The AI Writing Companion";
 const DEFAULT_DESCRIPTION =
-  "Paste your draft and get a Slop Score. Wordsmith flags the AI tells in your writing, explains each one, and helps you rewrite in your own voice. It never writes for you.";
+  "Wordsmith is the AI writing companion that keeps you sounding like you, not like AI. Paste a draft, get a Slop Score, and rewrite in your own voice. It never writes for you.";
 
 export default function App({ Component, pageProps }: AppProps) {
   const [supabaseClient] = useState(() => createBrowserSupabaseClient());

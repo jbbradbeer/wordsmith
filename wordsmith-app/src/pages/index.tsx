@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useSession } from "@supabase/auth-helpers-react";
 import { SITE_URL, jsonLdSerialize } from "@/lib/seo";
 import { useAnalyze } from "@/lib/use-analyze";
+import { useScans } from "@/lib/use-scans";
+import CompanionHome from "@/components/home/CompanionHome";
 import { runRules } from "@/lib/slop/rules";
 import { computeScan } from "@/lib/slop/score";
 import { trackEvent } from "@/lib/analytics";
@@ -20,12 +22,13 @@ import WhatItCatches from "@/components/home/WhatItCatches";
 import HomePricing from "@/components/home/HomePricing";
 import ClosingCta from "@/components/home/ClosingCta";
 
-const TITLE = "Wordsmith: De-slop Your Writing. Get Your Slop Score.";
+const TITLE = "Wordsmith: The AI Writing Companion That Keeps You Human";
 const DESCRIPTION =
-  "Paste your draft and get a Slop Score. Wordsmith flags the AI tells in your writing, stock phrases, hedging, flat rhythm, explains each one, and helps you rewrite in your own voice. It never writes for you.";
+  "The AI writing companion that keeps you sounding like you, not like AI. It reads your draft, flags the tells, and never writes a word for you.";
 
 export default function Analyzer() {
   const session = useSession();
+  const { pro, stats, recent } = useScans();
   const { result, setResult, error, loading, limit, analyze } = useAnalyze();
   const [draft, setDraft] = useState("");
   const [editing, setEditing] = useState(true);
@@ -172,6 +175,19 @@ export default function Analyzer() {
         </div>
       </nav>
 
+      {session && pro && stats && <CompanionHome recent={recent} stats={stats} />}
+      {session && !pro && (
+        <div className="max-w-[1000px] mx-auto px-6 pt-8">
+          <button
+            onClick={() => setShowPaywall(true)}
+            className="w-full text-left bg-parchment-100/70 border border-gold/25 rounded-2xl px-5 py-4 font-body text-[14px] text-parchment-700 cursor-pointer transition-colors hover:bg-parchment-100"
+          >
+            <span className="font-semibold text-parchment-900">Wordsmith Pro tracks your Slop Score over time.</span>{" "}
+            See your drafts get cleaner, scan after scan. Upgrade to unlock your progress.
+          </button>
+        </div>
+      )}
+
       {/* Hero + live analyzer */}
       <header ref={analyzerRef} className="max-w-[1000px] mx-auto px-6 pt-16 md:pt-20 pb-4">
         <div className="text-center mb-10">
@@ -184,8 +200,9 @@ export default function Analyzer() {
             Not like a <span className="italic text-gold">bot</span>.
           </h1>
           <p className="font-body text-[17px] leading-relaxed text-parchment-600 max-w-[540px] mx-auto m-0">
-            Paste your draft. Wordsmith flags the slop, explains every tell, and
-            you rewrite it in your own voice. It never writes a word for you.
+            Your AI writing companion. It reads every draft, flags the slop, and
+            explains each tell. You rewrite in your own voice. It never writes a
+            word for you.
           </p>
         </div>
 
