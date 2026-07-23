@@ -12,6 +12,7 @@ export function useScans() {
 
   useEffect(() => {
     if (!session) {
+      setLoading(false);
       setPro(false);
       setRecent([]);
       setStats(null);
