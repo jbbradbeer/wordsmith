@@ -6,6 +6,8 @@ import { isSeedWord, relatedWords } from "@/lib/seed-words";
 import { getWordPageData } from "@/lib/word-pages";
 import { SITE_URL, jsonLdSerialize } from "@/lib/seo";
 import { WORD_CATEGORIES } from "@/lib/constants";
+import { isPruned, isBoosted, boostRelated } from "@/lib/seo-controls";
+import { buildWordFaq } from "@/lib/faq";
 import type { WordData } from "@/lib/types";
 
 interface SynonymPageProps {
@@ -40,7 +42,11 @@ function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export default function SynonymPage({ word, alternatives, related }: SynonymPageProps) {
+export default function SynonymPage({
+  word,
+  alternatives,
+  related: relatedProp,
+}: SynonymPageProps) {
   const canonical = `${SITE_URL}/synonyms-for/${word}`;
   const synonymList = alternatives.map((a) => a.word);
   const title = `Synonyms for "${capitalize(word)}": ${alternatives.length} Better Alternatives | Wordsmith`;
@@ -48,34 +54,46 @@ export default function SynonymPage({ word, alternatives, related }: SynonymPage
     .slice(0, 5)
     .join(", ")}. Each with its meaning, pronunciation, and an example sentence.`;
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "DefinedTermSet",
-        name: `Synonyms for "${word}"`,
-        url: canonical,
-        hasDefinedTerm: alternatives.map((a) => ({
-          "@type": "DefinedTerm",
-          name: a.word,
-          description: a.definition,
-        })),
-      },
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Wordsmith", item: SITE_URL },
-          { "@type": "ListItem", position: 2, name: "Word Library", item: `${SITE_URL}/words` },
-          {
-            "@type": "ListItem",
-            position: 3,
-            name: `Synonyms for ${capitalize(word)}`,
-            item: canonical,
-          },
-        ],
-      },
-    ],
-  };
+  const pruned = isPruned(word);
+  const faq = isBoosted(word) ? buildWordFaq(word, alternatives) : [];
+  const related = boostRelated(relatedProp, word, 2);
+
+  const graph: object[] = [
+    {
+      "@type": "DefinedTermSet",
+      name: `Synonyms for "${word}"`,
+      url: canonical,
+      hasDefinedTerm: alternatives.map((a) => ({
+        "@type": "DefinedTerm",
+        name: a.word,
+        description: a.definition,
+      })),
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Wordsmith", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: "Word Library", item: `${SITE_URL}/words` },
+        {
+          "@type": "ListItem",
+          position: 3,
+          name: `Synonyms for ${capitalize(word)}`,
+          item: canonical,
+        },
+      ],
+    },
+  ];
+  if (faq.length > 0) {
+    graph.push({
+      "@type": "FAQPage",
+      mainEntity: faq.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    });
+  }
+  const jsonLd = { "@context": "https://schema.org", "@graph": graph };
 
   return (
     <div className="min-h-screen">
@@ -86,6 +104,7 @@ export default function SynonymPage({ word, alternatives, related }: SynonymPage
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:url" content={canonical} />
+        {pruned && <meta name="robots" content="noindex,follow" />}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdSerialize(jsonLd) }}
@@ -234,6 +253,22 @@ export default function SynonymPage({ word, alternatives, related }: SynonymPage
             ))}
           </div>
         </section>
+
+        {faq.length > 0 && (
+          <section aria-label="Frequently asked questions" className="mt-12">
+            <h2 className="font-display font-bold text-[22px] text-parchment-900 mb-4">
+              Frequently asked
+            </h2>
+            {faq.map((f) => (
+              <div key={f.q} className="mb-4">
+                <h3 className="font-body font-semibold text-[15px] text-parchment-900 m-0 mb-1">
+                  {f.q}
+                </h3>
+                <p className="font-body text-[14px] text-parchment-600 m-0">{f.a}</p>
+              </div>
+            ))}
+          </section>
+        )}
       </main>
 
       <Footer />

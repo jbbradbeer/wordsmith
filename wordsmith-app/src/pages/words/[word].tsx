@@ -6,6 +6,8 @@ import { isSeedWord, relatedWords } from "@/lib/seed-words";
 import { getWordPageData } from "@/lib/word-pages";
 import { SITE_URL, jsonLdSerialize } from "@/lib/seo";
 import { WORD_CATEGORIES } from "@/lib/constants";
+import { isPruned, isBoosted, boostRelated } from "@/lib/seo-controls";
+import { buildWordFaq } from "@/lib/faq";
 import type { WordData } from "@/lib/types";
 
 interface WordPageProps {
@@ -42,35 +44,47 @@ function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export default function WordPage({ word, alternatives, related }: WordPageProps) {
+export default function WordPage({ word, alternatives, related: relatedProp }: WordPageProps) {
   const canonical = `${SITE_URL}/words/${word}`;
   const top = alternatives.slice(0, 3).map((a) => a.word);
   const title = `Better Words for "${capitalize(word)}": ${alternatives.length} Elevated Alternatives | Wordsmith`;
   const description = `Stop writing "${word}." Try ${top.join(", ")}. ${alternatives.length} curated alternatives with definitions, pronunciation, and example sentences.`;
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "DefinedTermSet",
-        name: `Alternatives for "${word}"`,
-        url: canonical,
-        hasDefinedTerm: alternatives.map((a) => ({
-          "@type": "DefinedTerm",
-          name: a.word,
-          description: a.definition,
-        })),
-      },
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Wordsmith", item: SITE_URL },
-          { "@type": "ListItem", position: 2, name: "Word Library", item: `${SITE_URL}/words` },
-          { "@type": "ListItem", position: 3, name: capitalize(word), item: canonical },
-        ],
-      },
-    ],
-  };
+  const pruned = isPruned(word);
+  const faq = isBoosted(word) ? buildWordFaq(word, alternatives) : [];
+  const related = boostRelated(relatedProp, word, 2);
+
+  const graph: object[] = [
+    {
+      "@type": "DefinedTermSet",
+      name: `Alternatives for "${word}"`,
+      url: canonical,
+      hasDefinedTerm: alternatives.map((a) => ({
+        "@type": "DefinedTerm",
+        name: a.word,
+        description: a.definition,
+      })),
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Wordsmith", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: "Word Library", item: `${SITE_URL}/words` },
+        { "@type": "ListItem", position: 3, name: capitalize(word), item: canonical },
+      ],
+    },
+  ];
+  if (faq.length > 0) {
+    graph.push({
+      "@type": "FAQPage",
+      mainEntity: faq.map((f) => ({
+        "@type": "Question",
+        name: f.q,
+        acceptedAnswer: { "@type": "Answer", text: f.a },
+      })),
+    });
+  }
+  const jsonLd = { "@context": "https://schema.org", "@graph": graph };
 
   return (
     <div className="min-h-screen">
@@ -81,6 +95,7 @@ export default function WordPage({ word, alternatives, related }: WordPageProps)
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
         <meta property="og:url" content={canonical} />
+        {pruned && <meta name="robots" content="noindex,follow" />}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: jsonLdSerialize(jsonLd) }}
@@ -212,6 +227,22 @@ export default function WordPage({ word, alternatives, related }: WordPageProps)
             ))}
           </div>
         </section>
+
+        {faq.length > 0 && (
+          <section aria-label="Frequently asked questions" className="mt-12">
+            <h2 className="font-display font-bold text-[22px] text-parchment-900 mb-4">
+              Frequently asked
+            </h2>
+            {faq.map((f) => (
+              <div key={f.q} className="mb-4">
+                <h3 className="font-body font-semibold text-[15px] text-parchment-900 m-0 mb-1">
+                  {f.q}
+                </h3>
+                <p className="font-body text-[14px] text-parchment-600 m-0">{f.a}</p>
+              </div>
+            ))}
+          </section>
+        )}
       </main>
 
       <Footer />

@@ -3,6 +3,7 @@ import { SEED_WORDS } from "@/lib/seed-words";
 import { WORD_HUBS } from "@/lib/word-hubs";
 import { SYNONYM_VOLUMES } from "@/lib/synonym-volumes";
 import { SITE_URL } from "@/lib/seo";
+import { isPruned } from "@/lib/seo-controls";
 
 // Coarse priority from search volume so crawlers hit the biggest pages first.
 function priorityFor(word: string): string {
@@ -13,7 +14,7 @@ function priorityFor(word: string): string {
   return "0.6";
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ res }) => {
+export function buildSitemapEntries(): { path: string; priority: string }[] {
   const staticEntries = [
     { path: "", priority: "1.0" },
     { path: "/words", priority: "0.8" },
@@ -21,11 +22,16 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
     { path: "/privacy", priority: "0.3" },
   ];
   // Both page types share the word_pages data but target different queries
-  const wordEntries = SEED_WORDS.flatMap((w) => [
+  // Exclude pruned words from both /words/* and /synonyms-for/* routes
+  const wordEntries = SEED_WORDS.filter((w) => !isPruned(w)).flatMap((w) => [
     { path: `/synonyms-for/${w}`, priority: priorityFor(w) },
     { path: `/words/${w}`, priority: priorityFor(w) },
   ]);
-  const entries = [...staticEntries, ...wordEntries];
+  return [...staticEntries, ...wordEntries];
+}
+
+export const getServerSideProps: GetServerSideProps = async ({ res }) => {
+  const entries = buildSitemapEntries();
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
