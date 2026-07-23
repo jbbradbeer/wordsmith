@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useSession } from "@supabase/auth-helpers-react";
 import { SITE_URL, jsonLdSerialize } from "@/lib/seo";
 import { useAnalyze } from "@/lib/use-analyze";
+import { useScans } from "@/lib/use-scans";
+import CompanionHome from "@/components/home/CompanionHome";
 import { runRules } from "@/lib/slop/rules";
 import { computeScan } from "@/lib/slop/score";
 import { trackEvent } from "@/lib/analytics";
@@ -26,6 +28,7 @@ const DESCRIPTION =
 
 export default function Analyzer() {
   const session = useSession();
+  const { pro, stats, recent } = useScans();
   const { result, setResult, error, loading, limit, analyze } = useAnalyze();
   const [draft, setDraft] = useState("");
   const [editing, setEditing] = useState(true);
@@ -171,6 +174,19 @@ export default function Analyzer() {
           )}
         </div>
       </nav>
+
+      {session && pro && stats && <CompanionHome recent={recent} stats={stats} />}
+      {session && !pro && (
+        <div className="max-w-[1000px] mx-auto px-6 pt-8">
+          <button
+            onClick={() => setShowPaywall(true)}
+            className="w-full text-left bg-parchment-100/70 border border-gold/25 rounded-2xl px-5 py-4 font-body text-[14px] text-parchment-700 cursor-pointer transition-colors hover:bg-parchment-100"
+          >
+            <span className="font-semibold text-parchment-900">Wordsmith Pro tracks your Slop Score over time.</span>{" "}
+            See your drafts get cleaner, scan after scan. Upgrade to unlock your progress.
+          </button>
+        </div>
+      )}
 
       {/* Hero + live analyzer */}
       <header ref={analyzerRef} className="max-w-[1000px] mx-auto px-6 pt-16 md:pt-20 pb-4">
