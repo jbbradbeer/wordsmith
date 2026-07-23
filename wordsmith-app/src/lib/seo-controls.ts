@@ -40,6 +40,7 @@ export function boostRelated(
     toInject.push(w);
   }
   if (toInject.length === 0) return related;
-  const keep = related.slice(0, Math.max(0, related.length - toInject.length));
-  return [...keep, ...toInject];
+  const injectCount = Math.min(toInject.length, related.length);
+  const keep = related.slice(0, related.length - injectCount);
+  return [...keep, ...toInject.slice(0, injectCount)];
 }

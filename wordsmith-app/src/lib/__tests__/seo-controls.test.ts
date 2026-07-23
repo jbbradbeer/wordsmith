@@ -36,4 +36,9 @@ describe("boostRelated", () => {
     const injected = out.filter((w) => w === "zzz" || w === "yyy");
     expect(injected).toHaveLength(1);
   });
+  it("never returns more items than the input, even when boosted words exceed length", () => {
+    const short = ["a", "b"];
+    const out = boostRelated(short, "x", 5, new Set(["p", "q", "r", "s"]));
+    expect(out).toHaveLength(short.length);
+  });
 });
