@@ -24,7 +24,7 @@ export default function HighlightedText({ text, spans, activeIndex, onSpanClick 
           activeIndex === i ? "bg-gold/30" : "bg-gold/15"
         }`}
         style={{ boxShadow: "inset 0 -2px 0 #C0392B66", font: "inherit" }}
-        aria-label={`Flagged: ${span.text}`}
+        title="Flagged"
       >
         {text.slice(span.start, span.end)}
       </button>
@@ -33,7 +33,7 @@ export default function HighlightedText({ text, spans, activeIndex, onSpanClick 
   });
   if (cursor < text.length) parts.push(<span key="tail">{text.slice(cursor)}</span>);
   return (
-    <div className="font-body text-[15px] leading-relaxed text-parchment-900 whitespace-pre-wrap">
+    <div className="font-body text-[15px] leading-relaxed text-parchment-900 whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
       {parts}
     </div>
   );

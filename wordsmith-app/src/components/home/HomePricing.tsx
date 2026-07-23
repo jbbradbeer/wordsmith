@@ -62,7 +62,7 @@ export default function HomePricing({ onStartFree, onGoPro }: Props) {
               onClick={onStartFree}
               className="btn-outline w-full py-3 rounded-xl border border-gold text-gold font-body text-[15px] font-semibold cursor-pointer bg-transparent transition-colors"
             >
-              Score a draft
+              Score a Draft
             </button>
           </div>
         </Reveal>

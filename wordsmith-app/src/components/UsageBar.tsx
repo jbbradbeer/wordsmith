@@ -103,6 +103,7 @@ export default function UsageBar({
           <button
             onClick={onUpgrade}
             aria-label="You've used all of today's free searches. Upgrade to Pro for unlimited access."
+            className="hover:opacity-70"
             style={{
               background: "none",
               border: "none",
@@ -112,6 +113,7 @@ export default function UsageBar({
               fontFamily: "'DM Sans', sans-serif",
               fontSize: "12px",
               padding: 0,
+              transition: "opacity 0.15s ease",
             }}
           >
             0 left. Upgrade

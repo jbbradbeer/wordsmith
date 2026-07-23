@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   SUBSCRIPTION_PRICE_MONTHLY,
   SUBSCRIPTION_PRICE_ANNUAL,
@@ -28,10 +28,14 @@ const ANNUAL_SAVINGS_PCT = Math.round(
 export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState<BillingPlan>("annual");
+  const [error, setError] = useState<string | null>(null);
   const headingId = "paywall-modal-title";
+  const annualRef = useRef<HTMLButtonElement>(null);
+  const monthlyRef = useRef<HTMLButtonElement>(null);
 
   const handleUpgrade = async () => {
     setLoading(true);
+    setError(null);
     trackEvent("checkout_start", { plan });
     try {
       const res = await fetch("/api/checkout", {
@@ -42,12 +46,35 @@ export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
       const data = await res.json();
       if (data.url) {
         window.location.href = data.url;
+      } else {
+        console.error("Checkout error: missing checkout URL in response");
+        setError("Could not start checkout. Please try again.");
       }
     } catch (err) {
       console.error("Checkout error:", err);
+      setError("Could not start checkout. Please try again.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const selectPlan = (next: BillingPlan) => {
+    setPlan(next);
+    (next === "annual" ? annualRef : monthlyRef).current?.focus();
+  };
+
+  const handleRadioKeyDown = (e: React.KeyboardEvent) => {
+    if (
+      e.key !== "ArrowDown" &&
+      e.key !== "ArrowRight" &&
+      e.key !== "ArrowUp" &&
+      e.key !== "ArrowLeft"
+    ) {
+      return;
+    }
+    e.preventDefault();
+    // Only two options, so moving in either direction (wrapping) toggles between them.
+    selectPlan(plan === "annual" ? "monthly" : "annual");
   };
 
   return (
@@ -72,7 +99,7 @@ export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
           Unlock unlimited words
         </h2>
         <p className="font-body text-sm leading-normal text-parchment-600 m-0 mb-7">
-          You&apos;ve hit today&apos;s free limit. Upgrade for unlimited scans and
+          You’ve hit today’s free limit. Upgrade for unlimited scans and
           searches, and keep your writing unmistakably yours.
         </p>
 
@@ -94,12 +121,15 @@ export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
           role="radiogroup"
           aria-label="Billing plan"
           className="flex gap-2 mb-4"
+          onKeyDown={handleRadioKeyDown}
         >
           <button
+            ref={annualRef}
             type="button"
             role="radio"
             aria-checked={plan === "annual"}
-            onClick={() => setPlan("annual")}
+            tabIndex={plan === "annual" ? 0 : -1}
+            onClick={() => selectPlan("annual")}
             className={`flex-1 rounded-xl border p-3 text-left transition-colors ${plan === "annual" ? "border-gold bg-gold/[0.06]" : "border-parchment-300 bg-white"}`}
           >
             <span className="block font-body text-[11px] font-bold uppercase tracking-[0.1em] text-gold">
@@ -113,10 +143,12 @@ export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             </span>
           </button>
           <button
+            ref={monthlyRef}
             type="button"
             role="radio"
             aria-checked={plan === "monthly"}
-            onClick={() => setPlan("monthly")}
+            tabIndex={plan === "monthly" ? 0 : -1}
+            onClick={() => selectPlan("monthly")}
             className={`flex-1 rounded-xl border p-3 text-left transition-colors ${plan === "monthly" ? "border-gold bg-gold/[0.06]" : "border-parchment-300 bg-white"}`}
           >
             <span className="block font-body text-[11px] font-bold uppercase tracking-[0.1em] text-parchment-500">
@@ -128,6 +160,12 @@ export default function PaywallModal({ isOpen, onClose }: PaywallModalProps) {
             <span className="font-body text-xs text-parchment-600">/mo</span>
           </button>
         </div>
+
+        {error && (
+          <p role="alert" className="font-body text-[13px] text-category-punchy mb-3.5">
+            {error}
+          </p>
+        )}
 
         <button
           onClick={handleUpgrade}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Link from "next/link";
 import type { Collection, CollectionWord } from "@/lib/types";
 import { WORD_CATEGORIES } from "@/lib/constants";
@@ -65,8 +65,13 @@ export default function CollectionCard({
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(collection.name);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const cancelingRef = useRef(false);
 
   const submitRename = () => {
+    if (cancelingRef.current) {
+      cancelingRef.current = false;
+      return;
+    }
     setIsEditing(false);
     const name = editName.trim();
     if (name && name !== collection.name) onRename(name);
@@ -104,14 +109,18 @@ export default function CollectionCard({
             onChange={(e) => setEditName(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") submitRename();
-              if (e.key === "Escape") setIsEditing(false);
+              if (e.key === "Escape") {
+                cancelingRef.current = true;
+                setEditName(collection.name);
+                setIsEditing(false);
+              }
             }}
             onBlur={submitRename}
             onClick={(e) => e.stopPropagation()}
             className="flex-1 font-display font-bold text-lg text-parchment-900 border border-gold rounded-md px-2 py-1 bg-parchment-50"
           />
         ) : (
-          <h3 className="flex-1 font-display font-bold text-lg text-parchment-900 m-0">
+          <h3 className="flex-1 min-w-0 truncate font-display font-bold text-lg text-parchment-900 m-0">
             {collection.name}
           </h3>
         )}
