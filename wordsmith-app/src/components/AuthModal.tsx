@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSupabaseClient } from "@supabase/auth-helpers-react";
 import Modal from "./Modal";
 
@@ -35,6 +35,13 @@ export default function AuthModal({
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const headingId = "auth-modal-title";
+  const errorRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (error) {
+      errorRef.current?.focus();
+    }
+  }, [error]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -166,7 +173,12 @@ export default function AuthModal({
         </div>
 
         {error && (
-          <p role="alert" className="font-body text-[13px] text-category-punchy mb-3.5">
+          <p
+            ref={errorRef}
+            role="alert"
+            tabIndex={-1}
+            className="font-body text-[13px] text-category-punchy mb-3.5 outline-none"
+          >
             {error}
           </p>
         )}
@@ -190,7 +202,7 @@ export default function AuthModal({
       </form>
 
       <p className="font-body text-[13px] text-parchment-600 text-center mt-[18px] m-0">
-        {mode === "signup" ? "Already have an account?" : "Don't have an account?"}{" "}
+        {mode === "signup" ? "Already have an account?" : "Don’t have an account?"}{" "}
         <button
           onClick={() => {
             setMode(mode === "signup" ? "signin" : "signup");

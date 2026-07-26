@@ -19,7 +19,7 @@ export default function ScoreBadge({ result }: { result: ScanResult }) {
       <div className="font-body text-[11px] font-semibold tracking-[0.22em] uppercase text-parchment-500 mb-1">
         Slop Score
       </div>
-      <div className="font-display font-black text-[56px] leading-none" style={{ color: band.color }}>
+      <div className="font-display font-black text-[56px] leading-none tabular-nums" style={{ color: band.color }}>
         {result.score}
       </div>
       <div className="font-body text-sm font-semibold mb-4" style={{ color: band.color }}>

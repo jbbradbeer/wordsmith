@@ -64,13 +64,13 @@ export default function CompanionHome({ recent, stats }: { recent: Scan[]; stats
           <div className="flex items-center gap-6">
             {stats.best !== null && (
               <div className="text-center">
-                <div className="font-display font-black text-3xl text-gold leading-none">{stats.best}</div>
+                <div className="font-display font-black text-3xl text-gold leading-none tabular-nums">{stats.best}</div>
                 <div className="font-body text-[11px] uppercase tracking-[0.12em] text-parchment-500 mt-1">Best</div>
               </div>
             )}
             {stats.streakDays > 0 && (
               <div className="text-center">
-                <div className="font-display font-black text-3xl text-parchment-900 leading-none">{stats.streakDays}</div>
+                <div className="font-display font-black text-3xl text-parchment-900 leading-none tabular-nums">{stats.streakDays}</div>
                 <div className="font-body text-[11px] uppercase tracking-[0.12em] text-parchment-500 mt-1">Day streak</div>
               </div>
             )}
@@ -83,7 +83,7 @@ export default function CompanionHome({ recent, stats }: { recent: Scan[]; stats
             {recent.slice(0, 6).map((s) => (
               <span key={s.createdAt} className="font-body text-[13px] text-parchment-600 inline-flex items-center gap-2">
                 {new Date(s.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
-                <span className="font-semibold" style={{ color: BAND_COLOR[s.band] ?? "#8A8478" }}>
+                <span className="font-semibold tabular-nums" style={{ color: BAND_COLOR[s.band] ?? "#8A8478" }}>
                   {s.score}
                 </span>
               </span>

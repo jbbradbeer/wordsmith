@@ -146,6 +146,8 @@ export default function Collections() {
   };
 
   const handleDelete = async (id: string) => {
+    const name = collections.find((c) => c.id === id)?.name ?? "this collection";
+    if (!window.confirm(`Delete the collection "${name}"? This cannot be undone.`)) return;
     try {
       const res = await fetch("/api/collections", {
         method: "DELETE",

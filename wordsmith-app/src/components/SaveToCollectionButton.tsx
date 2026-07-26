@@ -28,6 +28,8 @@ function SaveToCollectionButton({
   const [feedback, setFeedback] = useState<string | null>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const wasOpenRef = useRef(false);
 
   // Track if word is saved in any collection
   const isSaved = savedTo.size > 0;
@@ -67,10 +69,22 @@ function SaveToCollectionButton({
       .finally(() => setLoading(false));
   }, [open, word.word]);
 
-  // Focus input when visible
+  // Focus management: move focus into the popover on open, restore it to the
+  // trigger button on close (dialog contract).
   useEffect(() => {
-    if (open && inputRef.current) {
-      setTimeout(() => inputRef.current?.focus(), 100);
+    if (open) {
+      wasOpenRef.current = true;
+      const timer = setTimeout(() => {
+        const firstFocusable = popoverRef.current?.querySelector<HTMLElement>(
+          "input, button:not([disabled])"
+        );
+        (firstFocusable ?? inputRef.current)?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+    if (wasOpenRef.current) {
+      wasOpenRef.current = false;
+      triggerRef.current?.focus();
     }
   }, [open, collections]);
 
@@ -163,6 +177,7 @@ function SaveToCollectionButton({
     >
       {/* Bookmark icon */}
       <button
+        ref={triggerRef}
         onClick={handleClick}
         aria-label={
           !session
@@ -205,6 +220,12 @@ function SaveToCollectionButton({
           role="dialog"
           aria-label="Save to collection"
           onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            if (e.key === "Escape") {
+              e.stopPropagation();
+              setOpen(false);
+            }
+          }}
           style={{
             position: "absolute",
             top: "100%",
@@ -268,6 +289,7 @@ function SaveToCollectionButton({
             style={{
               maxHeight: "180px",
               overflowY: "auto",
+              overscrollBehavior: "contain",
             }}
           >
             {loading ? (
