@@ -1,7 +1,6 @@
 // src/pages/index.tsx — the de-slop analyzer landing (core surface)
 import { useEffect, useMemo, useRef, useState } from "react";
 import Head from "next/head";
-import Link from "next/link";
 import { useSession } from "@supabase/auth-helpers-react";
 import { SITE_URL, jsonLdSerialize } from "@/lib/seo";
 import { useAnalyze } from "@/lib/use-analyze";
@@ -15,18 +14,19 @@ import SpanCard from "@/components/slop/SpanCard";
 import HighlightedText from "@/components/slop/HighlightedText";
 import AuthModal from "@/components/AuthModal";
 import PaywallModal from "@/components/PaywallModal";
-import Footer from "@/components/landing/Footer";
 import SlopExamples from "@/components/home/SlopExamples";
 import HowItWorks from "@/components/home/HowItWorks";
 import WhatItCatches from "@/components/home/WhatItCatches";
 import HomePricing from "@/components/home/HomePricing";
 import ClosingCta from "@/components/home/ClosingCta";
+import type { NextPageWithLayout } from "@/pages/_app";
+import { withShell } from "@/components/nav/ShellLayout";
 
 const TITLE = "Wordsmith: The AI Writing Companion That Keeps You Human";
 const DESCRIPTION =
   "The AI writing companion that keeps you sounding like you, not like AI. It reads your draft, flags the tells, and never writes a word for you.";
 
-export default function Analyzer() {
+function Analyzer() {
   const session = useSession();
   const { pro, stats, recent } = useScans();
   const { result, setResult, error, loading, limit, analyze } = useAnalyze();
@@ -143,46 +143,6 @@ export default function Analyzer() {
 
       <div className="grain fixed inset-0 z-[60] pointer-events-none" aria-hidden="true" />
 
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:top-2 focus:left-2 focus:bg-white focus:text-parchment-900 focus:px-4 focus:py-2 focus:rounded-lg focus:border focus:border-gold"
-      >
-        Skip to content
-      </a>
-
-      <nav
-        aria-label="Site navigation"
-        className="sticky top-0 z-40 h-[64px] px-6 flex justify-between items-center border-b border-gold/[.09] bg-[#f2ede2]/80 backdrop-blur-md"
-      >
-        <Link href="/" className="font-display font-black text-lg text-parchment-900 no-underline">
-          Wordsmith
-        </Link>
-        <div className="flex gap-5 items-center font-body text-sm">
-          <Link href="/search" className="footer-link text-parchment-700 no-underline hidden sm:inline">
-            Word Search
-          </Link>
-          <Link href="/words" className="footer-link text-parchment-700 no-underline hidden sm:inline">
-            Word Library
-          </Link>
-          {session ? (
-            <Link href="/search" className="footer-link text-parchment-800 font-semibold no-underline">
-              Account
-            </Link>
-          ) : (
-            <button
-              onClick={() => {
-                setAuthMode("signin");
-                setShowAuth(true);
-              }}
-              className="footer-link text-parchment-800 font-semibold bg-transparent border-none cursor-pointer font-body text-sm"
-            >
-              Sign in
-            </button>
-          )}
-        </div>
-      </nav>
-
-      <main id="main-content">
       {session && pro && stats && <CompanionHome recent={recent} stats={stats} />}
       {session && !pro && (
         <div className="max-w-[1000px] mx-auto px-6 pt-8">
@@ -308,11 +268,12 @@ export default function Analyzer() {
       <WhatItCatches />
       <HomePricing onStartFree={focusAnalyzer} onGoPro={goPro} />
       <ClosingCta onStartFree={focusAnalyzer} />
-      </main>
 
-      <Footer />
       <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} initialMode={authMode} />
       <PaywallModal isOpen={showPaywall} onClose={() => setShowPaywall(false)} />
     </div>
   );
 }
+
+(Analyzer as NextPageWithLayout).getLayout = withShell("full");
+export default Analyzer;
