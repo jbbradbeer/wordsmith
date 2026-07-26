@@ -18,7 +18,6 @@ import SocialProofBar from "@/components/landing/SocialProofBar";
 import WordMarquee from "@/components/landing/WordMarquee";
 import HowItWorks from "@/components/landing/HowItWorks";
 import FeaturesSection from "@/components/landing/FeaturesSection";
-import TestimonialsSection from "@/components/landing/TestimonialsSection";
 import PricingSection from "@/components/landing/PricingSection";
 import CtaSection from "@/components/landing/CtaSection";
 import Footer from "@/components/landing/Footer";
@@ -536,7 +535,6 @@ export default function Home() {
           <WordMarquee />
           <HowItWorks />
           <FeaturesSection />
-          <TestimonialsSection />
           <PricingSection
             onGetStarted={handleGetStarted}
             onUpgrade={handleUpgrade}
