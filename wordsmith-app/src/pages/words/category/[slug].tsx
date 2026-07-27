@@ -1,10 +1,11 @@
 import type { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import Footer from "@/components/landing/Footer";
 import { WORD_HUBS, getHub, type WordHub } from "@/lib/word-hubs";
 import { byVolume } from "@/lib/synonym-volumes";
 import { SITE_URL, jsonLdSerialize } from "@/lib/seo";
+import type { NextPageWithLayout } from "@/pages/_app";
+import { withShell } from "@/components/nav/ShellLayout";
 
 interface HubPageProps {
   hub: WordHub;
@@ -34,7 +35,7 @@ export const getStaticProps: GetStaticProps<HubPageProps> = async ({ params }) =
   };
 };
 
-export default function HubPage({ hub, words, otherHubs }: HubPageProps) {
+function HubPage({ hub, words, otherHubs }: HubPageProps) {
   const canonical = `${SITE_URL}/words/category/${hub.slug}`;
   const title = `${hub.title}: Synonyms for ${words.length} Common Words | Wordsmith`;
 
@@ -98,7 +99,7 @@ export default function HubPage({ hub, words, otherHubs }: HubPageProps) {
         </ol>
       </nav>
 
-      <main className="max-w-[840px] mx-auto px-6 pt-10 pb-16">
+      <div className="max-w-[840px] mx-auto px-6 pt-10 pb-16">
         <header className="mb-10">
           <span className="font-body text-[11px] font-semibold tracking-[0.22em] uppercase text-gold block mb-3">
             Word Library
@@ -160,9 +161,10 @@ export default function HubPage({ hub, words, otherHubs }: HubPageProps) {
             ))}
           </div>
         </section>
-      </main>
-
-      <Footer />
+      </div>
     </div>
   );
 }
+
+(HubPage as NextPageWithLayout).getLayout = withShell("lean");
+export default HubPage;
