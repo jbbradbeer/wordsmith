@@ -1,7 +1,6 @@
 import type { GetStaticPaths, GetStaticProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
-import Footer from "@/components/landing/Footer";
 import { isSeedWord, relatedWords } from "@/lib/seed-words";
 import { getWordPageData } from "@/lib/word-pages";
 import { SITE_URL, jsonLdSerialize } from "@/lib/seo";
@@ -9,6 +8,8 @@ import { WORD_CATEGORIES } from "@/lib/constants";
 import { isPruned, isBoosted, boostRelated } from "@/lib/seo-controls";
 import { buildWordFaq } from "@/lib/faq";
 import type { WordData } from "@/lib/types";
+import type { NextPageWithLayout } from "@/pages/_app";
+import { withShell } from "@/components/nav/ShellLayout";
 
 interface SynonymPageProps {
   word: string;
@@ -42,7 +43,7 @@ function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export default function SynonymPage({
+function SynonymPage({
   word,
   alternatives,
   related: relatedProp,
@@ -131,7 +132,7 @@ export default function SynonymPage({
         </ol>
       </nav>
 
-      <main className="max-w-[720px] mx-auto px-6 pt-10 pb-16">
+      <div className="max-w-[720px] mx-auto px-6 pt-10 pb-16">
         <header className="mb-8">
           <span className="font-body text-[11px] font-semibold tracking-[0.22em] uppercase text-gold block mb-3">
             Synonyms for
@@ -269,9 +270,10 @@ export default function SynonymPage({
             ))}
           </section>
         )}
-      </main>
-
-      <Footer />
+      </div>
     </div>
   );
 }
+
+(SynonymPage as NextPageWithLayout).getLayout = withShell("lean");
+export default SynonymPage;

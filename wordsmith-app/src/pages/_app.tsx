@@ -1,5 +1,7 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
+import type { NextPage } from "next";
+import type { ReactElement, ReactNode } from "react";
 import { createBrowserSupabaseClient } from "@supabase/auth-helpers-nextjs";
 import { SessionContextProvider } from "@supabase/auth-helpers-react";
 import { useState } from "react";
@@ -28,7 +30,13 @@ const DEFAULT_TITLE = "Wordsmith: The AI Writing Companion";
 const DEFAULT_DESCRIPTION =
   "Wordsmith is the AI writing companion that keeps you sounding like you, not like AI. Paste a draft, get a Slop Score, and rewrite in your own voice. It never writes for you.";
 
-export default function App({ Component, pageProps }: AppProps) {
+export type NextPageWithLayout<P = {}> = NextPage<P> & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
+
+type AppPropsWithLayout = AppProps & { Component: NextPageWithLayout };
+
+export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const [supabaseClient] = useState(() => createBrowserSupabaseClient());
 
   return (
@@ -60,7 +68,7 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
       <div className={`${display.variable} ${body.variable} font-body`}>
         <ErrorBoundary>
-          <Component {...pageProps} />
+          {(Component.getLayout ?? ((page) => page))(<Component {...pageProps} />)}
         </ErrorBoundary>
       </div>
       <Analytics />

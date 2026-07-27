@@ -1,15 +1,16 @@
 import Head from "next/head";
 import Link from "next/link";
-import Footer from "@/components/landing/Footer";
 import { SEED_WORDS } from "@/lib/seed-words";
 import { WORD_HUBS } from "@/lib/word-hubs";
 import { SITE_URL } from "@/lib/seo";
+import type { NextPageWithLayout } from "@/pages/_app";
+import { withShell } from "@/components/nav/ShellLayout";
 
 const TITLE = `Word Library: Better Words for ${SEED_WORDS.length} Common Words | Wordsmith`;
 const DESCRIPTION =
   "Browse curated alternatives for the most overused words in English: elevated, literary, punchy, and rare replacements with definitions and examples.";
 
-export default function WordLibrary() {
+function WordLibrary() {
   const sorted = [...SEED_WORDS].sort();
   const groups = sorted.reduce<Record<string, string[]>>((acc, word) => {
     const letter = word[0].toUpperCase();
@@ -28,14 +29,8 @@ export default function WordLibrary() {
         <meta property="og:url" content={`${SITE_URL}/words`} />
       </Head>
 
-      <main className="max-w-[840px] mx-auto px-6 pt-12 pb-16">
+      <div className="max-w-[840px] mx-auto px-6 pt-12 pb-16">
         <header className="mb-12 text-center">
-          <Link
-            href="/"
-            className="font-body text-[11px] font-semibold tracking-[0.22em] uppercase text-gold no-underline block mb-3"
-          >
-            Wordsmith
-          </Link>
           <h1
             className="font-display font-black text-parchment-900 m-0 mb-4 tracking-[-0.03em]"
             style={{ fontSize: "clamp(36px, 6vw, 56px)" }}
@@ -83,9 +78,10 @@ export default function WordLibrary() {
             </div>
           </section>
         ))}
-      </main>
-
-      <Footer />
+      </div>
     </div>
   );
 }
+
+(WordLibrary as NextPageWithLayout).getLayout = withShell("lean");
+export default WordLibrary;

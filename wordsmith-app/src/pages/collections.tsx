@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback, ReactNode } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession } from "@supabase/auth-helpers-react";
 import Head from "next/head";
 import Link from "next/link";
 import AuthModal from "@/components/AuthModal";
 import PaywallModal from "@/components/PaywallModal";
 import CollectionCard from "@/components/collections/CollectionCard";
-import Footer from "@/components/landing/Footer";
 import { useUserInfo } from "@/lib/use-user-info";
 import type { Collection, CollectionWord } from "@/lib/types";
+import type { NextPageWithLayout } from "@/pages/_app";
+import { withShell } from "@/components/nav/ShellLayout";
 
 /** Shared shell for the signed-out / unpaid guard screens. */
 function GuardScreen({
@@ -39,22 +40,15 @@ function GuardScreen({
         >
           {buttonLabel}
         </button>
-        <div className="mt-5">
-          <Link href="/" className="font-body text-[13px] text-parchment-600">
-            &larr; Back to Wordsmith
-          </Link>
-        </div>
       </div>
       {children}
-      <Footer />
     </div>
   );
 }
 
-export default function Collections() {
+function Collections() {
   const session = useSession();
-  const supabase = useSupabaseClient();
-  const { userInfo, setUserInfo } = useUserInfo();
+  const { userInfo } = useUserInfo();
 
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
@@ -191,26 +185,6 @@ export default function Collections() {
     }
   };
 
-  const handleManageSubscription = async () => {
-    try {
-      const res = await fetch("/api/portal", { method: "POST" });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (err) {
-      console.error("Portal error:", err);
-      setActionError("Couldn't open the billing portal. Please try again.");
-    }
-  };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setUserInfo(null);
-    setCollections([]);
-    setWords({});
-  };
-
   // Auth guard: if not logged in, show auth prompt
   if (!session) {
     return (
@@ -248,28 +222,6 @@ export default function Collections() {
       <Head>
         <meta name="robots" content="noindex" />
       </Head>
-
-      {/* Nav bar */}
-      <nav className="max-w-[800px] mx-auto px-6 py-4 flex items-center gap-3">
-        <Link href="/" className="font-body text-xs text-parchment-600 no-underline">
-          Search
-        </Link>
-        <span className="font-body text-xs font-semibold text-gold">Collections</span>
-        <div className="flex-1" />
-        <button
-          onClick={handleManageSubscription}
-          className="btn-ghost bg-transparent border-none text-parchment-500 text-xs cursor-pointer font-body"
-        >
-          Manage
-        </button>
-        <span className="font-body text-xs text-parchment-600">{session.user.email}</span>
-        <button
-          onClick={handleSignOut}
-          className="bg-transparent border border-parchment-300 rounded-md px-3 py-1.5 text-xs text-parchment-600 cursor-pointer font-body"
-        >
-          Sign out
-        </button>
-      </nav>
 
       {/* Header */}
       <header className="max-w-[720px] mx-auto px-6 pt-6 pb-2 text-center">
@@ -371,8 +323,9 @@ export default function Collections() {
           </button>
         </div>
       )}
-
-      <Footer />
     </div>
   );
 }
+
+(Collections as NextPageWithLayout).getLayout = withShell("full");
+export default Collections;

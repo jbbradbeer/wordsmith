@@ -1,5 +1,6 @@
 import Head from "next/head";
-import Link from "next/link";
+import type { NextPageWithLayout } from "@/pages/_app";
+import { withShell } from "@/components/nav/ShellLayout";
 
 const SECTIONS = [
   {
@@ -67,7 +68,7 @@ const SECTIONS = [
   },
 ];
 
-export default function PrivacyPage() {
+function PrivacyPage() {
   return (
     <>
       <Head>
@@ -79,33 +80,8 @@ export default function PrivacyPage() {
       </Head>
 
       <div style={{ minHeight: "100vh", background: "#FDFBF7" }}>
-        {/* Navigation */}
-        <nav
-          style={{
-            maxWidth: "720px",
-            margin: "0 auto",
-            padding: "16px 24px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Link
-            href="/"
-            style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
-              fontSize: "20px",
-              fontWeight: 800,
-              color: "#1A1A18",
-              textDecoration: "none",
-            }}
-          >
-            Wordsmith
-          </Link>
-        </nav>
-
         {/* Content */}
-        <main
+        <div
           style={{
             maxWidth: "720px",
             margin: "0 auto",
@@ -183,31 +159,11 @@ export default function PrivacyPage() {
               ))}
             </section>
           ))}
-
-          {/* Back link */}
-          <div
-            style={{
-              marginTop: "48px",
-              paddingTop: "24px",
-              borderTop: "1px solid #E8E2D8",
-              textAlign: "center",
-            }}
-          >
-            <Link
-              href="/"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: "14px",
-                color: "#8B6914",
-                textDecoration: "none",
-                fontWeight: 600,
-              }}
-            >
-              &larr; Back to Wordsmith
-            </Link>
-          </div>
-        </main>
+        </div>
       </div>
     </>
   );
 }
+
+(PrivacyPage as NextPageWithLayout).getLayout = withShell("lean");
+export default PrivacyPage;

@@ -1,31 +1,21 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
+import { useSession } from "@supabase/auth-helpers-react";
 import Head from "next/head";
 import Link from "next/link";
 import AuthModal from "@/components/AuthModal";
 import PaywallModal from "@/components/PaywallModal";
 import WordCard from "@/components/WordCard";
-import UsageBar from "@/components/UsageBar";
 import { FREE_SEARCH_LIMIT, WORD_CATEGORIES, ANON_COUNT_KEY } from "@/lib/constants";
 import { useUserInfo } from "@/lib/use-user-info";
 import { useSseSearch } from "@/lib/use-sse-search";
 import { trackEvent } from "@/lib/analytics";
 import type { WordData } from "@/lib/types";
 
-// Landing page components
-import Hero from "@/components/landing/Hero";
 import SocialProofBar from "@/components/landing/SocialProofBar";
-import WordMarquee from "@/components/landing/WordMarquee";
-import HowItWorks from "@/components/landing/HowItWorks";
-import FeaturesSection from "@/components/landing/FeaturesSection";
-import TestimonialsSection from "@/components/landing/TestimonialsSection";
-import PricingSection from "@/components/landing/PricingSection";
-import CtaSection from "@/components/landing/CtaSection";
-import Footer from "@/components/landing/Footer";
-import WordRain from "@/components/WordRain";
-import { useKonami } from "@/lib/use-konami";
 import { SITE_URL, jsonLdSerialize } from "@/lib/seo";
 import { SUBSCRIPTION_PRICE_MONTHLY } from "@/lib/constants";
+import type { NextPageWithLayout } from "@/pages/_app";
+import { withShell } from "@/components/nav/ShellLayout";
 
 const LANDING_JSON_LD = {
   "@context": "https://schema.org",
@@ -65,9 +55,8 @@ const STARTER_WORDS = [
   "fast",
 ];
 
-export default function Home() {
+function Home() {
   const session = useSession();
-  const supabase = useSupabaseClient();
 
   const [query, setQuery] = useState("");
   const [history, setHistory] = useState<string[]>([]);
@@ -83,7 +72,7 @@ export default function Home() {
   // Anonymous search tracking
   const [anonSearchCount, setAnonSearchCount] = useState(0);
 
-  const { results, setResults, loading, error, search } = useSseSearch({
+  const { results, loading, error, search } = useSseSearch({
     onLimitReached: (kind) => {
       trackEvent("limit_hit", { kind });
       if (kind === "paywall") {
@@ -120,10 +109,6 @@ export default function Home() {
       }
     },
   });
-
-  // Easter egg — Konami code or the footer fleuron summons the secret lexicon
-  const [logophileMode, setLogophileMode] = useState(false);
-  useKonami(() => setLogophileMode(true));
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -185,25 +170,6 @@ export default function Home() {
     searchWord(query);
   };
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    setUserInfo(null);
-    setResults(null);
-    setHistory([]);
-  };
-
-  const handleManageSubscription = async () => {
-    try {
-      const res = await fetch("/api/portal", { method: "POST" });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (err) {
-      console.error("Portal error:", err);
-    }
-  };
-
   const handleGetStarted = () => {
     setAuthMode("signup");
     setShowAuth(true);
@@ -216,18 +182,6 @@ export default function Home() {
   }, []);
   const requireUpgrade = useCallback(() => setShowPaywall(true), []);
 
-  const handleUpgrade = () => {
-    if (!session) {
-      setAuthMode("signup");
-      setShowAuth(true);
-    } else {
-      setShowPaywall(true);
-    }
-  };
-
-  // Show landing sections when there are no results displayed
-  const showLandingSections = !results && !loading && !error;
-
   return (
     <div className="min-h-screen">
       <Head>
@@ -239,89 +193,14 @@ export default function Home() {
         />
       </Head>
 
-      {/* Nav bar */}
-      <nav
-        aria-label="Site navigation"
-        className="sticky top-0 z-40 px-6 py-4 flex justify-between items-center gap-3 border-b border-gold/[.09] bg-[#f2ede2]/75 backdrop-blur-md"
-      >
-        <div className="flex items-center gap-5">
-          <Link href="/" className="font-display font-black text-lg text-parchment-900 no-underline">
-            Wordsmith
-          </Link>
-          <Link
-            href="/"
-            className="footer-link font-body text-sm text-parchment-700 no-underline hidden sm:inline"
-          >
-            Slop Score
-          </Link>
-        </div>
-        <div className="flex items-center gap-3">
-        {session ? (
-          <>
-            <UsageBar
-              searchCount={userInfo?.searchCount || 0}
-              isPaid={userInfo?.isPaid || false}
-              onUpgrade={() => setShowPaywall(true)}
-            />
-            {userInfo?.isPaid && (
-              <Link
-                href="/collections"
-                className="font-body text-xs font-semibold text-gold no-underline cursor-pointer"
-              >
-                Collections
-              </Link>
-            )}
-            {userInfo?.isPaid && (
-              <button
-                onClick={handleManageSubscription}
-                className="btn-ghost bg-transparent border-none text-parchment-500 text-xs cursor-pointer font-body transition-colors duration-200"
-              >
-                Manage
-              </button>
-            )}
-            <span className="font-body text-xs text-parchment-600 truncate max-w-[140px] hidden sm:inline">
-              {session.user.email}
-            </span>
-            <button
-              onClick={handleSignOut}
-              className="bg-transparent border border-parchment-300 rounded px-3 py-1.5 text-xs text-parchment-600 cursor-pointer font-body transition-all duration-200"
-            >
-              Sign out
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              onClick={() => {
-                setAuthMode("signin");
-                setShowAuth(true);
-              }}
-              className="btn-ghost bg-transparent border-none text-parchment-600 text-[13px] cursor-pointer font-body font-medium transition-colors duration-200"
-            >
-              Sign in
-            </button>
-            <button
-              onClick={() => {
-                setAuthMode("signup");
-                setShowAuth(true);
-              }}
-              className="btn-primary bg-gold text-white border-none rounded-lg px-4 py-2 text-[13px] font-semibold cursor-pointer font-body transition-colors duration-200"
-            >
-              Get started free
-            </button>
-          </>
-        )}
-        </div>
-      </nav>
-
-      {/* Kinetic hero */}
-      <Hero />
-
-      {/* Social Proof Bar */}
-      <SocialProofBar />
-
       {/* Search */}
-      <div className="max-w-[720px] mx-auto px-6">
+      <div className="max-w-[720px] mx-auto px-6 pt-10">
+        <p className="text-center font-body text-sm text-parchment-600 mb-5">
+          Find sharper alternatives for any word.{" "}
+          <Link href="/words" className="text-gold font-semibold no-underline">
+            Browse the full Word Library.
+          </Link>
+        </p>
         <div
           className="search-box flex gap-2.5 bg-white rounded-2xl pl-[22px] pr-2 py-2 items-center"
           style={{ boxShadow: "0 4px 28px rgba(26,26,24,0.09), 0 1px 4px rgba(26,26,24,0.06)" }}
@@ -349,6 +228,10 @@ export default function Home() {
           >
             {loading ? "Searching…" : "Find Words"}
           </button>
+        </div>
+
+        <div className="mt-3">
+          <SocialProofBar />
         </div>
 
         {/* Anonymous usage indicator */}
@@ -530,27 +413,6 @@ export default function Home() {
         )}
       </div>
 
-      {/* Landing Page Sections — shown when no results are displayed */}
-      {showLandingSections && (
-        <>
-          <WordMarquee />
-          <HowItWorks />
-          <FeaturesSection />
-          <TestimonialsSection />
-          <PricingSection
-            onGetStarted={handleGetStarted}
-            onUpgrade={handleUpgrade}
-          />
-          <CtaSection onGetStarted={handleGetStarted} />
-        </>
-      )}
-
-      {/* Footer — always visible */}
-      <Footer onSecret={() => setLogophileMode(true)} />
-
-      {/* Logophile mode — the secret lexicon */}
-      {logophileMode && <WordRain onDone={() => setLogophileMode(false)} />}
-
       {/* Modals */}
       <AuthModal
         isOpen={showAuth}
@@ -564,3 +426,6 @@ export default function Home() {
     </div>
   );
 }
+
+(Home as NextPageWithLayout).getLayout = withShell("full");
+export default Home;
