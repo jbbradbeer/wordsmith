@@ -29,7 +29,7 @@ export default function HowItWorks() {
           >
             It coaches. It never ghostwrites.
           </h2>
-          <p className="font-body text-[15px] text-parchment-600 text-center max-w-[520px] mx-auto m-0 mb-14 -mt-8">
+          <p className="font-body text-[15px] text-parchment-600 text-center max-w-[520px] mx-auto mt-4 mb-14">
             An AI whose entire job is making sure you do not sound like AI. It
             points; you write.
           </p>
