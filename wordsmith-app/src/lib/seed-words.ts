@@ -85,6 +85,11 @@ export const SEED_WORDS = [
   "fear", "inspire", "struggle", "allow", "approach", "celebrate", "continue", "evolve",
   "complex", "confusing", "eager", "helpful", "agree", "build", "complete", "consider",
   "decide",
+  // Weekly SEO loop 2026-07-27 (25 words from backlog)
+  "describe", "discuss", "navigate", "persist", "protect", "respect", "critical", "thrive",
+  "intense", "address", "balance", "design", "differ", "embrace", "enforce", "evaluate",
+  "include", "preserve", "scare", "shift", "emotional", "fake", "stop", "immense",
+  "adapt",
 ] as const;
 
 const SEED_SET = new Set<string>(SEED_WORDS);

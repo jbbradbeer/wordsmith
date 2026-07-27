@@ -106,6 +106,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   struggle: 40500, allow: 33100, approach: 33100, celebrate: 33100, continue: 33100,
   evolve: 33100, complex: 33100, confusing: 33100, eager: 33100, helpful: 33100,
   agree: 27100, build: 27100, complete: 27100, consider: 27100, decide: 27100,
+  describe: 27100, discuss: 27100, navigate: 27100, persist: 27100, protect: 27100,
+  respect: 27100, critical: 27100, thrive: 27100, intense: 27100, address: 22200,
+  balance: 22200, design: 22200, differ: 22200, embrace: 22200, enforce: 22200,
+  evaluate: 22200, include: 22200, preserve: 22200, scare: 22200, shift: 22200,
+  emotional: 22200, fake: 22200, stop: 22200, immense: 22200, adapt: 18100,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
