@@ -36,7 +36,7 @@ export default function Footer({ onSecret }: FooterProps) {
             href="/"
             className="footer-link font-body text-[13px] text-parchment-600 no-underline transition-colors duration-200"
           >
-            Slop Score
+            Analyze
           </Link>
           <Link
             href="/search"
@@ -49,6 +49,12 @@ export default function Footer({ onSecret }: FooterProps) {
             className="footer-link font-body text-[13px] text-parchment-600 no-underline transition-colors duration-200"
           >
             Word Library
+          </Link>
+          <Link
+            href="/collections"
+            className="footer-link font-body text-[13px] text-parchment-600 no-underline transition-colors duration-200"
+          >
+            Collections
           </Link>
           <Link
             href="/privacy"
