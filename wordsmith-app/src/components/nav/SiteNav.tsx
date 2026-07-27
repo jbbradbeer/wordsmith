@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { useSupabaseClient } from "@supabase/auth-helpers-react";
+import {
+  useSupabaseClient,
+  useSessionContext,
+} from "@supabase/auth-helpers-react";
 import { useUserInfo } from "@/lib/use-user-info";
 import { PRIMARY_NAV, activeNavHref } from "@/lib/nav-config";
 import UsageBar from "@/components/UsageBar";
@@ -13,11 +16,14 @@ type Variant = "full" | "lean";
 export default function SiteNav({ variant }: { variant: Variant }) {
   const router = useRouter();
   const supabase = useSupabaseClient();
+  const { isLoading } = useSessionContext();
   const { userInfo, setUserInfo, session } = useUserInfo();
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signup");
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [managing, setManaging] = useState(false);
+  const [manageError, setManageError] = useState(false);
 
   const active = activeNavHref(router.pathname);
   const isPaid = !!userInfo?.isPaid;
@@ -29,13 +35,23 @@ export default function SiteNav({ variant }: { variant: Variant }) {
   };
 
   const handleManage = async () => {
+    if (managing) return;
+    setManaging(true);
+    setManageError(false);
     try {
       const res = await fetch("/api/portal", { method: "POST" });
       const data = await res.json();
-      if (data.url) window.location.href = data.url;
-      else console.error("portal: no url in response");
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        console.error("portal: no url in response");
+        setManageError(true);
+        setManaging(false);
+      }
     } catch (e) {
       console.error("portal error", e);
+      setManageError(true);
+      setManaging(false);
     }
   };
 
@@ -102,7 +118,7 @@ export default function SiteNav({ variant }: { variant: Variant }) {
 
         {/* Desktop account/CTA slot */}
         <div className="hidden sm:flex items-center gap-3">
-          {session === undefined ? (
+          {isLoading ? (
             <div className="h-6 w-24" aria-hidden="true" />
           ) : session ? (
             <>
@@ -127,10 +143,16 @@ export default function SiteNav({ variant }: { variant: Variant }) {
                   {isPaid && (
                     <button
                       onClick={handleManage}
-                      className="btn-ghost bg-transparent border-none text-parchment-500 text-xs cursor-pointer font-body"
+                      disabled={managing}
+                      className="btn-ghost bg-transparent border-none text-parchment-500 text-xs cursor-pointer font-body disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Manage billing
                     </button>
+                  )}
+                  {manageError && (
+                    <span role="alert" className="font-body text-xs text-red-600">
+                      Could not open billing. Please try again.
+                    </span>
                   )}
                   <span className="font-body text-xs text-parchment-600 truncate max-w-[140px] hidden md:inline">
                     {session.user.email}
@@ -201,27 +223,48 @@ export default function SiteNav({ variant }: { variant: Variant }) {
               {item.label}
             </Link>
           ))}
-          {session === undefined ? null : session ? (
+          {isLoading ? null : session ? (
             <>
-              {variant === "full" && isPaid && (
-                <Link href="/collections" className={linkBase}>
-                  Collections
+              {variant === "lean" && (
+                <Link href="/" className={linkBase}>
+                  Go to app
                 </Link>
               )}
-              {variant === "full" && isPaid && (
-                <button
-                  onClick={handleManage}
-                  className={`${linkBase} text-left bg-transparent border-none cursor-pointer`}
-                >
-                  Manage billing
-                </button>
+              {variant === "full" && (
+                <>
+                  {isPaid && (
+                    <Link
+                      href="/collections"
+                      aria-current={
+                        router.pathname === "/collections" ? "page" : undefined
+                      }
+                      className={linkBase}
+                    >
+                      Collections
+                    </Link>
+                  )}
+                  {isPaid && (
+                    <button
+                      onClick={handleManage}
+                      disabled={managing}
+                      className={`${linkBase} text-left bg-transparent border-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                      Manage billing
+                    </button>
+                  )}
+                  {manageError && (
+                    <span role="alert" className="font-body text-xs text-red-600">
+                      Could not open billing. Please try again.
+                    </span>
+                  )}
+                  <button
+                    onClick={handleSignOut}
+                    className={`${linkBase} text-left bg-transparent border-none cursor-pointer`}
+                  >
+                    Sign out
+                  </button>
+                </>
               )}
-              <button
-                onClick={handleSignOut}
-                className={`${linkBase} text-left bg-transparent border-none cursor-pointer`}
-              >
-                Sign out
-              </button>
             </>
           ) : (
             <>
