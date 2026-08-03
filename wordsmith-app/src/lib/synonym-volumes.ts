@@ -111,6 +111,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   balance: 22200, design: 22200, differ: 22200, embrace: 22200, enforce: 22200,
   evaluate: 22200, include: 22200, preserve: 22200, scare: 22200, shift: 22200,
   emotional: 22200, fake: 22200, stop: 22200, immense: 22200, adapt: 18100,
+  assess: 18100, assist: 18100, assume: 18100, attempt: 18100, avoid: 18100,
+  capture: 18100, confirm: 18100, confront: 18100, connect: 18100, correct: 18100,
+  criticize: 18100, demand: 18100, display: 18100, empower: 18100, form: 18100,
+  ignore: 18100, master: 18100, move: 18100, praise: 18100, prevent: 18100,
+  equal: 18100, trust: 18100, try: 18100, innocent: 18100, aware: 14800,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
