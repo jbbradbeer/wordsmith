@@ -116,6 +116,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   criticize: 18100, demand: 18100, display: 18100, empower: 18100, form: 18100,
   ignore: 18100, master: 18100, move: 18100, praise: 18100, prevent: 18100,
   equal: 18100, trust: 18100, try: 18100, innocent: 18100, aware: 14800,
+  bless: 14800, collect: 14800, discover: 14800, dream: 14800, escape: 14800,
+  fail: 14800, follow: 14800, fulfill: 14800, function: 14800, invest: 14800,
+  mix: 14800, open: 14800, operate: 14800, overcome: 14800, play: 14800,
+  point: 14800, regret: 14800, resist: 14800, bold: 14800, defiant: 14800,
+  dramatic: 14800, expert: 14800, friendly: 14800, spread: 14800, suffer: 14800,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
