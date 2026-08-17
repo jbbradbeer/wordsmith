@@ -121,6 +121,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   mix: 14800, open: 14800, operate: 14800, overcome: 14800, play: 14800,
   point: 14800, regret: 14800, resist: 14800, bold: 14800, defiant: 14800,
   dramatic: 14800, expert: 14800, friendly: 14800, spread: 14800, suffer: 14800,
+  test: 14800, view: 14800, handsome: 14800, ideal: 14800, argue: 12100,
+  break: 12100, close: 12100, damage: 12100, deal: 12100, disappear: 12100,
+  face: 12100, fix: 12100, interact: 12100, interpret: 12100, limit: 12100,
+  list: 12100, measure: 12100, persuade: 12100, practice: 12100, prohibit: 12100,
+  react: 12100, release: 12100, rely: 12100, remind: 12100, restore: 12100,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
