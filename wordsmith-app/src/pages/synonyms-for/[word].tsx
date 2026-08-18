@@ -18,8 +18,8 @@ interface SynonymPageProps {
 }
 
 export const getStaticPaths: GetStaticPaths = async () => ({
-  // Generate on first request, then persist via word_pages (shared with
-  // /words/[word]) — one Claude call per word, ever, across both routes.
+  // Generate on first request, then persist via word_pages —
+  // one Claude call per word, ever.
   paths: [],
   fallback: "blocking",
 });
@@ -144,9 +144,9 @@ function SynonymPage({
             &ldquo;{word}&rdquo;
           </h1>
           <p className="font-body text-[15px] leading-relaxed text-parchment-600 m-0 max-w-[560px]">
-            {alternatives.length} synonyms for &ldquo;{word},&rdquo; each with its precise
-            meaning and an example so you pick the one that actually fits, not just the
-            nearest match.
+            {alternatives.length} synonyms and better words for &ldquo;{word},&rdquo; each
+            with its precise meaning and an example so you pick the one that actually
+            fits, not just the nearest match.
           </p>
         </header>
 
@@ -212,14 +212,6 @@ function SynonymPage({
             );
           })}
         </section>
-
-        {/* Cross-link to the sibling "better words" page */}
-        <p className="font-body text-sm text-parchment-600 mt-6 mb-0">
-          Looking to upgrade your writing, not just swap a word?{" "}
-          <Link href={`/words/${word}`} className="footer-link text-gold font-semibold">
-            See better words for &ldquo;{word}&rdquo; →
-          </Link>
-        </p>
 
         {/* CTA */}
         <section className="bg-gradient-to-b from-gold/[0.05] to-gold/[0.1] border border-gold/20 rounded-2xl p-8 text-center mt-8 mb-12">

@@ -69,7 +69,7 @@ function WordLibrary() {
               {words.map((w) => (
                 <Link
                   key={w}
-                  href={`/words/${w}`}
+                  href={`/synonyms-for/${w}`}
                   className="history-chip bg-white border border-parchment-300 rounded-full px-4 py-1.5 font-body text-[13px] text-parchment-700 no-underline transition-colors duration-150"
                 >
                   {w}

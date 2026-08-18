@@ -35,6 +35,14 @@ const nextConfig = {
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
+  async redirects() {
+    // /words/[word] consolidated into /synonyms-for/[word] (Aug 2026 SEO
+    // audit: the duplicate route sets split ranking signals). Single-segment
+    // source, so /words and /words/category/:slug are unaffected.
+    return [
+      { source: "/words/:word", destination: "/synonyms-for/:word", permanent: true },
+    ];
+  },
 };
 
 module.exports = nextConfig;

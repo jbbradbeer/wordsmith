@@ -4,6 +4,7 @@ import { WORD_HUBS } from "@/lib/word-hubs";
 import { SYNONYM_VOLUMES } from "@/lib/synonym-volumes";
 import { SITE_URL } from "@/lib/seo";
 import { isPruned } from "@/lib/seo-controls";
+import { GUIDES, isGuidePublished } from "@/lib/guides";
 
 // Coarse priority from search volume so crawlers hit the biggest pages first.
 function priorityFor(word: string): string {
@@ -21,13 +22,19 @@ export function buildSitemapEntries(): { path: string; priority: string }[] {
     ...WORD_HUBS.map((h) => ({ path: `/words/category/${h.slug}`, priority: "0.8" })),
     { path: "/privacy", priority: "0.3" },
   ];
-  // Both page types share the word_pages data but target different queries
-  // Exclude pruned words from both /words/* and /synonyms-for/* routes
-  const wordEntries = SEED_WORDS.filter((w) => !isPruned(w)).flatMap((w) => [
-    { path: `/synonyms-for/${w}`, priority: priorityFor(w) },
-    { path: `/words/${w}`, priority: priorityFor(w) },
-  ]);
-  return [...staticEntries, ...wordEntries];
+  // One canonical page per word. /words/[word] 301s to /synonyms-for/[word]
+  // (Aug 2026 consolidation), so only the surviving route is listed.
+  const wordEntries = SEED_WORDS.filter((w) => !isPruned(w)).map((w) => ({
+    path: `/synonyms-for/${w}`,
+    priority: priorityFor(w),
+  }));
+  // Guides enter the sitemap only once their copy is written (they carry
+  // noindex until then — see /guides/[slug]).
+  const guideEntries = GUIDES.filter(isGuidePublished).map((g) => ({
+    path: `/guides/${g.slug}`,
+    priority: "0.8",
+  }));
+  return [...staticEntries, ...wordEntries, ...guideEntries];
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {

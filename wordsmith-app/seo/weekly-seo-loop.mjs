@@ -2,8 +2,8 @@
 /**
  * Weekly SEO loop — consume the top N words from seo/keyword-backlog.json into
  * SEED_WORDS (src/lib/seed-words.ts) and SYNONYM_VOLUMES
- * (src/lib/synonym-volumes.ts). Each consumed word publishes two pages on the
- * next deploy (/synonyms-for/[word] and /words/[word]).
+ * (src/lib/synonym-volumes.ts). Each consumed word publishes one page on the
+ * next deploy (/synonyms-for/[word]).
  *
  * Deterministic by design: the weekly cloud agent runs this, verifies
  * (tests + build), and pushes. Judgment stays with the agent; the file

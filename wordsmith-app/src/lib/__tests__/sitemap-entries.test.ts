@@ -28,9 +28,9 @@ vi.mock("@/lib/seo", () => ({
 import { buildSitemapEntries } from "../../pages/sitemap.xml";
 
 describe("buildSitemapEntries", () => {
-  it("includes both routes for a normal word", () => {
+  it("includes only the canonical /synonyms-for route for a normal word", () => {
     const paths = buildSitemapEntries().map((e) => e.path);
-    expect(paths).toContain("/words/happy");
+    expect(paths).not.toContain("/words/happy");
     expect(paths).toContain("/synonyms-for/happy");
   });
   it("excludes both routes for a pruned word", () => {
