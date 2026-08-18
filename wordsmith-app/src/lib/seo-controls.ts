@@ -9,6 +9,21 @@ export const PRUNED_WORDS: ReadonlySet<string> = new Set<string>([
 
 export const BOOSTED_WORDS: ReadonlySet<string> = new Set<string>([
   // Added by the monthly review for position 5-20 striking-distance pages.
+  // 2026-08: pages at avg position 5-20 with >=20 impressions over 28 days (GSC).
+  "answer", "bitter", "bless", "bold", "build", "cheerful", "collect",
+  "defiant", "delightful", "differ", "dry", "enable", "enforce", "envious",
+  "evaluate", "exactly", "expensive", "expert", "fact", "find", "fine",
+  "follow", "fulfill", "full", "function", "generally", "generate", "gentle",
+  "hear", "hit", "identify", "introduce", "invest", "involve", "jump", "keep",
+  "know", "leverage", "long", "lost", "make", "meet", "messy", "mix", "much",
+  "mysterious", "need", "never", "next", "offer", "operate", "organize",
+  "overcome", "part", "pessimistic", "play", "point", "previous", "prove",
+  "rare", "read", "real", "recognize", "reduce", "refer", "referred",
+  "regret", "reliable", "replace", "require", "resist", "respond", "select",
+  "sharp", "short", "sick", "sing", "soft", "sometimes", "speak",
+  "spectacular", "stand", "start", "stick", "story", "strengthen", "suffer",
+  "sweet", "tear", "thick", "thin", "thing", "tiny", "track", "usually",
+  "want", "win", "wish", "worried", "worse", "worst", "write",
 ]);
 
 export function isPruned(word: string): boolean {
