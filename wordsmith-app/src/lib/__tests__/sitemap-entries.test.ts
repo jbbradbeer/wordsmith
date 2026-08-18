@@ -25,6 +25,14 @@ vi.mock("@/lib/seo", () => ({
   SITE_URL: "https://wordsmith.example.com",
 }));
 
+vi.mock("@/lib/guides", () => ({
+  GUIDES: [
+    { slug: "published-guide", done: true },
+    { slug: "draft-guide", done: false },
+  ],
+  isGuidePublished: (g: { done: boolean }) => g.done,
+}));
+
 import { buildSitemapEntries } from "../../pages/sitemap.xml";
 
 describe("buildSitemapEntries", () => {
@@ -37,5 +45,10 @@ describe("buildSitemapEntries", () => {
     const paths = buildSitemapEntries().map((e) => e.path);
     expect(paths).not.toContain("/words/prunedword");
     expect(paths).not.toContain("/synonyms-for/prunedword");
+  });
+  it("lists only published guides", () => {
+    const paths = buildSitemapEntries().map((e) => e.path);
+    expect(paths).toContain("/guides/published-guide");
+    expect(paths).not.toContain("/guides/draft-guide");
   });
 });
