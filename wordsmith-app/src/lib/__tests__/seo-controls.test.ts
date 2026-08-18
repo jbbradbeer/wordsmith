@@ -2,21 +2,21 @@ import { describe, it, expect } from "vitest";
 import { isPruned, isBoosted, boostRelated, PRUNED_WORDS, BOOSTED_WORDS } from "../seo-controls";
 
 describe("seo-controls sets", () => {
-  it("start empty (edited only by the monthly review PR)", () => {
+  it("hold the 2026-08 review data (edited only by the monthly review PR)", () => {
     expect(PRUNED_WORDS.size).toBe(0);
-    expect(BOOSTED_WORDS.size).toBe(0);
+    expect(BOOSTED_WORDS.size).toBe(102);
   });
   it("isPruned/isBoosted reflect membership", () => {
-    // membership is data-driven; with empty sets everything is false
     expect(isPruned("happy")).toBe(false);
     expect(isBoosted("happy")).toBe(false);
+    expect(isBoosted("evaluate")).toBe(true);
   });
 });
 
 describe("boostRelated", () => {
   const related = ["a", "b", "c", "d", "e", "f", "g", "h"];
   it("returns the list unchanged when no boosted words exist", () => {
-    expect(boostRelated(related, "x", 2)).toEqual(related);
+    expect(boostRelated(related, "x", 2, new Set())).toEqual(related);
   });
   it("injects boosted words (not already present, not the current word) by replacing the tail, keeping length", () => {
     const out = boostRelated(related, "x", 2, new Set(["zzz", "yyy"]));
