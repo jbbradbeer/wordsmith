@@ -26,8 +26,29 @@ function parseNdjson(text: string): WordData[] {
  * on a miss, generates once with Claude and persists, so each seed word
  * costs a single API call ever. Returns null if generation fails.
  */
+/**
+ * Read-only batch lookup of cached word pages. Never generates content —
+ * words without a cached row are simply absent from the result. Safe to call
+ * at build time (category hubs) without spending Claude calls.
+ */
+export async function getCachedWordPages(
+  words: string[]
+): Promise<Record<string, WordData[]>> {
+  const supabase = getServiceSupabase();
+  const { data } = await supabase
+    .from("word_pages")
+    .select("word, alternatives")
+    .in("word", words);
+
+  const pages: Record<string, WordData[]> = {};
+  for (const row of data ?? []) {
+    if (row.alternatives) pages[row.word] = row.alternatives as WordData[];
+  }
+  return pages;
+}
+
 export async function getWordPageData(word: string): Promise<WordData[] | null> {
-  const log = createRequestLogger("words/[word]");
+  const log = createRequestLogger("word-pages");
   const supabase = getServiceSupabase();
 
   const { data } = await supabase

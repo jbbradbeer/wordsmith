@@ -3,16 +3,28 @@ import Head from "next/head";
 import Link from "next/link";
 import { WORD_HUBS, getHub, type WordHub } from "@/lib/word-hubs";
 import { byVolume } from "@/lib/synonym-volumes";
+import { getCachedWordPages } from "@/lib/word-pages";
 import { SITE_URL, jsonLdSerialize } from "@/lib/seo";
 import type { NextPageWithLayout } from "@/pages/_app";
 import { withShell } from "@/components/nav/ShellLayout";
+
+/** One highest-demand word rendered as a mini-entry with its top synonyms. */
+interface FeaturedWord {
+  word: string;
+  synonyms: { word: string; definition: string }[];
+}
 
 interface HubPageProps {
   hub: WordHub;
   /** Hub words ordered by search demand (most-wanted first). */
   words: string[];
+  featured: FeaturedWord[];
   otherHubs: { slug: string; title: string }[];
 }
+
+/** How many top-demand words get a full mini-entry on the hub page. */
+const FEATURED_COUNT = 12;
+const SYNONYMS_PER_ENTRY = 3;
 
 export const getStaticPaths: GetStaticPaths = async () => ({
   paths: WORD_HUBS.map((h) => ({ params: { slug: h.slug } })),
@@ -23,21 +35,52 @@ export const getStaticProps: GetStaticProps<HubPageProps> = async ({ params }) =
   const hub = getHub(String(params?.slug || ""));
   if (!hub) return { notFound: true };
 
+  const words = byVolume(hub.words);
+
+  // Cached rows only — never generates content at build time. Words that
+  // haven't been visited yet (no word_pages row) just aren't featured. If
+  // Supabase isn't reachable (e.g. local build without env), the hub still
+  // builds — just without featured entries until the next revalidation.
+  let cached: Awaited<ReturnType<typeof getCachedWordPages>> = {};
+  try {
+    cached = await getCachedWordPages(words.slice(0, FEATURED_COUNT * 2));
+  } catch {
+    cached = {};
+  }
+  const featured: FeaturedWord[] = [];
+  for (const w of words) {
+    if (featured.length >= FEATURED_COUNT) break;
+    const alternatives = cached[w];
+    if (!alternatives) continue;
+    featured.push({
+      word: w,
+      synonyms: alternatives
+        .slice(0, SYNONYMS_PER_ENTRY)
+        .map(({ word, definition }) => ({ word, definition })),
+    });
+  }
+
   return {
     props: {
       hub,
-      words: byVolume(hub.words),
+      words,
+      featured,
       otherHubs: WORD_HUBS.filter((h) => h.slug !== hub.slug).map(({ slug, title }) => ({
         slug,
         title,
       })),
     },
+    // Hubs are static, but featured entries depend on the word_pages cache
+    // filling up as pages are first visited — refresh daily.
+    revalidate: 86400,
   };
 };
 
-function HubPage({ hub, words, otherHubs }: HubPageProps) {
+function HubPage({ hub, words, featured, otherHubs }: HubPageProps) {
   const canonical = `${SITE_URL}/words/category/${hub.slug}`;
-  const title = `${hub.title}: Synonyms for ${words.length} Common Words | Wordsmith`;
+  const title = `${hub.title}: Synonyms for ${words.length} Words | Wordsmith`;
+  const featuredSet = new Set(featured.map((f) => f.word));
+  const chipWords = words.filter((w) => !featuredSet.has(w));
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -115,9 +158,53 @@ function HubPage({ hub, words, otherHubs }: HubPageProps) {
           </p>
         </header>
 
+        {featured.length > 0 && (
+          <section aria-label={`Top words for ${hub.noun}`} className="mb-12">
+            <h2 className="font-body text-[11px] font-semibold tracking-[0.22em] uppercase text-gold m-0 mb-4">
+              Most searched
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {featured.map((f) => (
+                <article
+                  key={f.word}
+                  className="bg-white border border-parchment-300 rounded-2xl p-6"
+                >
+                  <h3 className="font-display font-bold text-[22px] text-parchment-900 m-0 mb-3">
+                    <Link
+                      href={`/synonyms-for/${f.word}`}
+                      className="footer-link text-parchment-900 no-underline"
+                    >
+                      {f.word}
+                    </Link>
+                  </h3>
+                  <ul className="list-none p-0 m-0 flex flex-col gap-2">
+                    {f.synonyms.map((s) => (
+                      <li key={s.word} className="font-body text-[14px] leading-snug">
+                        <span className="font-semibold text-gold">{s.word}</span>{" "}
+                        <span className="text-parchment-600">— {s.definition}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={`/synonyms-for/${f.word}`}
+                    className="footer-link inline-block mt-3 font-body text-[13px] font-semibold text-gold no-underline"
+                  >
+                    All synonyms for &ldquo;{f.word}&rdquo; →
+                  </Link>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+
         <section aria-label={`Words for ${hub.noun}`} className="mb-12">
+          {featured.length > 0 && (
+            <h2 className="font-body text-[11px] font-semibold tracking-[0.22em] uppercase text-gold m-0 mb-4">
+              More {hub.noun}
+            </h2>
+          )}
           <div className="flex flex-wrap gap-2">
-            {words.map((w) => (
+            {chipWords.map((w) => (
               <Link
                 key={w}
                 href={`/synonyms-for/${w}`}
