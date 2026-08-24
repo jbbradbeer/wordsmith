@@ -126,6 +126,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   face: 12100, fix: 12100, interact: 12100, interpret: 12100, limit: 12100,
   list: 12100, measure: 12100, persuade: 12100, practice: 12100, prohibit: 12100,
   react: 12100, release: 12100, rely: 12100, remind: 12100, restore: 12100,
+  hidden: 12100, elevate: 9900, eliminate: 9900, finish: 9900, gain: 9900,
+  justify: 9900, neglect: 9900, possess: 9900, reject: 9900, command: 8100,
+  contain: 8100, entertain: 8100, modify: 8100, object: 8100, retain: 8100,
+  delicate: 8100, tolerate: 8100, verify: 8100, approve: 6600, remain: 6600,
+  grand: 6600, helpless: 6600, keen: 6600, happen: 5400, hesitate: 5400,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
