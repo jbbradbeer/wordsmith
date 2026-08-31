@@ -131,6 +131,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   contain: 8100, entertain: 8100, modify: 8100, object: 8100, retain: 8100,
   delicate: 8100, tolerate: 8100, verify: 8100, approve: 6600, remain: 6600,
   grand: 6600, helpless: 6600, keen: 6600, happen: 5400, hesitate: 5400,
+  imitate: 5400, punish: 5400, foolish: 5400, lavish: 5400, anticipate: 4400,
+  donate: 4400, frighten: 4400, incorporate: 4400, locate: 4400, barren: 4400,
+  considerate: 4400, clarify: 3600, complain: 3600, direct: 3600, negotiate: 3600,
+  vanish: 3600, accomplish: 2900, classify: 2900, deserve: 2900, impress: 2900,
+  reserve: 2900, seize: 2900, ornate: 2900, apologize: 2400, expect: 2400,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
