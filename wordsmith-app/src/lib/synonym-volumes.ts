@@ -136,6 +136,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   considerate: 4400, clarify: 3600, complain: 3600, direct: 3600, negotiate: 3600,
   vanish: 3600, accomplish: 2900, classify: 2900, deserve: 2900, impress: 2900,
   reserve: 2900, seize: 2900, ornate: 2900, apologize: 2400, expect: 2400,
+  guess: 2400, land: 2400, narrate: 2400, careless: 2400, suspect: 2400,
+  scream: 12100, search: 12100, shape: 12100, treat: 12100, watch: 12100,
+  wonder: 12100, insecure: 12100, admire: 9900, attend: 9900, blame: 9900,
+  broad: 9900, claim: 9900, decrease: 9900, devote: 9900, disagree: 9900,
+  dislike: 9900, doubt: 9900, expose: 9900, flow: 9900, force: 9900,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */

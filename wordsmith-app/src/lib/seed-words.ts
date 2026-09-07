@@ -115,6 +115,11 @@ export const SEED_WORDS = [
   "locate", "barren", "considerate", "clarify", "complain", "direct", "negotiate", "vanish",
   "accomplish", "classify", "deserve", "impress", "reserve", "seize", "ornate", "apologize",
   "expect",
+  // Weekly SEO loop 2026-09-07 (25 words from backlog)
+  "guess", "land", "narrate", "careless", "suspect", "scream", "search", "shape",
+  "treat", "watch", "wonder", "insecure", "admire", "attend", "blame", "broad",
+  "claim", "decrease", "devote", "disagree", "dislike", "doubt", "expose", "flow",
+  "force",
 ] as const;
 
 const SEED_SET = new Set<string>(SEED_WORDS);
