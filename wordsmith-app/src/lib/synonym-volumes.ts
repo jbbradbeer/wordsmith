@@ -141,6 +141,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   wonder: 12100, insecure: 12100, admire: 9900, attend: 9900, blame: 9900,
   broad: 9900, claim: 9900, decrease: 9900, devote: 9900, disagree: 9900,
   dislike: 9900, doubt: 9900, expose: 9900, flow: 9900, force: 9900,
+  insult: 9900, lack: 9900, nurture: 9900, oppose: 9900, scold: 9900,
+  travel: 9900, whisper: 9900, yell: 9900, attract: 8100, beg: 8100,
+  burn: 8100, compete: 8100, consist: 8100, declare: 8100, disturb: 8100,
+  divide: 8100, gaze: 8100, guarantee: 8100, handle: 8100, harm: 8100,
+  imagine: 8100, judge: 8100, matter: 8100, push: 8100, recall: 8100,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
