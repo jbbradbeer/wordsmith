@@ -146,6 +146,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   burn: 8100, compete: 8100, consist: 8100, declare: 8100, disturb: 8100,
   divide: 8100, gaze: 8100, guarantee: 8100, handle: 8100, harm: 8100,
   imagine: 8100, judge: 8100, matter: 8100, push: 8100, recall: 8100,
+  shout: 8100, cunning: 8100, eerie: 8100, enchanting: 8100, firm: 8100,
+  surrender: 8100, trick: 8100, yield: 8100, harsh: 8100, mature: 8100,
+  advance: 6600, cheer: 6600, combine: 6600, defend: 6600, emerge: 6600,
+  excuse: 6600, exercise: 6600, exist: 6600, invite: 6600, link: 6600,
+  mark: 6600, pause: 6600, plead: 6600, reach: 6600, recover: 6600,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
