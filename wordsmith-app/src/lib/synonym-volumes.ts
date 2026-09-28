@@ -151,6 +151,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   advance: 6600, cheer: 6600, combine: 6600, defend: 6600, emerge: 6600,
   excuse: 6600, exercise: 6600, exist: 6600, invite: 6600, link: 6600,
   mark: 6600, pause: 6600, plead: 6600, reach: 6600, recover: 6600,
+  refuse: 6600, report: 6600, resemble: 6600, resign: 6600, reward: 6600,
+  secure: 6600, seem: 6600, fierce: 6600, fit: 6600, surround: 6600,
+  switch: 6600, wait: 6600, wander: 6600, wave: 6600, humble: 6600,
+  noble: 6600, novel: 6600, acknowledge: 5400, assure: 5400, boast: 5400,
+  compare: 5400, cope: 5400, cover: 5400, depend: 5400, drop: 5400,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
