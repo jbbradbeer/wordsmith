@@ -156,6 +156,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   switch: 6600, wait: 6600, wander: 6600, wave: 6600, humble: 6600,
   noble: 6600, novel: 6600, acknowledge: 5400, assure: 5400, boast: 5400,
   compare: 5400, cope: 5400, cover: 5400, depend: 5400, drop: 5400,
+  grieve: 5400, label: 5400, mourn: 5400, ponder: 5400, refine: 5400,
+  ample: 5400, average: 5400, cruel: 5400, genuine: 5400, soar: 5400,
+  stretch: 5400, strike: 5400, tremble: 5400, grim: 5400, narrow: 5400,
+  outgoing: 5400, adjust: 4400, admit: 4400, attach: 4400, climb: 4400,
+  drag: 4400, endure: 4400, exclaim: 4400, glance: 4400, melt: 4400,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
