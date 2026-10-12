@@ -161,6 +161,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   stretch: 5400, strike: 5400, tremble: 5400, grim: 5400, narrow: 5400,
   outgoing: 5400, adjust: 4400, admit: 4400, attach: 4400, climb: 4400,
   drag: 4400, endure: 4400, exclaim: 4400, glance: 4400, melt: 4400,
+  miss: 4400, protest: 4400, remark: 4400, agile: 4400, earnest: 4400,
+  flat: 4400, stumble: 4400, summon: 4400, twist: 4400, visit: 4400,
+  gruesome: 4400, hollow: 4400, moist: 4400, advise: 3600, brag: 3600,
+  charge: 3600, cook: 3600, decline: 3600, deliver: 3600, fill: 3600,
+  instruct: 3600, interfere: 3600, join: 3600, lecture: 3600, lift: 3600,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
