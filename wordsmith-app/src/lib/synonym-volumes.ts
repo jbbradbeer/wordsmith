@@ -166,6 +166,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   gruesome: 4400, hollow: 4400, moist: 4400, advise: 3600, brag: 3600,
   charge: 3600, cook: 3600, decline: 3600, deliver: 3600, fill: 3600,
   instruct: 3600, interfere: 3600, join: 3600, lecture: 3600, lift: 3600,
+  murmur: 3600, note: 3600, postpone: 3600, prefer: 3600, quarrel: 3600,
+  quit: 3600, raise: 3600, rebuild: 3600, retreat: 3600, sense: 3600,
+  shrink: 3600, awkward: 3600, slam: 3600, spin: 3600, starve: 3600,
+  stun: 3600, unite: 3600, warn: 3600, lush: 3600, neat: 3600,
+  pale: 3600, announce: 2900, chase: 2900, convince: 2900, count: 2900,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
