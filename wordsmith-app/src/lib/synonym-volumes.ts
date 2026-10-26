@@ -171,6 +171,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   shrink: 3600, awkward: 3600, slam: 3600, spin: 3600, starve: 3600,
   stun: 3600, unite: 3600, warn: 3600, lush: 3600, neat: 3600,
   pale: 3600, announce: 2900, chase: 2900, convince: 2900, count: 2900,
+  crash: 2900, distribute: 2900, freeze: 2900, glow: 2900, greet: 2900,
+  intend: 2900, lock: 2900, oblige: 2900, order: 2900, paint: 2900,
+  pledge: 2900, prescribe: 2900, proclaim: 2900, regard: 2900, repair: 2900,
+  repeat: 2900, rescue: 2900, return: 2900, save: 2900, dull: 2900,
+  fragile: 2900, skip: 2900, spring: 2900, squeeze: 2900, taste: 2900,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
