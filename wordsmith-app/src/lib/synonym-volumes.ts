@@ -176,6 +176,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   pledge: 2900, prescribe: 2900, proclaim: 2900, regard: 2900, repair: 2900,
   repeat: 2900, rescue: 2900, return: 2900, save: 2900, dull: 2900,
   fragile: 2900, skip: 2900, spring: 2900, squeeze: 2900, taste: 2900,
+  trace: 2900, urge: 2900, venture: 2900, gross: 2900, lame: 2900,
+  belong: 2400, bother: 2400, cling: 2400, creep: 2400, dig: 2400,
+  drift: 2400, enroll: 2400, extend: 2400, flee: 2400, float: 2400,
+  grab: 2400, grin: 2400, mind: 2400, occur: 2400, reunite: 2400,
+  roar: 2400, rush: 2400, settle: 2400, blunt: 2400, frigid: 2400,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
