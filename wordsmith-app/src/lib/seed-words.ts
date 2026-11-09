@@ -160,6 +160,11 @@ export const SEED_WORDS = [
   "creep", "dig", "drift", "enroll", "extend", "flee", "float", "grab",
   "grin", "mind", "occur", "reunite", "roar", "rush", "settle", "blunt",
   "frigid",
+  // Weekly SEO loop 2026-11-09 (25 words from backlog)
+  "snap", "sob", "sweep", "swell", "weep", "humid", "idle", "low",
+  "mellow", "numb", "borrow", "brief", "earn", "enclose", "interrupt", "nod",
+  "pick", "pitch", "roam", "bare", "brisk", "coarse", "compact", "slide",
+  "smash",
 ] as const;
 
 const SEED_SET = new Set<string>(SEED_WORDS);

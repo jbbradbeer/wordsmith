@@ -181,6 +181,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   drift: 2400, enroll: 2400, extend: 2400, flee: 2400, float: 2400,
   grab: 2400, grin: 2400, mind: 2400, occur: 2400, reunite: 2400,
   roar: 2400, rush: 2400, settle: 2400, blunt: 2400, frigid: 2400,
+  snap: 2400, sob: 2400, sweep: 2400, swell: 2400, weep: 2400,
+  humid: 2400, idle: 2400, low: 2400, mellow: 2400, numb: 2400,
+  borrow: 1900, brief: 1900, earn: 1900, enclose: 1900, interrupt: 1900,
+  nod: 1900, pick: 1900, pitch: 1900, roam: 1900, bare: 1900,
+  brisk: 1900, coarse: 1900, compact: 1900, slide: 1900, smash: 1900,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
