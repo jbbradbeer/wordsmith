@@ -186,6 +186,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   borrow: 1900, brief: 1900, earn: 1900, enclose: 1900, interrupt: 1900,
   nod: 1900, pick: 1900, pitch: 1900, roam: 1900, bare: 1900,
   brisk: 1900, coarse: 1900, compact: 1900, slide: 1900, smash: 1900,
+  sparkle: 1900, stare: 1900, transfer: 1900, turn: 1900, waste: 1900,
+  authentic: 12100, capable: 12100, cautious: 12100, colorful: 12100, diligent: 12100,
+  worry: 12100, lovely: 12100, massive: 12100, heal: 9900, ambitious: 9900,
+  blissful: 9900, energetic: 9900, ethical: 9900, frantic: 9900, vary: 9900,
+  awful: 8100, delay: 8100, deny: 8100, experiment: 8100, grant: 8100,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
