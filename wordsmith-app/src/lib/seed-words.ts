@@ -170,6 +170,11 @@ export const SEED_WORDS = [
   "colorful", "diligent", "worry", "lovely", "massive", "heal", "ambitious", "blissful",
   "energetic", "ethical", "frantic", "vary", "awful", "delay", "deny", "experiment",
   "grant",
+  // Weekly SEO loop 2026-11-23 (25 words from backlog)
+  "plant", "satisfy", "adorable", "flexible", "logical", "notable", "classic", "cozy",
+  "gloomy", "obedient", "obey", "pity", "crowded", "distant", "faithful", "gracious",
+  "greedy", "apply", "arrive", "basic", "comment", "live", "reply", "decent",
+  "supply",
 ] as const;
 
 const SEED_SET = new Set<string>(SEED_WORDS);

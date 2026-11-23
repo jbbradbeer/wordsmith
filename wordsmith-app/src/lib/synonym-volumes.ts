@@ -191,6 +191,11 @@ export const SYNONYM_VOLUMES: Record<string, number> = {
   worry: 12100, lovely: 12100, massive: 12100, heal: 9900, ambitious: 9900,
   blissful: 9900, energetic: 9900, ethical: 9900, frantic: 9900, vary: 9900,
   awful: 8100, delay: 8100, deny: 8100, experiment: 8100, grant: 8100,
+  plant: 8100, satisfy: 8100, adorable: 8100, flexible: 8100, logical: 8100,
+  notable: 8100, classic: 6600, cozy: 6600, gloomy: 6600, obedient: 6600,
+  obey: 5400, pity: 5400, crowded: 5400, distant: 5400, faithful: 5400,
+  gracious: 5400, greedy: 5400, apply: 4400, arrive: 4400, basic: 4400,
+  comment: 4400, live: 4400, reply: 4400, decent: 4400, supply: 4400,
 };
 
 /** Seed words ordered by descending "synonyms for" volume (unknowns last). */
